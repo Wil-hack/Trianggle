@@ -291,7 +291,7 @@
       transform: scale(0.98);
     }
 
-    /* CHAT MODAL RAPI & ELEGAN */
+    /* CHAT MODAL RAPI */
     .chat-backdrop {
       align-items: center;
       padding: 10px;
@@ -299,7 +299,7 @@
     .chat-card-full {
       width: 96%;
       max-width: 440px;
-      height: 84vh; /* Tinggi pas di layar HP */
+      height: 84vh;
       max-height: 720px;
       background: rgba(16, 18, 26, 0.88);
       backdrop-filter: blur(25px);
@@ -367,6 +367,7 @@
       line-height: 1.4;
       box-shadow: 0 4px 10px rgba(0,0,0,0.25);
       position: relative;
+      word-break: break-word;
     }
     .msg-in {
       background: rgba(255, 255, 255, 0.12);
@@ -559,7 +560,7 @@
         </div>
       </div>
       <div class="chat-body-full" id="chat-body">
-        <div class="msg msg-in">Halo! Selamat datang di TriHive chat.</div>
+        <!-- Pesan real-time dari Firebase akan muncul di sini -->
       </div>
       <div class="chat-footer-full">
         <input type="text" id="chat-input" placeholder="Ketik pesan..." onkeypress="handleKey(event)">
@@ -578,7 +579,23 @@
     </div>
   </div>
 
-  <script>
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, push, onChildAdded, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBfAvdE0PZMvytkSaofbFAgk0749E-b_pI",
+      authDomain: "trihive-857cd.firebaseapp.com",
+      projectId: "trihive-857cd",
+      storageBucket: "trihive-857cd.firebasestorage.app",
+      messagingSenderId: "434709340496",
+      appId: "1:434709340496:web:3e1206dc10679ddc680c55"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
     const contacts = [
       { id: 1, name: "Siti Rahma", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80" },
       { id: 2, name: "Budi Santoso", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80" },
@@ -589,7 +606,9 @@
     ];
 
     let activeContact = null;
+    let currentUser = "wildan";
     let selectedAvatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
+    let messageListenerRef = null;
 
     function buildGrid() {
       const grid = document.getElementById('grid');
@@ -669,7 +688,7 @@
 
     window.addEventListener('touchend', endPan);
 
-    function handleFileUpload(e) {
+    window.handleFileUpload = function(e) {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
@@ -683,20 +702,21 @@
       }
     }
 
-    function switchTab(tab) {
+    window.switchTab = function(tab) {
       document.getElementById('tab-login').classList.toggle('active', tab === 'login');
       document.getElementById('tab-register').classList.toggle('active', tab === 'register');
       document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
       document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
     }
 
-    function submitLogin() {
-      const user = document.getElementById('login-username').value || "Pengguna";
-      loginUser(user, selectedAvatarUrl);
+    window.submitLogin = function() {
+      currentUser = document.getElementById('login-username').value.trim() || "wildan";
+      loginUser(currentUser, selectedAvatarUrl);
     }
 
-    function submitRegister() {
-      const name = document.getElementById('reg-fullname').value || "Pengguna Baru";
+    window.submitRegister = function() {
+      currentUser = document.getElementById('reg-username').value.trim() || "user_baru";
+      const name = document.getElementById('reg-fullname').value || currentUser;
       loginUser(name, selectedAvatarUrl);
     }
 
@@ -707,58 +727,87 @@
       document.getElementById('current-user-avatar').src = avatar;
     }
 
-    function logout() {
+    window.logout = function() {
       document.getElementById('user-pill').style.display = 'none';
       document.getElementById('login-modal').classList.add('active');
     }
 
-    function openProfile(person) {
+    window.openProfile = function(person) {
       activeContact = person;
       document.getElementById('preview-name').innerText = person.name;
       document.getElementById('preview-avatar').src = person.avatar;
       document.getElementById('profile-modal').classList.add('active');
     }
 
-    function openChat() {
+    window.openChat = function() {
       closeModals();
       document.getElementById('chat-name').innerText = activeContact.name;
       document.getElementById('chat-avatar').src = activeContact.avatar;
       document.getElementById('chat-modal').classList.add('active');
+      loadMessages();
     }
 
-    function startCall() {
+    function getRoomId(userA, userB) {
+      return [userA, userB].sort().join('_');
+    }
+
+    function loadMessages() {
+      const chatBody = document.getElementById('chat-body');
+      chatBody.innerHTML = '';
+
+      const roomId = getRoomId(currentUser, activeContact.name);
+      const messagesRef = ref(db, 'chats/' + roomId);
+
+      if (messageListenerRef) {
+        // Hapus listener sebelumnya jika ganti kontak
+      }
+
+      onChildAdded(messagesRef, (snapshot) => {
+        const data = snapshot.val();
+        const msgDiv = document.createElement('div');
+        const isMe = data.sender === currentUser;
+        msgDiv.className = `msg ${isMe ? 'msg-out' : 'msg-in'}`;
+        msgDiv.innerHTML = `${data.text}${isMe ? '<span class="msg-status">✓✓</span>' : ''}`;
+        chatBody.appendChild(msgDiv);
+        chatBody.scrollTop = chatBody.scrollHeight;
+      });
+    }
+
+    window.sendMsg = function() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text || !activeContact) return;
+
+      const roomId = getRoomId(currentUser, activeContact.name);
+      const messagesRef = ref(db, 'chats/' + roomId);
+
+      push(messagesRef, {
+        sender: currentUser,
+        text: text,
+        timestamp: Date.now()
+      });
+
+      input.value = '';
+    }
+
+    window.handleKey = function(e) {
+      if (e.key === 'Enter') window.sendMsg();
+    }
+
+    window.startCall = function() {
       document.getElementById('call-name').innerText = activeContact.name;
       document.getElementById('call-avatar').src = activeContact.avatar;
       document.getElementById('call-modal').classList.add('active');
     }
 
-    function endCall() {
+    window.endCall = function() {
       document.getElementById('call-modal').classList.remove('active');
     }
 
-    function closeModals() {
+    window.closeModals = function() {
       document.querySelectorAll('.modal-backdrop').forEach(m => {
         if (m.id !== 'login-modal') m.classList.remove('active');
       });
-    }
-
-    function sendMsg() {
-      const input = document.getElementById('chat-input');
-      const text = input.value.trim();
-      if (!text) return;
-
-      const body = document.getElementById('chat-body');
-      const msgOut = document.createElement('div');
-      msgOut.className = 'msg msg-out';
-      msgOut.innerHTML = `${text}<span class="msg-status">✓✓</span>`;
-      body.appendChild(msgOut);
-
-      input.value = '';
-      body.scrollTop = body.scrollHeight;
-    }
-
-    function handleKey(e) {
-      if (e.key === 'Enter') sendMsg();
     }
 
     buildGrid();
