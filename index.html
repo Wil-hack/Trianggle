@@ -539,9 +539,10 @@
     </div>
   </div>
 
-  <!-- AUDIO ELEMENT UNTUK NOTIFIKASI & RINGING -->
+  <!-- AUDIO ELEMENTS -->
   <audio id="notif-audio" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
   <audio id="ring-audio" src="https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3" loop preload="auto"></audio>
+  <audio id="remote-audio" autoplay playsinline></audio>
 
   <!-- LOGIN / REGISTER MODAL -->
   <div class="modal-backdrop active" id="login-modal">
@@ -634,7 +635,7 @@
     </div>
   </div>
 
-  <!-- CHAT MODAL RAPI -->
+  <!-- CHAT MODAL -->
   <div class="modal-backdrop chat-backdrop" id="chat-modal">
     <div class="chat-card-full">
       <div class="chat-header-full">
@@ -708,13 +709,37 @@
     let currentAvatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
     let tempUploadAvatar = "";
     let unreadCounts = {};
-    let currentCallId = null;
+    let activeListeners = {};
+
+    let peerConnection = null;
+    let localStream = null;
+    let targetUser = null;
+    const rtcConfig = {
+      iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+    };
+
+    function unlockAudio() {
+      const notifAudio = document.getElementById('notif-audio');
+      const ringAudio = document.getElementById('ring-audio');
+      if (notifAudio) {
+        notifAudio.play().then(() => {
+          notifAudio.pause();
+          notifAudio.currentTime = 0;
+        }).catch(() => {});
+      }
+      if (ringAudio) {
+        ringAudio.play().then(() => {
+          ringAudio.pause();
+          ringAudio.currentTime = 0;
+        }).catch(() => {});
+      }
+    }
 
     function playNotificationSound() {
       const audio = document.getElementById('notif-audio');
       if (audio) {
         audio.currentTime = 0;
-        audio.play().catch(e => console.log("Audio blocked:", e));
+        audio.play().catch(e => console.log("Audio notify blocked:", e));
       }
     }
 
@@ -849,7 +874,7 @@
     }
 
     window.submitLogin = function() {
-      playNotificationSound(); // Interaksi sentuhan pertama membuka izin audio
+      unlockAudio();
       const inputUsername = document.getElementById('login-username').value.trim().toLowerCase();
       if (!inputUsername) {
         alert("Masukkan username unik Anda!");
@@ -875,7 +900,7 @@
     }
 
     window.submitRegister = function() {
-      playNotificationSound(); // Interaksi sentuhan pertama membuka izin audio
+      unlockAudio();
       const regUsername = document.getElementById('reg-username').value.trim().toLowerCase();
       const regFullname = document.getElementById('reg-fullname').value.trim() || regUsername;
 
@@ -939,8 +964,16 @@
     }
 
     function listenIncomingMessages(contactUsername) {
+      if (activeListeners[contactUsername]) return;
+      activeListeners[contactUsername] = true;
+
       const roomId = getRoomId(currentUser, contactUsername);
       const messagesRef = ref(db, `chats/${roomId}`);
+
+      let initialLoad = true;
+      get(messagesRef).then(() => {
+        initialLoad = false;
+      });
 
       onChildAdded(messagesRef, (snapshot) => {
         const data = snapshot.val();
@@ -948,7 +981,9 @@
           const isChatOpen = activeContact && activeContact.username === contactUsername && document.getElementById('chat-modal').classList.contains('active');
           
           if (!isChatOpen) {
-            playNotificationSound();
+            if (!initialLoad) {
+              playNotificationSound();
+            }
             unreadCounts[contactUsername] = (unreadCounts[contactUsername] || 0) + 1;
             buildGrid();
           }
@@ -956,70 +991,187 @@
       });
     }
 
-    // LISTENER PANGGILAN MASUK (REALTIME DATABASE)
     function listenIncomingCalls() {
       const callsRef = ref(db, `calls/${currentUser}`);
       onValue(callsRef, (snapshot) => {
         const callData = snapshot.val();
         if (callData && callData.status === 'calling') {
-          currentCallId = callData.caller;
+          targetUser = callData.caller;
           playRingingSound();
           document.getElementById('incoming-name').innerText = callData.callerName;
           document.getElementById('incoming-avatar').src = callData.callerAvatar;
           document.getElementById('incoming-call-modal').classList.add('active');
         } else if (!callData) {
           stopRingingSound();
+          cleanupWebRTC();
           document.getElementById('incoming-call-modal').classList.remove('active');
           document.getElementById('call-modal').classList.remove('active');
         }
       });
+
+      const signalRef = ref(db, `webrtc_signals/${currentUser}`);
+      onValue(signalRef, async (snapshot) => {
+        const data = snapshot.val();
+        if (!data || !peerConnection) return;
+
+        if (data.answer && !peerConnection.currentRemoteDescription) {
+          const remoteDesc = new RTCSessionDescription(data.answer);
+          await peerConnection.setRemoteDescription(remoteDesc);
+          document.getElementById('call-status-text').innerText = "Terhubung (Suara Live)";
+          stopRingingSound();
+        }
+
+        if (data.candidate) {
+          try {
+            await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+          } catch (e) {
+            console.error("Error adding ice candidate", e);
+          }
+        }
+      });
     }
 
-    window.startCall = function() {
-      if (!activeContact) return;
-      currentCallId = activeContact.username;
-      playRingingSound();
+    async function initLocalAudio() {
+      try {
+        localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      } catch (err) {
+        alert("Mohon izinkan akses Mikrofon di browser HP Anda!");
+        throw err;
+      }
+    }
 
-      set(ref(db, `calls/${activeContact.username}`), {
+    function createPeerConnection() {
+      peerConnection = new RTCPeerConnection(rtcConfig);
+
+      if (localStream) {
+        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+      }
+
+      peerConnection.ontrack = (event) => {
+        const remoteAudio = document.getElementById('remote-audio');
+        if (remoteAudio && event.streams[0]) {
+          remoteAudio.srcObject = event.streams[0];
+        }
+      };
+
+      peerConnection.onicecandidate = (event) => {
+        if (event.candidate && targetUser) {
+          push(ref(db, `webrtc_signals/${targetUser}/candidates`), event.candidate.toJSON());
+        }
+      };
+    }
+
+    window.startCall = async function() {
+      if (!activeContact) return;
+      targetUser = activeContact.username;
+
+      try {
+        await initLocalAudio();
+      } catch (e) { return; }
+
+      playRingingSound();
+      createPeerConnection();
+
+      const offer = await peerConnection.createOffer();
+      await peerConnection.setLocalDescription(offer);
+
+      set(ref(db, `calls/${targetUser}`), {
         caller: currentUser,
         callerName: currentDisplayName,
         callerAvatar: currentAvatarUrl,
         status: 'calling'
       });
 
+      set(ref(db, `webrtc_signals/${targetUser}`), {
+        offer: { type: offer.type, sdp: offer.sdp }
+      });
+
       document.getElementById('call-name').innerText = activeContact.name;
       document.getElementById('call-avatar').src = activeContact.avatar;
       document.getElementById('call-status-text').innerText = "Memanggil...";
       document.getElementById('call-modal').classList.add('active');
+
+      const candRef = ref(db, `webrtc_signals/${currentUser}/candidates`);
+      onChildAdded(candRef, (snapshot) => {
+        const candidate = snapshot.val();
+        if (candidate && peerConnection) {
+          peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+        }
+      });
     }
 
-    window.acceptCall = function() {
+    window.acceptCall = async function() {
       stopRingingSound();
-      playNotificationSound();
       document.getElementById('incoming-call-modal').classList.remove('active');
 
-      set(ref(db, `calls/${currentUser}`), {
-        status: 'connected'
-      });
+      try {
+        await initLocalAudio();
+      } catch (e) { return; }
+
+      createPeerConnection();
+
+      const offerSnap = await get(ref(db, `webrtc_signals/${currentUser}/offer`));
+      if (offerSnap.exists()) {
+        const offer = offerSnap.val();
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+
+        update(ref(db, `webrtc_signals/${targetUser}`), {
+          answer: { type: answer.type, sdp: answer.sdp }
+        });
+
+        const candRef = ref(db, `webrtc_signals/${currentUser}/candidates`);
+        onChildAdded(candRef, (snapshot) => {
+          const candidate = snapshot.val();
+          if (candidate && peerConnection) {
+            peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+          }
+        });
+      }
+
+      set(ref(db, `calls/${currentUser}`), { status: 'connected' });
 
       document.getElementById('call-name').innerText = document.getElementById('incoming-name').innerText;
       document.getElementById('call-avatar').src = document.getElementById('incoming-avatar').src;
-      document.getElementById('call-status-text').innerText = "Terhubung (Suara Aktif)";
+      document.getElementById('call-status-text').innerText = "Terhubung (Suara Live)";
       document.getElementById('call-modal').classList.add('active');
     }
 
     window.rejectCall = function() {
       stopRingingSound();
       remove(ref(db, `calls/${currentUser}`));
+      remove(ref(db, `webrtc_signals/${currentUser}`));
       document.getElementById('incoming-call-modal').classList.remove('active');
+    }
+
+    function cleanupWebRTC() {
+      if (peerConnection) {
+        peerConnection.close();
+        peerConnection = null;
+      }
+      if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = null;
+      }
+      const remoteAudio = document.getElementById('remote-audio');
+      if (remoteAudio) remoteAudio.srcObject = null;
     }
 
     window.endCall = function() {
       stopRingingSound();
+      if (targetUser) {
+        remove(ref(db, `calls/${targetUser}`));
+        remove(ref(db, `webrtc_signals/${targetUser}`));
+      }
       if (activeContact) {
         remove(ref(db, `calls/${activeContact.username}`));
+        remove(ref(db, `webrtc_signals/${activeContact.username}`));
       }
       remove(ref(db, `calls/${currentUser}`));
+      remove(ref(db, `webrtc_signals/${currentUser}`));
+      cleanupWebRTC();
       document.getElementById('call-modal').classList.remove('active');
     }
 
@@ -1095,6 +1247,7 @@
       currentUser = null;
       contacts = [];
       unreadCounts = {};
+      activeListeners = {};
       buildGrid();
       document.getElementById('user-pill').style.display = 'none';
       closeModals();
