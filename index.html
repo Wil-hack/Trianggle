@@ -431,7 +431,7 @@
       background: rgba(10, 11, 15, 0.5);
       border-top: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
     }
     .chat-footer-full input {
@@ -444,7 +444,7 @@
       outline: none;
       font-size: 0.88rem;
     }
-    .chat-footer-full button {
+    .btn-chat-action {
       background: #3b82f6;
       border: none;
       width: 42px;
@@ -456,6 +456,17 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-shrink: 0;
+    }
+    .btn-mic {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #ef4444;
+    }
+    .btn-mic.recording {
+      background: #ef4444;
+      color: white;
+      animation: pulse 1s infinite;
     }
 
     .call-card {
@@ -654,7 +665,8 @@
       <div class="chat-body-full" id="chat-body"></div>
       <div class="chat-footer-full">
         <input type="text" id="chat-input" placeholder="Ketik pesan..." onkeypress="handleKey(event)">
-        <button onclick="sendMsg()">➔</button>
+        <button class="btn-chat-action btn-mic" id="btn-mic" onclick="toggleVoiceRecord()" title="Kirim Pesan Suara">🎤</button>
+        <button class="btn-chat-action" onclick="sendMsg()" title="Kirim">➔</button>
       </div>
     </div>
   </div>
@@ -714,6 +726,10 @@
     let peerConnection = null;
     let localStream = null;
     let targetUser = null;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+
     const rtcConfig = {
       iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
     };
@@ -1175,6 +1191,61 @@
       document.getElementById('call-modal').classList.remove('active');
     }
 
+    // FITUR REKAM & KIRIM PESAN SUARA (VOICE NOTE)
+    window.toggleVoiceRecord = async function() {
+      const micBtn = document.getElementById('btn-mic');
+      if (!isRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+
+          mediaRecorder.ondataavailable = event => {
+            audioChunks.push(event.data);
+          };
+
+          mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            const reader = new FileReader();
+            reader.readAsDataURL(audioBlob);
+            reader.onloadend = function() {
+              const base64Audio = reader.result;
+              sendVoiceMessage(base64Audio);
+            };
+            // Matikan track mikrofon
+            stream.getTracks().forEach(track => track.stop());
+          };
+
+          mediaRecorder.start();
+          isRecording = true;
+          micBtn.classList.add('recording');
+          micBtn.title = "Ketuk untuk Berhenti & Kirim";
+        } catch (e) {
+          alert("Gagal mengakses mikrofon: " + e.message);
+        }
+      } else {
+        if (mediaRecorder) {
+          mediaRecorder.stop();
+        }
+        isRecording = false;
+        micBtn.classList.remove('recording');
+        micBtn.title = "Kirim Pesan Suara";
+      }
+    }
+
+    function sendVoiceMessage(audioBase64) {
+      if (!activeContact) return;
+      const roomId = getRoomId(currentUser, activeContact.username);
+      const messagesRef = ref(db, `chats/${roomId}`);
+
+      push(messagesRef, {
+        sender: currentUser,
+        type: 'voice',
+        audio: audioBase64,
+        timestamp: Date.now()
+      });
+    }
+
     window.openEditProfileModal = function() {
       document.getElementById('edit-username-id').innerText = `@${currentUser}`;
       document.getElementById('edit-fullname').value = currentDisplayName;
@@ -1286,10 +1357,31 @@
         const msgDiv = document.createElement('div');
         const isMe = data.sender === currentUser;
         msgDiv.className = `msg ${isMe ? 'msg-out' : 'msg-in'}`;
-        msgDiv.innerHTML = `${data.text}${isMe ? '<span class="msg-status">✓✓</span>' : ''}`;
+
+        if (data.type === 'voice') {
+          msgDiv.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button onclick="playVoice(this, '${data.audio}')" style="background:#10b981; border:none; color:white; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:0.9rem;">▶</button>
+              <span>🎤 Pesan Suara</span>
+            </div>
+            ${isMe ? '<span class="msg-status">✓✓</span>' : ''}
+          `;
+        } else {
+          msgDiv.innerHTML = `${data.text}${isMe ? '<span class="msg-status">✓✓</span>' : ''}`;
+        }
+
         chatBody.appendChild(msgDiv);
         chatBody.scrollTop = chatBody.scrollHeight;
       });
+    }
+
+    window.playVoice = function(btn, base64Audio) {
+      const audio = new Audio(base64Audio);
+      btn.innerText = "⏸";
+      audio.play();
+      audio.onended = () => {
+        btn.innerText = "▶";
+      };
     }
 
     window.sendMsg = function() {
@@ -1302,6 +1394,7 @@
 
       push(messagesRef, {
         sender: currentUser,
+        type: 'text',
         text: text,
         timestamp: Date.now()
       });
