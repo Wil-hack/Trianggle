@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>TriHive - Web Chat & Voice Call</title>
   <style>
     * {
@@ -168,7 +168,7 @@
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 16px;
+      border-radius: 20px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
       color: #e2e8f0;
       width: 90%;
@@ -291,39 +291,42 @@
       transform: scale(0.98);
     }
 
-    /* FULLSCREEN TRANSPARENT BLUR CHAT MODAL */
+    /* CHAT MODAL PROPORSIONAL & TIDAK OFFSCREEN */
     .chat-backdrop {
-      align-items: flex-end;
-      padding: 0;
+      align-items: center;
+      padding: 12px;
     }
     .chat-card-full {
-      width: 100vw;
-      height: 100vh;
-      background: rgba(13, 14, 18, 0.65); /* Transparan */
-      backdrop-filter: blur(20px); /* Efek Blur Sangat Halus */
-      -webkit-backdrop-filter: blur(20px);
-      border: none;
+      width: 95%;
+      max-width: 420px;
+      height: 88vh; /* Proporsional 88% tinggi layar HP */
+      max-height: 750px;
+      background: rgba(18, 20, 28, 0.82); /* Transparan translusen */
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
     }
     .chat-header-full {
-      padding: 16px 20px;
-      background: rgba(255, 255, 255, 0.05);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 14px 18px;
+      background: rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-top: 0;
     }
     .chat-user-full {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
     .chat-user-full img {
-      width: 40px;
-      height: 40px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       object-fit: cover;
       border: 2px solid #3b82f6;
@@ -331,16 +334,16 @@
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
     }
     .btn-icon-call {
       background: #10b981;
       border: none;
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       color: white;
-      font-size: 1.1rem;
+      font-size: 1rem;
       cursor: pointer;
       display: flex;
       justify-content: center;
@@ -349,25 +352,23 @@
     }
     .chat-body-full {
       flex: 1;
-      padding: 20px;
+      padding: 16px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       touch-action: pan-y;
     }
     .msg {
-      max-width: 78%;
-      padding: 12px 16px;
+      max-width: 80%;
+      padding: 10px 14px;
       border-radius: 16px;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       line-height: 1.4;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
     }
     .msg-in {
       background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
       color: #f8fafc;
       align-self: flex-start;
       border-bottom-left-radius: 4px;
@@ -380,32 +381,31 @@
       border-bottom-right-radius: 4px;
     }
     .chat-footer-full {
-      padding: 14px 20px;
-      background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      padding: 12px 14px;
+      padding-bottom: max(12px, env(safe-area-inset-bottom)); /* Aman dari gesture bar HP */
+      background: rgba(0, 0, 0, 0.35);
       border-top: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
-      gap: 10px;
+      gap: 8px;
     }
     .chat-footer-full input {
       flex: 1;
-      padding: 12px 18px;
-      background: rgba(13, 14, 18, 0.7);
+      padding: 10px 16px;
+      background: rgba(13, 14, 18, 0.8);
       border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 25px;
+      border-radius: 20px;
       color: white;
       outline: none;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
     }
     .chat-footer-full button {
       background: #3b82f6;
       border: none;
-      width: 44px;
-      height: 44px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       color: white;
-      font-size: 1.1rem;
+      font-size: 1rem;
       cursor: pointer;
       display: flex;
       justify-content: center;
@@ -515,7 +515,7 @@
     </div>
   </div>
 
-  <!-- PROFILE PREVIEW MODAL (DENGAN 1 TOMBOL 'NGOBROL') -->
+  <!-- PROFILE PREVIEW MODAL -->
   <div class="modal-backdrop" id="profile-modal">
     <div class="profile-card">
       <button class="close-btn" onclick="closeModals()">✕</button>
@@ -526,20 +526,20 @@
     </div>
   </div>
 
-  <!-- FULLSCREEN BLUR CHAT MODAL -->
+  <!-- FULLSCREEN BLUR CHAT MODAL (PROPORSIONAL PAS DI HP) -->
   <div class="modal-backdrop chat-backdrop" id="chat-modal">
     <div class="chat-card-full">
       <div class="chat-header-full">
         <div class="chat-user-full">
           <img id="chat-avatar" src="" alt="Avatar">
           <div>
-            <h4 id="chat-name" style="color:white; font-size:1rem; font-weight:600;">Nama Kontak</h4>
+            <h4 id="chat-name" style="color:white; font-size:0.95rem; font-weight:600;">Nama Kontak</h4>
             <span style="color:#10b981; font-size:0.75rem;">Online</span>
           </div>
         </div>
         <div class="header-actions">
           <button class="btn-icon-call" onclick="startCall()" title="Panggil Suara">📞</button>
-          <button class="close-btn" style="position:static; font-size:1.5rem;" onclick="closeModals()">✕</button>
+          <button class="close-btn" style="position:static; font-size:1.4rem;" onclick="closeModals()">✕</button>
         </div>
       </div>
       <div class="chat-body-full" id="chat-body">
@@ -613,7 +613,7 @@
       }
     }
 
-    // CANVAS PANNING (MOUSE + TOUCH)
+    // CANVAS PANNING
     const viewport = document.getElementById('viewport');
     const canvas = document.getElementById('canvas');
     let isPanning = false, startX = 0, startY = 0, panX = -100, panY = -100;
