@@ -40,7 +40,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 20px;
+      padding: 0 16px;
       z-index: 100;
     }
     .brand-title {
@@ -50,14 +50,33 @@
       text-transform: lowercase;
       color: #f8fafc;
     }
-    .user-pill {
+    .header-controls {
       display: flex;
       align-items: center;
       gap: 10px;
+    }
+    .btn-add-contact {
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      color: #3b82f6;
+      padding: 6px 12px;
+      border-radius: 18px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       background: rgba(255, 255, 255, 0.05);
-      padding: 4px 12px;
+      padding: 4px 10px;
       border-radius: 20px;
       border: 1px solid rgba(255, 255, 255, 0.1);
+      cursor: pointer;
     }
     .user-pill img {
       width: 28px;
@@ -68,14 +87,7 @@
     .user-pill span {
       font-size: 0.85rem;
     }
-    .btn-logout {
-      background: transparent;
-      border: none;
-      color: #ef4444;
-      cursor: pointer;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
+
     #viewport {
       width: 100vw;
       height: 100vh;
@@ -139,6 +151,7 @@
       height: 100%;
       object-fit: cover;
     }
+
     .modal-backdrop {
       position: fixed;
       top: 0;
@@ -162,9 +175,9 @@
       pointer-events: auto;
     }
 
-    /* LOGIN MODAL */
-    .login-card {
-      background: rgba(22, 24, 34, 0.85);
+    /* CARD MODALS */
+    .card-modal {
+      background: rgba(22, 24, 34, 0.88);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.12);
@@ -175,9 +188,11 @@
       max-width: 380px;
       padding: 24px;
       text-align: center;
+      position: relative;
     }
-    .login-card h2 { font-size: 1.4rem; margin-bottom: 6px; }
-    .login-card p { font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px; }
+    .card-modal h2 { font-size: 1.4rem; margin-bottom: 6px; }
+    .card-modal p { font-size: 0.85rem; color: #94a3b8; margin-bottom: 18px; }
+    
     .tab-group {
       display: flex;
       background: rgba(255, 255, 255, 0.05);
@@ -197,6 +212,7 @@
       cursor: pointer;
     }
     .tab-btn.active { background: #3b82f6; color: white; }
+
     .form-group { margin-bottom: 14px; text-align: left; }
     .form-group label { display: block; font-size: 0.75rem; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; }
     .form-group input {
@@ -223,8 +239,8 @@
       margin-bottom: 10px;
     }
     .upload-preview {
-      width: 60px;
-      height: 60px;
+      width: 65px;
+      height: 65px;
       border-radius: 50%;
       object-fit: cover;
       margin: 8px auto;
@@ -236,11 +252,21 @@
       padding: 12px;
       background: #3b82f6;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       color: white;
       font-weight: 600;
       cursor: pointer;
       margin-top: 10px;
+    }
+    .close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.3rem;
+      cursor: pointer;
     }
 
     /* PROFILE PREVIEW MODAL */
@@ -255,16 +281,6 @@
       padding: 28px 24px;
       text-align: center;
       position: relative;
-    }
-    .close-btn {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: transparent;
-      border: none;
-      color: #94a3b8;
-      font-size: 1.3rem;
-      cursor: pointer;
     }
     .profile-card img {
       width: 85px;
@@ -286,9 +302,6 @@
       color: white;
       box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35);
       transition: transform 0.2s;
-    }
-    .btn-ngobrol:active {
-      transform: scale(0.98);
     }
 
     /* CHAT MODAL RAPI */
@@ -410,10 +423,6 @@
       outline: none;
       font-size: 0.88rem;
     }
-    .chat-footer-full input:focus {
-      border-color: #3b82f6;
-      background: rgba(255, 255, 255, 0.1);
-    }
     .chat-footer-full button {
       background: #3b82f6;
       border: none;
@@ -426,7 +435,6 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
     }
 
     /* CALL MODAL */
@@ -480,10 +488,12 @@
     <div class="brand">
       <span class="brand-title">trihive</span>
     </div>
-    <div class="user-pill" id="user-pill" style="display: none;">
-      <img id="current-user-avatar" src="" alt="Avatar">
-      <span id="current-user-name">Pengguna</span>
-      <button class="btn-logout" onclick="logout()">Keluar</button>
+    <div class="header-controls">
+      <button class="btn-add-contact" onclick="openAddContactModal()">+ Kontak</button>
+      <div class="user-pill" id="user-pill" style="display: none;" onclick="openEditProfileModal()">
+        <img id="current-user-avatar" src="" alt="Avatar">
+        <span id="current-user-name">Pengguna</span>
+      </div>
     </div>
   </header>
 
@@ -493,9 +503,9 @@
     </div>
   </div>
 
-  <!-- LOGIN MODAL -->
+  <!-- LOGIN / REGISTER MODAL -->
   <div class="modal-backdrop active" id="login-modal">
-    <div class="login-card">
+    <div class="card-modal">
       <h2>Masuk Ke TriHive</h2>
       <p>Aplikasi Chat & Telepon Mosaik Segitiga</p>
       
@@ -504,31 +514,73 @@
         <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Daftar</button>
       </div>
 
+      <!-- FORM MASUK -->
       <div id="form-login">
         <div class="form-group">
-          <label>Username</label>
-          <input type="text" id="login-username" placeholder="Masukkan username..." value="wildan">
+          <label>Username Unik</label>
+          <input type="text" id="login-username" placeholder="Masukkan username unik...">
         </div>
         <button class="btn-submit" onclick="submitLogin()">Masuk</button>
       </div>
 
+      <!-- FORM DAFTAR -->
       <div id="form-register" style="display: none;">
         <div class="form-group">
-          <label>Nama Lengkap</label>
-          <input type="text" id="reg-fullname" placeholder="Contoh: Wildan Jaka">
+          <label>Username Unik (Permanen / ID)</label>
+          <input type="text" id="reg-username" placeholder="Contoh: wildan_jaka">
         </div>
         <div class="form-group">
-          <label>Username</label>
-          <input type="text" id="reg-username" placeholder="Buat username...">
+          <label>Nama Tampilan</label>
+          <input type="text" id="reg-fullname" placeholder="Contoh: Wildan Jaka">
         </div>
         <div class="form-group">
           <label>Foto Profil (Upload HP)</label>
           <label for="file-input" class="btn-file-upload">📁 Pilih Foto dari HP</label>
-          <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="handleFileUpload(event)">
+          <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="handleFileUpload(event, 'upload-preview')">
           <img id="upload-preview" class="upload-preview" alt="Preview">
         </div>
-        <button class="btn-submit" onclick="submitRegister()">Daftar & Masuk</button>
+        <button class="btn-submit" onclick="submitRegister()">Daftar Akun Baru</button>
       </div>
+    </div>
+  </div>
+
+  <!-- EDIT PROFILE MODAL -->
+  <div class="modal-backdrop" id="edit-profile-modal">
+    <div class="card-modal">
+      <button class="close-btn" onclick="closeModals()">✕</button>
+      <h2>Ubah Profil</h2>
+      <p>ID Username: <strong id="edit-username-id" style="color:#3b82f6;">-</strong> (Permanen)</p>
+
+      <div class="form-group">
+        <label>Nama Tampilan Baru</label>
+        <input type="text" id="edit-fullname" placeholder="Masukkan nama baru...">
+      </div>
+
+      <div class="form-group">
+        <label>Ganti Foto Profil</label>
+        <label for="file-edit-input" class="btn-file-upload">📁 Pilih Foto Baru dari HP</label>
+        <input type="file" id="file-edit-input" accept="image/*" style="display: none;" onchange="handleFileUpload(event, 'edit-upload-preview')">
+        <img id="edit-upload-preview" class="upload-preview" alt="Preview">
+      </div>
+
+      <button class="btn-submit" onclick="saveProfileChanges()">Simpan Perubahan</button>
+      <button class="btn-submit" style="background:#ef4444; margin-top:8px;" onclick="logout()">Keluar Akun</button>
+    </div>
+  </div>
+
+  <!-- TAMBAH KONTAK MODAL -->
+  <div class="modal-backdrop" id="add-contact-modal">
+    <div class="card-modal">
+      <button class="close-btn" onclick="closeModals()">✕</button>
+      <h2>Tambah Kontak Baru</h2>
+      <p>Masukkan username teman yang terdaftar di TriHive</p>
+
+      <div class="form-group">
+        <label>Username Teman</label>
+        <input type="text" id="add-contact-username" placeholder="Masukkan username teman...">
+      </div>
+
+      <button class="btn-submit" onclick="submitAddContact()">+ Tambahkan Kontak</button>
     </div>
   </div>
 
@@ -537,7 +589,8 @@
     <div class="profile-card">
       <button class="close-btn" onclick="closeModals()">✕</button>
       <img id="preview-avatar" src="" alt="Avatar">
-      <h3 id="preview-name" style="margin-bottom: 4px; font-size:1.2rem;">Nama Kontak</h3>
+      <h3 id="preview-name" style="margin-bottom: 2px; font-size:1.2rem;">Nama Kontak</h3>
+      <p id="preview-username-id" style="color: #94a3b8; font-size: 0.75rem; margin-bottom: 6px;">@username</p>
       <p style="color: #10b981; font-size: 0.85rem; margin-bottom: 20px;">● Online</p>
       <button class="btn-ngobrol" onclick="openChat()">Ngobrol</button>
     </div>
@@ -559,9 +612,7 @@
           <button class="close-btn" style="position:static; font-size:1.4rem;" onclick="closeModals()">✕</button>
         </div>
       </div>
-      <div class="chat-body-full" id="chat-body">
-        <!-- Pesan real-time dari Firebase akan muncul di sini -->
-      </div>
+      <div class="chat-body-full" id="chat-body"></div>
       <div class="chat-footer-full">
         <input type="text" id="chat-input" placeholder="Ketik pesan..." onkeypress="handleKey(event)">
         <button onclick="sendMsg()">➔</button>
@@ -582,7 +633,7 @@
   <!-- Firebase SDKs -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, onChildAdded, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push, onChildAdded, set, get, update, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBfAvdE0PZMvytkSaofbFAgk0749E-b_pI",
@@ -596,19 +647,12 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const contacts = [
-      { id: 1, name: "Siti Rahma", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80" },
-      { id: 2, name: "Budi Santoso", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80" },
-      { id: 3, name: "Istriku", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" },
-      { id: 4, name: "Andi Pratama", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" },
-      { id: 5, name: "Dewi Lestari", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80" },
-      { id: 6, name: "Rian Hidayat", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80" }
-    ];
-
+    let contacts = [];
     let activeContact = null;
-    let currentUser = "wildan";
-    let selectedAvatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
-    let messageListenerRef = null;
+    let currentUser = null; // Username ID permanen
+    let currentDisplayName = "";
+    let currentAvatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
+    let tempUploadAvatar = "";
 
     function buildGrid() {
       const grid = document.getElementById('grid');
@@ -627,10 +671,10 @@
           const inner = document.createElement('div');
           inner.className = 'tile-inner';
 
-          if (!isUpright) {
+          if (!isUpright && contacts.length > 0) {
             const person = contacts[contactIdx % contacts.length];
             const img = document.createElement('img');
-            img.src = person.avatar;
+            img.src = person.avatar || currentAvatarUrl;
             img.className = 'tile-photo';
             inner.appendChild(img);
             tile.onclick = () => openProfile(person);
@@ -688,14 +732,14 @@
 
     window.addEventListener('touchend', endPan);
 
-    window.handleFileUpload = function(e) {
+    window.handleFileUpload = function(e, previewId) {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = function(evt) {
-          selectedAvatarUrl = evt.target.result;
-          const preview = document.getElementById('upload-preview');
-          preview.src = selectedAvatarUrl;
+          tempUploadAvatar = evt.target.result;
+          const preview = document.getElementById(previewId);
+          preview.src = tempUploadAvatar;
           preview.style.display = 'block';
         };
         reader.readAsDataURL(file);
@@ -709,32 +753,167 @@
       document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
     }
 
-    window.submitLogin = function() {
-      currentUser = document.getElementById('login-username').value.trim() || "wildan";
-      loginUser(currentUser, selectedAvatarUrl);
+    window.submitLogin = async function() {
+      const inputUsername = document.getElementById('login-username').value.trim().toLowerCase();
+      if (!inputUsername) {
+        alert("Masukkan username unik Anda!");
+        return;
+      }
+
+      const userSnapshot = await get(ref(db, `users/${inputUsername}`));
+      if (userSnapshot.exists()) {
+        const userData = userSnapshot.val();
+        currentUser = inputUsername;
+        currentDisplayName = userData.displayName || inputUsername;
+        currentAvatarUrl = userData.avatar || currentAvatarUrl;
+
+        setUserLoggedIn();
+        loadUserContacts();
+      } else {
+        alert("Username tidak ditemukan! Silakan daftar akun baru terlebih dahulu.");
+      }
     }
 
-    window.submitRegister = function() {
-      currentUser = document.getElementById('reg-username').value.trim() || "user_baru";
-      const name = document.getElementById('reg-fullname').value || currentUser;
-      loginUser(name, selectedAvatarUrl);
+    window.submitRegister = async function() {
+      const regUsername = document.getElementById('reg-username').value.trim().toLowerCase();
+      const regFullname = document.getElementById('reg-fullname').value.trim() || regUsername;
+
+      if (!regUsername) {
+        alert("Username unik wajib diisi!");
+        return;
+      }
+
+      // Cek apakah username sudah dipakai
+      const userSnapshot = await get(ref(db, `users/${regUsername}`));
+      if (userSnapshot.exists()) {
+        alert("Username ini sudah dipakai orang lain! Silakan pilih username lain.");
+        return;
+      }
+
+      const avatar = tempUploadAvatar || currentAvatarUrl;
+
+      // Simpan user baru ke database
+      await set(ref(db, `users/${regUsername}`), {
+        username: regUsername,
+        displayName: regFullname,
+        avatar: avatar
+      });
+
+      currentUser = regUsername;
+      currentDisplayName = regFullname;
+      currentAvatarUrl = avatar;
+
+      setUserLoggedIn();
+      loadUserContacts();
     }
 
-    function loginUser(name, avatar) {
+    function setUserLoggedIn() {
       document.getElementById('login-modal').classList.remove('active');
       document.getElementById('user-pill').style.display = 'flex';
-      document.getElementById('current-user-name').innerText = name;
-      document.getElementById('current-user-avatar').src = avatar;
+      document.getElementById('current-user-name').innerText = currentDisplayName;
+      document.getElementById('current-user-avatar').src = currentAvatarUrl;
+    }
+
+    function loadUserContacts() {
+      const userContactsRef = ref(db, `user_contacts/${currentUser}`);
+      onChildAdded(userContactsRef, async (snapshot) => {
+        const contactUsername = snapshot.key;
+        const cSnap = await get(ref(db, `users/${contactUsername}`));
+        if (cSnap.exists()) {
+          const cData = cSnap.val();
+          if (!contacts.find(c => c.username === contactUsername)) {
+            contacts.push({
+              username: cData.username,
+              name: cData.displayName || cData.username,
+              avatar: cData.avatar
+            });
+            buildGrid();
+          }
+        }
+      });
+    }
+
+    window.openEditProfileModal = function() {
+      document.getElementById('edit-username-id').innerText = `@${currentUser}`;
+      document.getElementById('edit-fullname').value = currentDisplayName;
+      document.getElementById('edit-upload-preview').src = currentAvatarUrl;
+      document.getElementById('edit-upload-preview').style.display = 'block';
+      document.getElementById('edit-profile-modal').classList.add('active');
+    }
+
+    window.saveProfileChanges = async function() {
+      const newName = document.getElementById('edit-fullname').value.trim();
+      const newAvatar = tempUploadAvatar || currentAvatarUrl;
+
+      if (!newName) {
+        alert("Nama tidak boleh kosong!");
+        return;
+      }
+
+      await update(ref(db, `users/${currentUser}`), {
+        displayName: newName,
+        avatar: newAvatar
+      });
+
+      currentDisplayName = newName;
+      currentAvatarUrl = newAvatar;
+
+      document.getElementById('current-user-name').innerText = currentDisplayName;
+      document.getElementById('current-user-avatar').src = currentAvatarUrl;
+      tempUploadAvatar = "";
+
+      alert("Profil berhasil diperbarui!");
+      closeModals();
+    }
+
+    window.openAddContactModal = function() {
+      if (!currentUser) {
+        alert("Silakan login terlebih dahulu!");
+        return;
+      }
+      document.getElementById('add-contact-modal').classList.add('active');
+    }
+
+    window.submitAddContact = async function() {
+      const contactUsername = document.getElementById('add-contact-username').value.trim().toLowerCase();
+      if (!contactUsername) {
+        alert("Masukkan username teman!");
+        return;
+      }
+
+      if (contactUsername === currentUser) {
+        alert("Anda tidak bisa menambahkan username sendiri!");
+        return;
+      }
+
+      const targetSnap = await get(ref(db, `users/${contactUsername}`));
+      if (!targetSnap.exists()) {
+        alert("Username tidak ditemukan di server!");
+        return;
+      }
+
+      // Tambahkan ke daftar kontak kedua belah pihak
+      await set(ref(db, `user_contacts/${currentUser}/${contactUsername}`), true);
+      await set(ref(db, `user_contacts/${contactUsername}/${currentUser}`), true);
+
+      document.getElementById('add-contact-username').value = '';
+      alert("Kontak berhasil ditambahkan!");
+      closeModals();
     }
 
     window.logout = function() {
+      currentUser = null;
+      contacts = [];
+      buildGrid();
       document.getElementById('user-pill').style.display = 'none';
+      closeModals();
       document.getElementById('login-modal').classList.add('active');
     }
 
     window.openProfile = function(person) {
       activeContact = person;
       document.getElementById('preview-name').innerText = person.name;
+      document.getElementById('preview-username-id').innerText = `@${person.username}`;
       document.getElementById('preview-avatar').src = person.avatar;
       document.getElementById('profile-modal').classList.add('active');
     }
@@ -755,12 +934,8 @@
       const chatBody = document.getElementById('chat-body');
       chatBody.innerHTML = '';
 
-      const roomId = getRoomId(currentUser, activeContact.name);
-      const messagesRef = ref(db, 'chats/' + roomId);
-
-      if (messageListenerRef) {
-        // Hapus listener sebelumnya jika ganti kontak
-      }
+      const roomId = getRoomId(currentUser, activeContact.username);
+      const messagesRef = ref(db, `chats/${roomId}`);
 
       onChildAdded(messagesRef, (snapshot) => {
         const data = snapshot.val();
@@ -778,8 +953,8 @@
       const text = input.value.trim();
       if (!text || !activeContact) return;
 
-      const roomId = getRoomId(currentUser, activeContact.name);
-      const messagesRef = ref(db, 'chats/' + roomId);
+      const roomId = getRoomId(currentUser, activeContact.username);
+      const messagesRef = ref(db, `chats/${roomId}`);
 
       push(messagesRef, {
         sender: currentUser,
