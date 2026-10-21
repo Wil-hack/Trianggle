@@ -428,7 +428,7 @@
     .chat-footer-full {
       padding: 12px 16px;
       padding-bottom: max(14px, env(safe-area-inset-bottom));
-      background: rgba(10, 11, 15, 0.5);
+      background: rgba(10, 11, 15, 0.8);
       border-top: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       gap: 8px;
@@ -436,6 +436,7 @@
     }
     .chat-footer-full input {
       flex: 1;
+      min-width: 0;
       padding: 11px 16px;
       background: rgba(255, 255, 255, 0.07);
       border: 1px solid rgba(255, 255, 255, 0.12);
@@ -447,8 +448,8 @@
     .btn-chat-action {
       background: #3b82f6;
       border: none;
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       color: white;
       font-size: 1rem;
@@ -731,7 +732,10 @@
     let isRecording = false;
 
     const rtcConfig = {
-      iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' }
+      ]
     };
 
     function unlockAudio() {
@@ -1017,6 +1021,9 @@
           document.getElementById('incoming-name').innerText = callData.callerName;
           document.getElementById('incoming-avatar').src = callData.callerAvatar;
           document.getElementById('incoming-call-modal').classList.add('active');
+        } else if (callData && callData.status === 'connected') {
+          stopRingingSound();
+          document.getElementById('call-status-text').innerText = "Terhubung (Suara Live)";
         } else if (!callData) {
           stopRingingSound();
           cleanupWebRTC();
@@ -1031,18 +1038,22 @@
         if (!data || !peerConnection) return;
 
         if (data.answer && !peerConnection.currentRemoteDescription) {
-          const remoteDesc = new RTCSessionDescription(data.answer);
-          await peerConnection.setRemoteDescription(remoteDesc);
-          document.getElementById('call-status-text').innerText = "Terhubung (Suara Live)";
-          stopRingingSound();
-        }
-
-        if (data.candidate) {
           try {
-            await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+            const remoteDesc = new RTCSessionDescription(data.answer);
+            await peerConnection.setRemoteDescription(remoteDesc);
+            document.getElementById('call-status-text').innerText = "Terhubung (Suara Live)";
+            stopRingingSound();
           } catch (e) {
-            console.error("Error adding ice candidate", e);
+            console.log("Set remote desc error:", e);
           }
+        }
+      });
+
+      const candRef = ref(db, `webrtc_signals/${currentUser}/candidates`);
+      onChildAdded(candRef, (snapshot) => {
+        const candidate = snapshot.val();
+        if (candidate && peerConnection) {
+          peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => console.log("ICE Error:", e));
         }
       });
     }
@@ -1057,6 +1068,7 @@
     }
 
     function createPeerConnection() {
+      if (peerConnection) return;
       peerConnection = new RTCPeerConnection(rtcConfig);
 
       if (localStream) {
@@ -1067,6 +1079,7 @@
         const remoteAudio = document.getElementById('remote-audio');
         if (remoteAudio && event.streams[0]) {
           remoteAudio.srcObject = event.streams[0];
+          remoteAudio.play().catch(e => console.log("Auto-play remote audio failed:", e));
         }
       };
 
@@ -1106,14 +1119,6 @@
       document.getElementById('call-avatar').src = activeContact.avatar;
       document.getElementById('call-status-text').innerText = "Memanggil...";
       document.getElementById('call-modal').classList.add('active');
-
-      const candRef = ref(db, `webrtc_signals/${currentUser}/candidates`);
-      onChildAdded(candRef, (snapshot) => {
-        const candidate = snapshot.val();
-        if (candidate && peerConnection) {
-          peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-        }
-      });
     }
 
     window.acceptCall = async function() {
@@ -1134,20 +1139,13 @@
         const answer = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answer);
 
-        update(ref(db, `webrtc_signals/${targetUser}`), {
+        await update(ref(db, `webrtc_signals/${targetUser}`), {
           answer: { type: answer.type, sdp: answer.sdp }
-        });
-
-        const candRef = ref(db, `webrtc_signals/${currentUser}/candidates`);
-        onChildAdded(candRef, (snapshot) => {
-          const candidate = snapshot.val();
-          if (candidate && peerConnection) {
-            peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-          }
         });
       }
 
-      set(ref(db, `calls/${currentUser}`), { status: 'connected' });
+      await update(ref(db, `calls/${currentUser}`), { status: 'connected' });
+      await update(ref(db, `calls/${targetUser}`), { status: 'connected' });
 
       document.getElementById('call-name').innerText = document.getElementById('incoming-name').innerText;
       document.getElementById('call-avatar').src = document.getElementById('incoming-avatar').src;
@@ -1191,7 +1189,7 @@
       document.getElementById('call-modal').classList.remove('active');
     }
 
-    // FITUR REKAM & KIRIM PESAN SUARA (VOICE NOTE)
+    // PESAN SUARA (VOICE NOTE)
     window.toggleVoiceRecord = async function() {
       const micBtn = document.getElementById('btn-mic');
       if (!isRecording) {
