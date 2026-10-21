@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TriHive - Web Chat & Voice Call</title>
   <style>
     * {
@@ -10,6 +10,8 @@
       margin: 0;
       padding: 0;
       user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
     }
     body, html {
       width: 100%;
@@ -33,17 +35,13 @@
       height: 60px;
       background: rgba(13, 14, 18, 0.85);
       backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 24px;
+      padding: 0 20px;
       z-index: 100;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
     }
     .brand-title {
       font-weight: 700;
@@ -55,9 +53,9 @@
     .user-pill {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       background: rgba(255, 255, 255, 0.05);
-      padding: 6px 14px;
+      padding: 4px 12px;
       border-radius: 20px;
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
@@ -84,6 +82,7 @@
       overflow: hidden;
       position: relative;
       cursor: grab;
+      touch-action: none;
     }
     #viewport:active {
       cursor: grabbing;
@@ -97,7 +96,7 @@
     }
     .honeycomb-grid {
       position: relative;
-      padding: 200px;
+      padding: 150px;
     }
     .grid-row {
       display: flex;
@@ -114,7 +113,7 @@
       transition: transform 0.2s ease;
       cursor: pointer;
     }
-    .tile:hover {
+    .tile:active {
       transform: scale(1.12);
       z-index: 20;
     }
@@ -146,8 +145,9 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(10, 11, 15, 0.8);
-      backdrop-filter: blur(8px);
+      background: rgba(10, 11, 15, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       z-index: 200;
       display: flex;
       justify-content: center;
@@ -155,38 +155,35 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
+      touch-action: auto;
     }
     .modal-backdrop.active {
       opacity: 1;
       pointer-events: auto;
     }
-    .login-card, .profile-card, .chat-card, .call-card {
-      background: #161822;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+
+    /* LOGIN MODAL */
+    .login-card {
+      background: rgba(22, 24, 34, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 16px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
       color: #e2e8f0;
-    }
-    .login-card {
-      width: 380px;
-      padding: 32px;
+      width: 90%;
+      max-width: 380px;
+      padding: 24px;
       text-align: center;
     }
-    .login-card h2 {
-      font-size: 1.5rem;
-      margin-bottom: 8px;
-    }
-    .login-card p {
-      font-size: 0.85rem;
-      color: #94a3b8;
-      margin-bottom: 24px;
-    }
+    .login-card h2 { font-size: 1.4rem; margin-bottom: 6px; }
+    .login-card p { font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px; }
     .tab-group {
       display: flex;
       background: rgba(255, 255, 255, 0.05);
       padding: 4px;
       border-radius: 8px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
     .tab-btn {
       flex: 1;
@@ -199,51 +196,42 @@
       border-radius: 6px;
       cursor: pointer;
     }
-    .tab-btn.active {
-      background: #3b82f6;
-      color: white;
-    }
-    .form-group {
-      margin-bottom: 16px;
-      text-align: left;
-    }
-    .form-group label {
-      display: block;
-      font-size: 0.75rem;
-      color: #94a3b8;
-      margin-bottom: 6px;
-      text-transform: uppercase;
-    }
+    .tab-btn.active { background: #3b82f6; color: white; }
+    .form-group { margin-bottom: 14px; text-align: left; }
+    .form-group label { display: block; font-size: 0.75rem; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; }
     .form-group input {
       width: 100%;
-      padding: 12px;
-      background: #0d0e12;
+      padding: 10px 12px;
+      background: rgba(13, 14, 18, 0.8);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 8px;
       color: white;
       outline: none;
     }
-    .avatar-picker {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 8px;
+    .btn-file-upload {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px dashed rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      color: #3b82f6;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 10px;
     }
-    .avatar-option {
-      width: 44px;
-      height: 44px;
+    .upload-preview {
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
       object-fit: cover;
-      cursor: pointer;
-      border: 2px solid transparent;
-      opacity: 0.6;
+      margin: 8px auto;
+      display: none;
+      border: 2px solid #3b82f6;
     }
-    .avatar-option.selected {
-      border-color: #3b82f6;
-      opacity: 1;
-      transform: scale(1.1);
-    }
-    .btn-submit, .btn-action {
+    .btn-submit {
       width: 100%;
       padding: 12px;
       background: #3b82f6;
@@ -254,9 +242,17 @@
       cursor: pointer;
       margin-top: 10px;
     }
+
+    /* PROFILE PREVIEW MODAL */
     .profile-card {
-      width: 320px;
-      padding: 24px;
+      background: rgba(22, 24, 34, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      width: 85%;
+      max-width: 320px;
+      padding: 28px 24px;
       text-align: center;
       position: relative;
     }
@@ -267,118 +263,170 @@
       background: transparent;
       border: none;
       color: #94a3b8;
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       cursor: pointer;
     }
     .profile-card img {
-      width: 90px;
-      height: 90px;
+      width: 85px;
+      height: 85px;
       border-radius: 50%;
       object-fit: cover;
       border: 3px solid #3b82f6;
       margin-bottom: 12px;
     }
-    .profile-card h3 {
-      font-size: 1.2rem;
-    }
-    .profile-card p {
-      font-size: 0.85rem;
-      color: #10b981;
-      margin-bottom: 20px;
-    }
-    .action-btns {
-      display: flex;
-      gap: 10px;
-    }
-    .btn-chat {
-      background: #3b82f6;
+    .btn-ngobrol {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
       color: white;
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35);
+      transition: transform 0.2s;
     }
-    .btn-call-action {
-      background: #10b981;
-      color: white;
+    .btn-ngobrol:active {
+      transform: scale(0.98);
     }
-    .chat-card {
-      width: 360px;
-      height: 480px;
+
+    /* FULLSCREEN TRANSPARENT BLUR CHAT MODAL */
+    .chat-backdrop {
+      align-items: flex-end;
+      padding: 0;
+    }
+    .chat-card-full {
+      width: 100vw;
+      height: 100vh;
+      background: rgba(13, 14, 18, 0.65); /* Transparan */
+      backdrop-filter: blur(20px); /* Efek Blur Sangat Halus */
+      -webkit-backdrop-filter: blur(20px);
+      border: none;
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
-    .chat-header {
-      padding: 16px;
-      background: rgba(255, 255, 255, 0.03);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    .chat-header-full {
+      padding: 16px 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
       align-items: center;
       justify-content: space-between;
+      margin-top: 0;
     }
-    .chat-user {
+    .chat-user-full {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
-    .chat-user img {
-      width: 36px;
-      height: 36px;
+    .chat-user-full img {
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       object-fit: cover;
+      border: 2px solid #3b82f6;
     }
-    .chat-body {
-      flex: 1;
-      padding: 16px;
-      overflow-y: auto;
+    .header-actions {
       display: flex;
-      flex-direction: column;
-      gap: 10px;
+      align-items: center;
+      gap: 16px;
     }
-    .msg {
-      max-width: 80%;
-      padding: 10px 14px;
-      border-radius: 12px;
-      font-size: 0.85rem;
-    }
-    .msg-in {
-      background: rgba(255, 255, 255, 0.08);
-      align-self: flex-start;
-    }
-    .msg-out {
-      background: #3b82f6;
-      color: white;
-      align-self: flex-end;
-    }
-    .chat-footer {
-      padding: 12px 16px;
-      background: rgba(0, 0, 0, 0.2);
-      display: flex;
-      gap: 8px;
-    }
-    .chat-footer input {
-      flex: 1;
-      padding: 10px 14px;
-      background: #0d0e12;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
-      color: white;
-      outline: none;
-    }
-    .chat-footer button {
-      background: #3b82f6;
+    .btn-icon-call {
+      background: #10b981;
       border: none;
       width: 38px;
       height: 38px;
       border-radius: 50%;
       color: white;
+      font-size: 1.1rem;
       cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
     }
+    .chat-body-full {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      touch-action: pan-y;
+    }
+    .msg {
+      max-width: 78%;
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .msg-in {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #f8fafc;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .msg-out {
+      background: #3b82f6;
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .chat-footer-full {
+      padding: 14px 20px;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      gap: 10px;
+    }
+    .chat-footer-full input {
+      flex: 1;
+      padding: 12px 18px;
+      background: rgba(13, 14, 18, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 25px;
+      color: white;
+      outline: none;
+      font-size: 0.9rem;
+    }
+    .chat-footer-full button {
+      background: #3b82f6;
+      border: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      color: white;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* CALL MODAL */
     .call-card {
-      width: 320px;
+      background: rgba(22, 24, 34, 0.9);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      width: 85%;
+      max-width: 320px;
       padding: 40px 24px;
       text-align: center;
     }
     .call-avatar {
-      width: 110px;
-      height: 110px;
+      width: 100px;
+      height: 100px;
       border-radius: 50%;
       object-fit: cover;
       border: 4px solid #10b981;
@@ -394,6 +442,7 @@
       font-size: 1.2rem;
       cursor: pointer;
       margin-top: 20px;
+      box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
     }
   </style>
 </head>
@@ -427,6 +476,7 @@
     </div>
   </div>
 
+  <!-- LOGIN MODAL -->
   <div class="modal-backdrop active" id="login-modal">
     <div class="login-card">
       <h2>Masuk Ke TriHive</h2>
@@ -455,54 +505,54 @@
           <input type="text" id="reg-username" placeholder="Buat username...">
         </div>
         <div class="form-group">
-          <label>Pilih Foto Profil</label>
-          <div class="avatar-picker">
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" class="avatar-option selected" onclick="selectAvatar(this)">
-            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80" class="avatar-option" onclick="selectAvatar(this)">
-            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80" class="avatar-option" onclick="selectAvatar(this)">
-            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" class="avatar-option" onclick="selectAvatar(this)">
-          </div>
+          <label>Foto Profil (Upload HP)</label>
+          <label for="file-input" class="btn-file-upload">📁 Pilih Foto dari HP</label>
+          <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="handleFileUpload(event)">
+          <img id="upload-preview" class="upload-preview" alt="Preview">
         </div>
         <button class="btn-submit" onclick="submitRegister()">Daftar & Masuk</button>
       </div>
     </div>
   </div>
 
+  <!-- PROFILE PREVIEW MODAL (DENGAN 1 TOMBOL 'NGOBROL') -->
   <div class="modal-backdrop" id="profile-modal">
     <div class="profile-card">
       <button class="close-btn" onclick="closeModals()">✕</button>
       <img id="preview-avatar" src="" alt="Avatar">
-      <h3 id="preview-name">Nama Kontak</h3>
-      <p>● Online</p>
-      <div class="action-btns">
-        <button class="btn-action btn-chat" onclick="openChat()">Mulai Chat</button>
-        <button class="btn-action btn-call-action" onclick="startCall()">Panggil</button>
-      </div>
+      <h3 id="preview-name" style="margin-bottom: 4px; font-size:1.2rem;">Nama Kontak</h3>
+      <p style="color: #10b981; font-size: 0.85rem; margin-bottom: 20px;">● Online</p>
+      <button class="btn-ngobrol" onclick="openChat()">Ngobrol</button>
     </div>
   </div>
 
-  <div class="modal-backdrop" id="chat-modal">
-    <div class="chat-card">
-      <div class="chat-header">
-        <div class="chat-user">
+  <!-- FULLSCREEN BLUR CHAT MODAL -->
+  <div class="modal-backdrop chat-backdrop" id="chat-modal">
+    <div class="chat-card-full">
+      <div class="chat-header-full">
+        <div class="chat-user-full">
           <img id="chat-avatar" src="" alt="Avatar">
           <div>
-            <h4 id="chat-name" style="color:white; font-size:0.95rem;">Nama Kontak</h4>
+            <h4 id="chat-name" style="color:white; font-size:1rem; font-weight:600;">Nama Kontak</h4>
             <span style="color:#10b981; font-size:0.75rem;">Online</span>
           </div>
         </div>
-        <button class="close-btn" style="position:static;" onclick="closeModals()">✕</button>
+        <div class="header-actions">
+          <button class="btn-icon-call" onclick="startCall()" title="Panggil Suara">📞</button>
+          <button class="close-btn" style="position:static; font-size:1.5rem;" onclick="closeModals()">✕</button>
+        </div>
       </div>
-      <div class="chat-body" id="chat-body">
+      <div class="chat-body-full" id="chat-body">
         <div class="msg msg-in">Halo! Selamat datang di TriHive chat.</div>
       </div>
-      <div class="chat-footer">
+      <div class="chat-footer-full">
         <input type="text" id="chat-input" placeholder="Ketik pesan..." onkeypress="handleKey(event)">
         <button onclick="sendMsg()">➔</button>
       </div>
     </div>
   </div>
 
+  <!-- CALL OVERLAY -->
   <div class="modal-backdrop" id="call-modal">
     <div class="call-card">
       <img class="call-avatar" id="call-avatar" src="" alt="Avatar">
@@ -563,6 +613,7 @@
       }
     }
 
+    // CANVAS PANNING (MOUSE + TOUCH)
     const viewport = document.getElementById('viewport');
     const canvas = document.getElementById('canvas');
     let isPanning = false, startX = 0, startY = 0, panX = -100, panY = -100;
@@ -572,31 +623,55 @@
     }
     updateTransform();
 
-    viewport.onmousedown = (e) => {
-      if (e.target.closest('.modal-backdrop') || e.target.closest('header')) return;
+    function startPan(clientX, clientY, target) {
+      if (target.closest('.modal-backdrop') || target.closest('header')) return;
       isPanning = true;
-      startX = e.clientX - panX;
-      startY = e.clientY - panY;
-    };
-    window.onmousemove = (e) => {
+      startX = clientX - panX;
+      startY = clientY - panY;
+    }
+
+    function movePan(clientX, clientY) {
       if (!isPanning) return;
-      panX = e.clientX - startX;
-      panY = e.clientY - startY;
+      panX = clientX - startX;
+      panY = clientY - startY;
       updateTransform();
-    };
-    window.onmouseup = () => isPanning = false;
+    }
+
+    function endPan() { isPanning = false; }
+
+    viewport.addEventListener('mousedown', (e) => startPan(e.clientX, e.clientY, e.target));
+    window.addEventListener('mousemove', (e) => movePan(e.clientX, e.clientY));
+    window.addEventListener('mouseup', endPan);
+
+    viewport.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) startPan(e.touches[0].clientX, e.touches[0].clientY, e.target);
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      if (isPanning && e.touches.length === 1) movePan(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+
+    window.addEventListener('touchend', endPan);
+
+    function handleFileUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          selectedAvatarUrl = evt.target.result;
+          const preview = document.getElementById('upload-preview');
+          preview.src = selectedAvatarUrl;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    }
 
     function switchTab(tab) {
       document.getElementById('tab-login').classList.toggle('active', tab === 'login');
       document.getElementById('tab-register').classList.toggle('active', tab === 'register');
       document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
       document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
-    }
-
-    function selectAvatar(el) {
-      document.querySelectorAll('.avatar-option').forEach(a => a.classList.remove('selected'));
-      el.classList.add('selected');
-      selectedAvatarUrl = el.src;
     }
 
     function submitLogin() {
@@ -636,14 +711,13 @@
     }
 
     function startCall() {
-      closeModals();
       document.getElementById('call-name').innerText = activeContact.name;
       document.getElementById('call-avatar').src = activeContact.avatar;
       document.getElementById('call-modal').classList.add('active');
     }
 
     function endCall() {
-      closeModals();
+      document.getElementById('call-modal').classList.remove('active');
     }
 
     function closeModals() {
