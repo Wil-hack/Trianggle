@@ -115,7 +115,6 @@
       margin-top: -36px;
     }
     
-    /* Variasi margin acak natural antar baris */
     .grid-row:nth-child(odd) { margin-left: 24px; }
     .grid-row:nth-child(even) { margin-left: 68px; }
     .grid-row:nth-child(3n) { margin-left: 12px; }
@@ -676,27 +675,40 @@
     let currentAvatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
     let tempUploadAvatar = "";
     let unreadCounts = {};
+    let audioCtx = null;
+
+    // FUNGSI MEMBUKA IZIN AUDIO BROWSER SAAT USER KLIK PERTAMA KALI
+    function initAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
 
     function playNotificationSound() {
       try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        initAudioContext();
+        if (!audioCtx) return;
+
         const oscillator = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
 
         oscillator.type = 'sine';
         oscillator.frequency.setValueAtTime(587.33, audioCtx.currentTime);
-        oscillator.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
+        oscillator.frequency.setValueAtTime(880, audioCtx.currentTime + 0.12);
 
-        gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
 
         oscillator.connect(gainNode);
         gainNode.connect(audioCtx.destination);
 
         oscillator.start();
-        oscillator.stop(audioCtx.currentTime + 0.3);
+        oscillator.stop(audioCtx.currentTime + 0.35);
       } catch (e) {
-        console.log("Audio diblokir browser.");
+        console.log("Audio error: ", e);
       }
     }
 
@@ -815,6 +827,7 @@
     }
 
     window.submitLogin = function() {
+      initAudioContext(); // Buka kunci audio saat tombol diklik
       const inputUsername = document.getElementById('login-username').value.trim().toLowerCase();
       if (!inputUsername) {
         alert("Masukkan username unik Anda!");
@@ -839,6 +852,7 @@
     }
 
     window.submitRegister = function() {
+      initAudioContext(); // Buka kunci audio saat tombol diklik
       const regUsername = document.getElementById('reg-username').value.trim().toLowerCase();
       const regFullname = document.getElementById('reg-fullname').value.trim() || regUsername;
 
