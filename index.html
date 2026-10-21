@@ -114,14 +114,18 @@
       display: flex;
       margin-top: -36px;
     }
-    .grid-row:nth-child(even) {
-      margin-left: 52px;
-    }
+    
+    /* Variasi margin acak natural antar baris */
+    .grid-row:nth-child(odd) { margin-left: 24px; }
+    .grid-row:nth-child(even) { margin-left: 68px; }
+    .grid-row:nth-child(3n) { margin-left: 12px; }
+    .grid-row:nth-child(5n) { margin-left: 52px; }
+
     .tile {
       position: relative;
       width: 100px;
       height: 115px;
-      margin: 0 2px;
+      margin: 0 4px;
       transition: transform 0.2s ease;
       cursor: pointer;
     }
@@ -150,6 +154,27 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+    }
+
+    .unread-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #ef4444;
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 10px;
+      border: 2px solid #0d0e12;
+      z-index: 10;
+      display: none;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
     }
 
     .modal-backdrop {
@@ -650,6 +675,30 @@
     let currentDisplayName = "";
     let currentAvatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
     let tempUploadAvatar = "";
+    let unreadCounts = {};
+
+    function playNotificationSound() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+        oscillator.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
+
+        gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.3);
+      } catch (e) {
+        console.log("Audio diblokir browser.");
+      }
+    }
 
     function buildGrid() {
       const grid = document.getElementById('grid');
@@ -674,7 +723,23 @@
             img.src = person.avatar || currentAvatarUrl;
             img.className = 'tile-photo';
             inner.appendChild(img);
-            tile.onclick = () => openProfile(person);
+
+            const badge = document.createElement('div');
+            badge.className = 'unread-badge';
+            badge.id = `badge-${person.username}`;
+            if (unreadCounts[person.username] > 0) {
+              badge.innerText = unreadCounts[person.username];
+              badge.style.display = 'block';
+            }
+            tile.appendChild(badge);
+
+            tile.onclick = () => {
+              unreadCounts[person.username] = 0;
+              if(document.getElementById(`badge-${person.username}`)) {
+                document.getElementById(`badge-${person.username}`).style.display = 'none';
+              }
+              openProfile(person);
+            };
             contactIdx++;
           } else {
             const bg = document.createElement('div');
@@ -828,9 +893,28 @@
                 avatar: cData.avatar
               });
               buildGrid();
+              listenIncomingMessages(contactUsername);
             }
           }
         });
+      });
+    }
+
+    function listenIncomingMessages(contactUsername) {
+      const roomId = getRoomId(currentUser, contactUsername);
+      const messagesRef = ref(db, `chats/${roomId}`);
+
+      onChildAdded(messagesRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data.sender === contactUsername) {
+          const isChatOpen = activeContact && activeContact.username === contactUsername && document.getElementById('chat-modal').classList.contains('active');
+          
+          if (!isChatOpen) {
+            playNotificationSound();
+            unreadCounts[contactUsername] = (unreadCounts[contactUsername] || 0) + 1;
+            buildGrid();
+          }
+        }
       });
     }
 
@@ -905,6 +989,7 @@
     window.logout = function() {
       currentUser = null;
       contacts = [];
+      unreadCounts = {};
       buildGrid();
       document.getElementById('user-pill').style.display = 'none';
       closeModals();
