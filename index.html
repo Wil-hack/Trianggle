@@ -175,7 +175,6 @@
       pointer-events: auto;
     }
 
-    /* CARD MODALS */
     .card-modal {
       background: rgba(22, 24, 34, 0.88);
       backdrop-filter: blur(16px);
@@ -269,7 +268,6 @@
       cursor: pointer;
     }
 
-    /* PROFILE PREVIEW MODAL */
     .profile-card {
       background: rgba(22, 24, 34, 0.85);
       backdrop-filter: blur(16px);
@@ -304,7 +302,6 @@
       transition: transform 0.2s;
     }
 
-    /* CHAT MODAL RAPI */
     .chat-backdrop {
       align-items: center;
       padding: 10px;
@@ -437,7 +434,6 @@
       align-items: center;
     }
 
-    /* CALL MODAL */
     .call-card {
       background: rgba(22, 24, 34, 0.9);
       backdrop-filter: blur(20px);
@@ -526,8 +522,8 @@
       <!-- FORM DAFTAR -->
       <div id="form-register" style="display: none;">
         <div class="form-group">
-          <label>Username Unik (Permanen / ID)</label>
-          <input type="text" id="reg-username" placeholder="Contoh: wildan_jaka">
+          <label>Username Unik (Huruf Kecil Semua)</label>
+          <input type="text" id="reg-username" placeholder="Contoh: wildan">
         </div>
         <div class="form-group">
           <label>Nama Tampilan</label>
@@ -630,10 +626,10 @@
     </div>
   </div>
 
-  <!-- Firebase SDKs -->
+  <!-- Firebase SDKs (CDN Version) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, onChildAdded, set, get, update, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push, onChildAdded, set, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBfAvdE0PZMvytkSaofbFAgk0749E-b_pI",
@@ -649,7 +645,7 @@
 
     let contacts = [];
     let activeContact = null;
-    let currentUser = null; // Username ID permanen
+    let currentUser = null; 
     let currentDisplayName = "";
     let currentAvatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
     let tempUploadAvatar = "";
@@ -692,7 +688,6 @@
       }
     }
 
-    // CANVAS PANNING
     const viewport = document.getElementById('viewport');
     const canvas = document.getElementById('canvas');
     let isPanning = false, startX = 0, startY = 0, panX = -100, panY = -100;
@@ -753,28 +748,31 @@
       document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
     }
 
-    window.submitLogin = async function() {
+    window.submitLogin = function() {
       const inputUsername = document.getElementById('login-username').value.trim().toLowerCase();
       if (!inputUsername) {
         alert("Masukkan username unik Anda!");
         return;
       }
 
-      const userSnapshot = await get(ref(db, `users/${inputUsername}`));
-      if (userSnapshot.exists()) {
-        const userData = userSnapshot.val();
-        currentUser = inputUsername;
-        currentDisplayName = userData.displayName || inputUsername;
-        currentAvatarUrl = userData.avatar || currentAvatarUrl;
+      get(ref(db, `users/${inputUsername}`)).then((userSnapshot) => {
+        if (userSnapshot.exists()) {
+          const userData = userSnapshot.val();
+          currentUser = inputUsername;
+          currentDisplayName = userData.displayName || inputUsername;
+          currentAvatarUrl = userData.avatar || currentAvatarUrl;
 
-        setUserLoggedIn();
-        loadUserContacts();
-      } else {
-        alert("Username tidak ditemukan! Silakan daftar akun baru terlebih dahulu.");
-      }
+          setUserLoggedIn();
+          loadUserContacts();
+        } else {
+          alert("Username tidak ditemukan! Silakan daftar akun baru terlebih dahulu.");
+        }
+      }).catch((err) => {
+        alert("Gagal terhubung ke database: " + err.message);
+      });
     }
 
-    window.submitRegister = async function() {
+    window.submitRegister = function() {
       const regUsername = document.getElementById('reg-username').value.trim().toLowerCase();
       const regFullname = document.getElementById('reg-fullname').value.trim() || regUsername;
 
@@ -783,28 +781,29 @@
         return;
       }
 
-      // Cek apakah username sudah dipakai
-      const userSnapshot = await get(ref(db, `users/${regUsername}`));
-      if (userSnapshot.exists()) {
-        alert("Username ini sudah dipakai orang lain! Silakan pilih username lain.");
-        return;
-      }
+      get(ref(db, `users/${regUsername}`)).then((userSnapshot) => {
+        if (userSnapshot.exists()) {
+          alert("Username ini sudah dipakai orang lain! Silakan pilih username lain.");
+          return;
+        }
 
-      const avatar = tempUploadAvatar || currentAvatarUrl;
+        const avatar = tempUploadAvatar || currentAvatarUrl;
 
-      // Simpan user baru ke database
-      await set(ref(db, `users/${regUsername}`), {
-        username: regUsername,
-        displayName: regFullname,
-        avatar: avatar
+        set(ref(db, `users/${regUsername}`), {
+          username: regUsername,
+          displayName: regFullname,
+          avatar: avatar
+        }).then(() => {
+          currentUser = regUsername;
+          currentDisplayName = regFullname;
+          currentAvatarUrl = avatar;
+
+          setUserLoggedIn();
+          loadUserContacts();
+        });
+      }).catch((err) => {
+        alert("Gagal mendaftarkan akun: " + err.message);
       });
-
-      currentUser = regUsername;
-      currentDisplayName = regFullname;
-      currentAvatarUrl = avatar;
-
-      setUserLoggedIn();
-      loadUserContacts();
     }
 
     function setUserLoggedIn() {
@@ -816,20 +815,21 @@
 
     function loadUserContacts() {
       const userContactsRef = ref(db, `user_contacts/${currentUser}`);
-      onChildAdded(userContactsRef, async (snapshot) => {
+      onChildAdded(userContactsRef, (snapshot) => {
         const contactUsername = snapshot.key;
-        const cSnap = await get(ref(db, `users/${contactUsername}`));
-        if (cSnap.exists()) {
-          const cData = cSnap.val();
-          if (!contacts.find(c => c.username === contactUsername)) {
-            contacts.push({
-              username: cData.username,
-              name: cData.displayName || cData.username,
-              avatar: cData.avatar
-            });
-            buildGrid();
+        get(ref(db, `users/${contactUsername}`)).then((cSnap) => {
+          if (cSnap.exists()) {
+            const cData = cSnap.val();
+            if (!contacts.find(c => c.username === contactUsername)) {
+              contacts.push({
+                username: cData.username,
+                name: cData.displayName || cData.username,
+                avatar: cData.avatar
+              });
+              buildGrid();
+            }
           }
-        }
+        });
       });
     }
 
@@ -841,7 +841,7 @@
       document.getElementById('edit-profile-modal').classList.add('active');
     }
 
-    window.saveProfileChanges = async function() {
+    window.saveProfileChanges = function() {
       const newName = document.getElementById('edit-fullname').value.trim();
       const newAvatar = tempUploadAvatar || currentAvatarUrl;
 
@@ -850,20 +850,20 @@
         return;
       }
 
-      await update(ref(db, `users/${currentUser}`), {
+      update(ref(db, `users/${currentUser}`), {
         displayName: newName,
         avatar: newAvatar
+      }).then(() => {
+        currentDisplayName = newName;
+        currentAvatarUrl = newAvatar;
+
+        document.getElementById('current-user-name').innerText = currentDisplayName;
+        document.getElementById('current-user-avatar').src = currentAvatarUrl;
+        tempUploadAvatar = "";
+
+        alert("Profil berhasil diperbarui!");
+        closeModals();
       });
-
-      currentDisplayName = newName;
-      currentAvatarUrl = newAvatar;
-
-      document.getElementById('current-user-name').innerText = currentDisplayName;
-      document.getElementById('current-user-avatar').src = currentAvatarUrl;
-      tempUploadAvatar = "";
-
-      alert("Profil berhasil diperbarui!");
-      closeModals();
     }
 
     window.openAddContactModal = function() {
@@ -874,7 +874,7 @@
       document.getElementById('add-contact-modal').classList.add('active');
     }
 
-    window.submitAddContact = async function() {
+    window.submitAddContact = function() {
       const contactUsername = document.getElementById('add-contact-username').value.trim().toLowerCase();
       if (!contactUsername) {
         alert("Masukkan username teman!");
@@ -886,19 +886,19 @@
         return;
       }
 
-      const targetSnap = await get(ref(db, `users/${contactUsername}`));
-      if (!targetSnap.exists()) {
-        alert("Username tidak ditemukan di server!");
-        return;
-      }
+      get(ref(db, `users/${contactUsername}`)).then((targetSnap) => {
+        if (!targetSnap.exists()) {
+          alert("Username tidak ditemukan di server!");
+          return;
+        }
 
-      // Tambahkan ke daftar kontak kedua belah pihak
-      await set(ref(db, `user_contacts/${currentUser}/${contactUsername}`), true);
-      await set(ref(db, `user_contacts/${contactUsername}/${currentUser}`), true);
+        set(ref(db, `user_contacts/${currentUser}/${contactUsername}`), true);
+        set(ref(db, `user_contacts/${contactUsername}/${currentUser}`), true);
 
-      document.getElementById('add-contact-username').value = '';
-      alert("Kontak berhasil ditambahkan!");
-      closeModals();
+        document.getElementById('add-contact-username').value = '';
+        alert("Kontak berhasil ditambahkan!");
+        closeModals();
+      });
     }
 
     window.logout = function() {
