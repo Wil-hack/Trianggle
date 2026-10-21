@@ -16,19 +16,15 @@
       height: 100%;
       overflow: hidden;
       background-color: #0d0e12;
-      font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Segoe UI', Roboto, sans-serif;
       color: #e2e8f0;
     }
-
-    /* SVG Clip Mask Definitions */
     .svg-defs {
       position: absolute;
       width: 0;
       height: 0;
       overflow: hidden;
     }
-
-    /* HEADER */
     header {
       position: fixed;
       top: 0;
@@ -48,11 +44,6 @@
       display: flex;
       align-items: center;
       gap: 10px;
-    }
-    .brand-icon {
-      width: 24px;
-      height: 24px;
-      fill: #3b82f6;
     }
     .brand-title {
       font-weight: 700;
@@ -78,7 +69,6 @@
     }
     .user-pill span {
       font-size: 0.85rem;
-      font-weight: 500;
     }
     .btn-logout {
       background: transparent;
@@ -86,11 +76,8 @@
       color: #ef4444;
       cursor: pointer;
       font-size: 0.8rem;
-      margin-left: 8px;
       font-weight: 600;
     }
-
-    /* INFINITE CANVAS */
     #viewport {
       width: 100vw;
       height: 100vh;
@@ -108,75 +95,58 @@
       transform-origin: 0 0;
       will-change: transform;
     }
-
-    /* HONEYCOMB GRID */
     .honeycomb-grid {
       position: relative;
       padding: 200px;
     }
     .grid-row {
       display: flex;
-      margin-top: -36px; /* Vertical interlocking */
+      margin-top: -36px;
     }
     .grid-row:nth-child(even) {
-      margin-left: 52px; /* Horizontal interlocking offset */
+      margin-left: 52px;
     }
-
     .tile {
       position: relative;
       width: 100px;
       height: 115px;
       margin: 0 2px;
-      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.2s ease;
+      transition: transform 0.2s ease;
       cursor: pointer;
     }
     .tile:hover {
       transform: scale(1.12);
       z-index: 20;
-      filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.5));
     }
-
     .tile-inner {
       width: 100%;
       height: 100%;
       position: relative;
     }
-
-    /* Upright vs Inverted Masking */
     .tile-upright .tile-inner {
       clip-path: url(#tri-upright-clip);
     }
     .tile-inverted .tile-inner {
       clip-path: url(#tri-inverted-clip);
     }
-
     .tile-bg {
       width: 100%;
       height: 100%;
-      background: #1e212b;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .tile-bg-dark {
       background: radial-gradient(circle at center, #181a22 0%, #0f1016 100%);
       border: 1px solid rgba(255,255,255,0.02);
     }
-
     .tile-photo {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-
-    /* MODAL BACKDROP */
     .modal-backdrop {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(10, 11, 15, 0.75);
+      background: rgba(10, 11, 15, 0.8);
       backdrop-filter: blur(8px);
       z-index: 200;
       display: flex;
@@ -190,21 +160,21 @@
       opacity: 1;
       pointer-events: auto;
     }
-
-    /* LOGIN MODAL */
-    .login-card {
-      width: 380px;
+    .login-card, .profile-card, .chat-card, .call-card {
       background: #161822;
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 16px;
-      padding: 32px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      color: #e2e8f0;
+    }
+    .login-card {
+      width: 380px;
+      padding: 32px;
       text-align: center;
     }
     .login-card h2 {
       font-size: 1.5rem;
       margin-bottom: 8px;
-      color: #f8fafc;
     }
     .login-card p {
       font-size: 0.85rem;
@@ -243,7 +213,6 @@
       color: #94a3b8;
       margin-bottom: 6px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
     .form-group input {
       width: 100%;
@@ -252,11 +221,7 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 8px;
       color: white;
-      font-size: 0.9rem;
       outline: none;
-    }
-    .form-group input:focus {
-      border-color: #3b82f6;
     }
     .avatar-picker {
       display: flex;
@@ -278,7 +243,7 @@
       opacity: 1;
       transform: scale(1.1);
     }
-    .btn-submit {
+    .btn-submit, .btn-action {
       width: 100%;
       padding: 12px;
       background: #3b82f6;
@@ -286,21 +251,11 @@
       border-radius: 8px;
       color: white;
       font-weight: 600;
-      font-size: 0.95rem;
       cursor: pointer;
       margin-top: 10px;
-      transition: background 0.2s;
     }
-    .btn-submit:hover {
-      background: #2563eb;
-    }
-
-    /* PROFILE PREVIEW MODAL */
     .profile-card {
       width: 320px;
-      background: #161822;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
       padding: 24px;
       text-align: center;
       position: relative;
@@ -325,7 +280,6 @@
     }
     .profile-card h3 {
       font-size: 1.2rem;
-      color: #f8fafc;
     }
     .profile-card p {
       font-size: 0.85rem;
@@ -336,15 +290,6 @@
       display: flex;
       gap: 10px;
     }
-    .btn-action {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      cursor: pointer;
-    }
     .btn-chat {
       background: #3b82f6;
       color: white;
@@ -353,14 +298,9 @@
       background: #10b981;
       color: white;
     }
-
-    /* CHAT MODAL */
     .chat-card {
       width: 360px;
       height: 480px;
-      background: #161822;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -384,14 +324,6 @@
       border-radius: 50%;
       object-fit: cover;
     }
-    .chat-user-info h4 {
-      font-size: 0.95rem;
-      color: white;
-    }
-    .chat-user-info span {
-      font-size: 0.75rem;
-      color: #10b981;
-    }
     .chat-body {
       flex: 1;
       padding: 16px;
@@ -405,9 +337,349 @@
       padding: 10px 14px;
       border-radius: 12px;
       font-size: 0.85rem;
-      line-height: 1.4;
     }
     .msg-in {
       background: rgba(255, 255, 255, 0.08);
-      color: #e2e8f0;
-      align-self: flex-start
+      align-self: flex-start;
+    }
+    .msg-out {
+      background: #3b82f6;
+      color: white;
+      align-self: flex-end;
+    }
+    .chat-footer {
+      padding: 12px 16px;
+      background: rgba(0, 0, 0, 0.2);
+      display: flex;
+      gap: 8px;
+    }
+    .chat-footer input {
+      flex: 1;
+      padding: 10px 14px;
+      background: #0d0e12;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      color: white;
+      outline: none;
+    }
+    .chat-footer button {
+      background: #3b82f6;
+      border: none;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+    }
+    .call-card {
+      width: 320px;
+      padding: 40px 24px;
+      text-align: center;
+    }
+    .call-avatar {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #10b981;
+      margin: 0 auto 20px;
+    }
+    .btn-end-call {
+      width: 56px;
+      height: 56px;
+      background: #ef4444;
+      border: none;
+      border-radius: 50%;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <svg class="svg-defs">
+    <defs>
+      <clipPath id="tri-upright-clip" clipPathUnits="objectBoundingBox">
+        <polygon points="0.5 0, 1 1, 0 1" />
+      </clipPath>
+      <clipPath id="tri-inverted-clip" clipPathUnits="objectBoundingBox">
+        <polygon points="0 0, 1 0, 0.5 1" />
+      </clipPath>
+    </defs>
+  </svg>
+
+  <header>
+    <div class="brand">
+      <span class="brand-title">trihive</span>
+    </div>
+    <div class="user-pill" id="user-pill" style="display: none;">
+      <img id="current-user-avatar" src="" alt="Avatar">
+      <span id="current-user-name">Pengguna</span>
+      <button class="btn-logout" onclick="logout()">Keluar</button>
+    </div>
+  </header>
+
+  <div id="viewport">
+    <div id="canvas">
+      <div class="honeycomb-grid" id="grid"></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop active" id="login-modal">
+    <div class="login-card">
+      <h2>Masuk Ke TriHive</h2>
+      <p>Aplikasi Chat & Telepon Mosaik Segitiga</p>
+      
+      <div class="tab-group">
+        <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Masuk</button>
+        <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Daftar</button>
+      </div>
+
+      <div id="form-login">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="login-username" placeholder="Masukkan username..." value="wildan">
+        </div>
+        <button class="btn-submit" onclick="submitLogin()">Masuk</button>
+      </div>
+
+      <div id="form-register" style="display: none;">
+        <div class="form-group">
+          <label>Nama Lengkap</label>
+          <input type="text" id="reg-fullname" placeholder="Contoh: Wildan Jaka">
+        </div>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="reg-username" placeholder="Buat username...">
+        </div>
+        <div class="form-group">
+          <label>Pilih Foto Profil</label>
+          <div class="avatar-picker">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" class="avatar-option selected" onclick="selectAvatar(this)">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80" class="avatar-option" onclick="selectAvatar(this)">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80" class="avatar-option" onclick="selectAvatar(this)">
+            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" class="avatar-option" onclick="selectAvatar(this)">
+          </div>
+        </div>
+        <button class="btn-submit" onclick="submitRegister()">Daftar & Masuk</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="profile-modal">
+    <div class="profile-card">
+      <button class="close-btn" onclick="closeModals()">✕</button>
+      <img id="preview-avatar" src="" alt="Avatar">
+      <h3 id="preview-name">Nama Kontak</h3>
+      <p>● Online</p>
+      <div class="action-btns">
+        <button class="btn-action btn-chat" onclick="openChat()">Mulai Chat</button>
+        <button class="btn-action btn-call-action" onclick="startCall()">Panggil</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="chat-modal">
+    <div class="chat-card">
+      <div class="chat-header">
+        <div class="chat-user">
+          <img id="chat-avatar" src="" alt="Avatar">
+          <div>
+            <h4 id="chat-name" style="color:white; font-size:0.95rem;">Nama Kontak</h4>
+            <span style="color:#10b981; font-size:0.75rem;">Online</span>
+          </div>
+        </div>
+        <button class="close-btn" style="position:static;" onclick="closeModals()">✕</button>
+      </div>
+      <div class="chat-body" id="chat-body">
+        <div class="msg msg-in">Halo! Selamat datang di TriHive chat.</div>
+      </div>
+      <div class="chat-footer">
+        <input type="text" id="chat-input" placeholder="Ketik pesan..." onkeypress="handleKey(event)">
+        <button onclick="sendMsg()">➔</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="call-modal">
+    <div class="call-card">
+      <img class="call-avatar" id="call-avatar" src="" alt="Avatar">
+      <h3 id="call-name" style="color:white; margin-bottom: 4px;">Nama Kontak</h3>
+      <p style="color: #10b981; font-size: 0.85rem;">Terhubung - 00:12</p>
+      <button class="btn-end-call" onclick="endCall()">✕</button>
+    </div>
+  </div>
+
+  <script>
+    const contacts = [
+      { id: 1, name: "Siti Rahma", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80" },
+      { id: 2, name: "Budi Santoso", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80" },
+      { id: 3, name: "Istriku", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" },
+      { id: 4, name: "Andi Pratama", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" },
+      { id: 5, name: "Dewi Lestari", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80" },
+      { id: 6, name: "Rian Hidayat", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80" }
+    ];
+
+    let activeContact = null;
+    let selectedAvatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
+
+    function buildGrid() {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      let contactIdx = 0;
+
+      for (let r = 0; r < 8; r++) {
+        const row = document.createElement('div');
+        row.className = 'grid-row';
+
+        for (let c = 0; c < 10; c++) {
+          const tile = document.createElement('div');
+          const isUpright = (r + c) % 2 === 0;
+          tile.className = `tile ${isUpright ? 'tile-upright' : 'tile-inverted'}`;
+
+          const inner = document.createElement('div');
+          inner.className = 'tile-inner';
+
+          if (!isUpright) {
+            const person = contacts[contactIdx % contacts.length];
+            const img = document.createElement('img');
+            img.src = person.avatar;
+            img.className = 'tile-photo';
+            inner.appendChild(img);
+            tile.onclick = () => openProfile(person);
+            contactIdx++;
+          } else {
+            const bg = document.createElement('div');
+            bg.className = 'tile-bg';
+            inner.appendChild(bg);
+          }
+
+          tile.appendChild(inner);
+          row.appendChild(tile);
+        }
+        grid.appendChild(row);
+      }
+    }
+
+    const viewport = document.getElementById('viewport');
+    const canvas = document.getElementById('canvas');
+    let isPanning = false, startX = 0, startY = 0, panX = -100, panY = -100;
+
+    function updateTransform() {
+      canvas.style.transform = `translate3d(${panX}px, ${panY}px, 0)`;
+    }
+    updateTransform();
+
+    viewport.onmousedown = (e) => {
+      if (e.target.closest('.modal-backdrop') || e.target.closest('header')) return;
+      isPanning = true;
+      startX = e.clientX - panX;
+      startY = e.clientY - panY;
+    };
+    window.onmousemove = (e) => {
+      if (!isPanning) return;
+      panX = e.clientX - startX;
+      panY = e.clientY - startY;
+      updateTransform();
+    };
+    window.onmouseup = () => isPanning = false;
+
+    function switchTab(tab) {
+      document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+      document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+      document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
+      document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
+    }
+
+    function selectAvatar(el) {
+      document.querySelectorAll('.avatar-option').forEach(a => a.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedAvatarUrl = el.src;
+    }
+
+    function submitLogin() {
+      const user = document.getElementById('login-username').value || "Pengguna";
+      loginUser(user, selectedAvatarUrl);
+    }
+
+    function submitRegister() {
+      const name = document.getElementById('reg-fullname').value || "Pengguna Baru";
+      loginUser(name, selectedAvatarUrl);
+    }
+
+    function loginUser(name, avatar) {
+      document.getElementById('login-modal').classList.remove('active');
+      document.getElementById('user-pill').style.display = 'flex';
+      document.getElementById('current-user-name').innerText = name;
+      document.getElementById('current-user-avatar').src = avatar;
+    }
+
+    function logout() {
+      document.getElementById('user-pill').style.display = 'none';
+      document.getElementById('login-modal').classList.add('active');
+    }
+
+    function openProfile(person) {
+      activeContact = person;
+      document.getElementById('preview-name').innerText = person.name;
+      document.getElementById('preview-avatar').src = person.avatar;
+      document.getElementById('profile-modal').classList.add('active');
+    }
+
+    function openChat() {
+      closeModals();
+      document.getElementById('chat-name').innerText = activeContact.name;
+      document.getElementById('chat-avatar').src = activeContact.avatar;
+      document.getElementById('chat-modal').classList.add('active');
+    }
+
+    function startCall() {
+      closeModals();
+      document.getElementById('call-name').innerText = activeContact.name;
+      document.getElementById('call-avatar').src = activeContact.avatar;
+      document.getElementById('call-modal').classList.add('active');
+    }
+
+    function endCall() {
+      closeModals();
+    }
+
+    function closeModals() {
+      document.querySelectorAll('.modal-backdrop').forEach(m => {
+        if (m.id !== 'login-modal') m.classList.remove('active');
+      });
+    }
+
+    function sendMsg() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const body = document.getElementById('chat-body');
+      const msgOut = document.createElement('div');
+      msgOut.className = 'msg msg-out';
+      msgOut.innerText = text;
+      body.appendChild(msgOut);
+
+      input.value = '';
+      body.scrollTop = body.scrollHeight;
+
+      setTimeout(() => {
+        const msgIn = document.createElement('div');
+        msgIn.className = 'msg msg-in';
+        msgIn.innerText = 'Pesan diterima 👍';
+        body.appendChild(msgIn);
+        body.scrollTop = body.scrollHeight;
+      }, 1000);
+    }
+
+    function handleKey(e) {
+      if (e.key === 'Enter') sendMsg();
+    }
+
+    buildGrid();
+  </script>
+</body>
+</html>
