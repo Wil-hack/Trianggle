@@ -20,6 +20,9 @@
       background-color: #0b0d12;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       color: #e2e8f0;
+      /* Mencegah halaman refresh otomatis saat ditarik ke bawah */
+      overscroll-behavior-y: none;
+      touch-action: pan-x pan-y;
     }
     .svg-defs {
       position: absolute;
@@ -121,7 +124,7 @@
     .grid-row:nth-child(odd) { margin-left: 24px; }
     .grid-row:nth-child(even) { margin-left: 68px; }
 
-    /* EFEK OMBAK MENGALIR SELARAS (WAVE FLOW) */
+    /* EFEK OMBAK DIOPTIMALKAN UNTUK PERFORMA MULUS (60 FPS) */
     .tile {
       position: relative;
       width: 100px;
@@ -129,18 +132,20 @@
       margin: 0 4px;
       cursor: pointer;
       will-change: transform;
+      transform: translateZ(0); /* Akselerasi Hardware GPU */
+      backface-visibility: hidden;
       animation: oceanWave 6s ease-in-out infinite alternate;
       animation-delay: calc(var(--col-index, 0) * 0.15s);
     }
 
     @keyframes oceanWave {
       0% { transform: translateY(0px) rotateX(0deg) scale(1); }
-      50% { transform: translateY(-9px) rotateX(5deg) scale(1.02); }
-      100% { transform: translateY(4px) rotateX(-4deg) scale(0.98); }
+      50% { transform: translateY(-7px) rotateX(4deg) scale(1.01); }
+      100% { transform: translateY(3px) rotateX(-3deg) scale(0.99); }
     }
 
     .tile:active {
-      transform: scale(1.15) translateZ(25px) !important;
+      transform: scale(1.1) translateZ(15px) !important;
       z-index: 30;
     }
 
@@ -148,7 +153,7 @@
       width: 100%;
       height: 100%;
       position: relative;
-      filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.7));
+      filter: brightness(0.96); /* Filter ringan pengganti drop-shadow berat */
     }
     .tile-upright .tile-inner { clip-path: url(#tri-upright-clip); }
     .tile-inverted .tile-inner { clip-path: url(#tri-inverted-clip); }
@@ -182,8 +187,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(0,0,0,0.1) 40%, rgba(11, 13, 18, 0.8) 100%);
-      box-shadow: inset 0 0 15px rgba(0,0,0,0.85);
+      background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.1) 40%, rgba(11, 13, 18, 0.8) 100%);
       pointer-events: none;
     }
 
@@ -234,7 +238,7 @@
     }
 
     .card-modal {
-      background: rgba(20, 22, 32, 0.9);
+      background: rgba(20, 22, 32, 0.95);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.12);
@@ -327,7 +331,7 @@
     }
 
     .profile-card {
-      background: rgba(20, 22, 32, 0.9);
+      background: rgba(20, 22, 32, 0.95);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.12);
@@ -362,9 +366,7 @@
     }
     .btn-ngobrol:active { transform: scale(0.96); }
 
-    /* ========================================================
-       JENDELA CHAT UTAMA LUAR: BERSIH TOTAL, DATAR, TANPA EFEK
-       ======================================================== */
+    /* JENDELA CHAT LUAR: BERSIH TOTAL & DATAR */
     .chat-backdrop {
       align-items: center;
       padding: 10px;
@@ -377,7 +379,6 @@
       background: rgba(14, 16, 23, 0.98);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 24px;
       display: flex;
@@ -438,9 +439,7 @@
       touch-action: pan-y;
     }
 
-    /* ========================================================
-       GELEMBUNG PESAN DALAM: EFEK 3D SEGITIGA TANPA GLOW
-       ======================================================== */
+    /* GELEMBUNG PESAN DALAM: EFEK 3D TIMBUL TANPA GLOW */
     .msg {
       max-width: 80%;
       padding: 11px 15px;
@@ -465,7 +464,6 @@
       border-top-right-radius: 4px;
       padding-bottom: 22px;
       padding-right: 36px;
-      /* Karakter 3D Timbul Senada Segitiga Tanpa Glow */
       border: 1px solid rgba(255, 255, 255, 0.22);
       border-top: 1.5px solid rgba(255, 255, 255, 0.35);
       box-shadow: 
@@ -483,9 +481,7 @@
       letter-spacing: -1.5px;
       font-weight: 700;
     }
-    .msg-status.read {
-      color: #38bdf8;
-    }
+    .msg-status.read { color: #38bdf8; }
 
     .chat-footer-full {
       padding: 12px 16px;
@@ -836,6 +832,38 @@
       ]
     };
 
+    // PEMICU IZIN MIKROFON OTOMATIS SAAT APLIKASI DIBUKA
+    window.addEventListener('DOMContentLoaded', () => {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+          .then((stream) => {
+            stream.getTracks().forEach(track => track.stop());
+            console.log("Izin Mikrofon Aktif!");
+          })
+          .catch((err) => {
+            console.log("Izin mikrofon belum diberikan:", err);
+          });
+      }
+      checkAutoLogin();
+    });
+
+    // SISTEM AUTO-LOGIN VIA LOCALSTORAGE
+    function checkAutoLogin() {
+      const savedUser = localStorage.getItem('trihive_user');
+      const savedName = localStorage.getItem('trihive_name');
+      const savedAvatar = localStorage.getItem('trihive_avatar');
+
+      if (savedUser) {
+        currentUser = savedUser;
+        currentDisplayName = savedName || savedUser;
+        currentAvatarUrl = savedAvatar || currentAvatarUrl;
+
+        setUserLoggedIn();
+        loadUserContacts();
+        listenIncomingCalls();
+      }
+    }
+
     function unlockAudio() {
       const notifAudio = document.getElementById('notif-audio');
       const ringAudio = document.getElementById('ring-audio');
@@ -1022,6 +1050,11 @@
           currentDisplayName = userData.displayName || inputUsername;
           currentAvatarUrl = userData.avatar || currentAvatarUrl;
 
+          // Simpan sesi ke localStorage
+          localStorage.setItem('trihive_user', currentUser);
+          localStorage.setItem('trihive_name', currentDisplayName);
+          localStorage.setItem('trihive_avatar', currentAvatarUrl);
+
           setUserLoggedIn();
           loadUserContacts();
           listenIncomingCalls();
@@ -1061,6 +1094,11 @@
           currentUser = regUsername;
           currentDisplayName = regFullname;
           currentAvatarUrl = avatar;
+
+          // Simpan sesi ke localStorage
+          localStorage.setItem('trihive_user', currentUser);
+          localStorage.setItem('trihive_name', currentDisplayName);
+          localStorage.setItem('trihive_avatar', currentAvatarUrl);
 
           setUserLoggedIn();
           loadUserContacts();
@@ -1417,6 +1455,9 @@
         currentDisplayName = newName;
         currentAvatarUrl = newAvatar;
 
+        localStorage.setItem('trihive_name', currentDisplayName);
+        localStorage.setItem('trihive_avatar', currentAvatarUrl);
+
         document.getElementById('current-user-name').innerText = currentDisplayName;
         document.getElementById('current-user-avatar').src = currentAvatarUrl;
         tempUploadAvatar = "";
@@ -1462,6 +1503,10 @@
     }
 
     window.logout = function() {
+      localStorage.removeItem('trihive_user');
+      localStorage.removeItem('trihive_name');
+      localStorage.removeItem('trihive_avatar');
+
       currentUser = null;
       contacts = [];
       unreadCounts = {};
