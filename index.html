@@ -363,7 +363,7 @@
     .btn-ngobrol:active { transform: scale(0.96); }
 
     /* ========================================================
-       JENDELA CHAT UTAMA STABIL (TANPA ANIMASI GERAK/3D LUAR)
+       JENDELA CHAT UTAMA LUAR: BERSIH TOTAL, DATAR, TANPA EFEK
        ======================================================== */
     .chat-backdrop {
       align-items: center;
@@ -374,23 +374,22 @@
       max-width: 440px;
       height: 85vh;
       max-height: 740px;
-      background: rgba(14, 16, 23, 0.95);
-      backdrop-filter: blur(25px);
-      -webkit-backdrop-filter: blur(25px);
+      background: rgba(14, 16, 23, 0.98);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       
-      /* PANEL LUAR STABIL, ELEGAN, DAN TENANG TANPA GOYANG */
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 26px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.85);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
     }
 
     .chat-header-full {
       padding: 14px 18px;
-      background: rgba(255, 255, 255, 0.04);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -440,7 +439,7 @@
     }
 
     /* ========================================================
-       EFEK 3D KHUSUS PADA GELEMBUNG PESAN USER (TIMBUL & ELEGAN)
+       GELEMBUNG PESAN DALAM: EFEK 3D SEGITIGA TANPA GLOW
        ======================================================== */
     .msg {
       max-width: 80%;
@@ -452,12 +451,12 @@
       word-break: break-word;
     }
     .msg-in {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.07);
       color: #f8fafc;
       align-self: flex-start;
       border-top-left-radius: 4px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
     }
     .msg-out {
       background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
@@ -466,14 +465,13 @@
       border-top-right-radius: 4px;
       padding-bottom: 22px;
       padding-right: 36px;
-      /* EFEK 3D TIMBUL NYATA PADA GELEMBUNG PESAN KELUAR */
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      border-top: 1px solid rgba(255, 255, 255, 0.4);
+      /* Karakter 3D Timbul Senada Segitiga Tanpa Glow */
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-top: 1.5px solid rgba(255, 255, 255, 0.35);
       box-shadow: 
-        0 8px 20px rgba(37, 99, 235, 0.45),
-        0 2px 4px rgba(0, 0, 0, 0.3),
-        inset 0 1px 1px rgba(255, 255, 255, 0.4),
-        inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+        0 6px 16px rgba(0, 0, 0, 0.4),
+        inset 0 1px 1px rgba(255, 255, 255, 0.35),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.4);
     }
     
     .msg-status {
@@ -631,7 +629,7 @@
   <audio id="ring-audio" src="https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3" loop preload="auto"></audio>
   <audio id="remote-audio" autoplay playsinline></audio>
 
-  <!-- LOGIN / REGISTER MODAL -->
+  <!-- LOGIN / REGISTER MODAL DENGAN PASSWORD -->
   <div class="modal-backdrop active" id="login-modal">
     <div class="card-modal">
       <h2>Masuk Ke TriHive</h2>
@@ -647,6 +645,10 @@
           <label>Username Unik</label>
           <input type="text" id="login-username" placeholder="Masukkan username unik...">
         </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" placeholder="Masukkan password...">
+        </div>
         <button class="btn-submit" onclick="submitLogin()">Masuk</button>
       </div>
 
@@ -658,6 +660,10 @@
         <div class="form-group">
           <label>Nama Tampilan</label>
           <input type="text" id="reg-fullname" placeholder="Contoh: Wildan Jaka">
+        </div>
+        <div class="form-group">
+          <label>Password Akun</label>
+          <input type="password" id="reg-password" placeholder="Buat password aman...">
         </div>
         <div class="form-group">
           <label>Foto Profil (Upload HP)</label>
@@ -722,7 +728,7 @@
     </div>
   </div>
 
-  <!-- CHAT MODAL STABIL DENGAN GELEMBUNG 3D -->
+  <!-- CHAT MODAL -->
   <div class="modal-backdrop chat-backdrop" id="chat-modal">
     <div class="chat-card-full">
       <div class="chat-header-full">
@@ -997,14 +1003,21 @@
     window.submitLogin = function() {
       unlockAudio();
       const inputUsername = document.getElementById('login-username').value.trim().toLowerCase();
-      if (!inputUsername) {
-        alert("Masukkan username unik Anda!");
+      const inputPassword = document.getElementById('login-password').value.trim();
+
+      if (!inputUsername || !inputPassword) {
+        alert("Username dan Password wajib diisi!");
         return;
       }
 
       get(ref(db, `users/${inputUsername}`)).then((userSnapshot) => {
         if (userSnapshot.exists()) {
           const userData = userSnapshot.val();
+          if (userData.password !== inputPassword) {
+            alert("Password salah!");
+            return;
+          }
+
           currentUser = inputUsername;
           currentDisplayName = userData.displayName || inputUsername;
           currentAvatarUrl = userData.avatar || currentAvatarUrl;
@@ -1013,7 +1026,7 @@
           loadUserContacts();
           listenIncomingCalls();
         } else {
-          alert("Username tidak ditemukan! Silakan daftar akun baru terlebih dahulu.");
+          alert("Username tidak ditemukan! Silakan daftar akun baru.");
         }
       }).catch((err) => {
         alert("Gagal terhubung ke database: " + err.message);
@@ -1024,15 +1037,16 @@
       unlockAudio();
       const regUsername = document.getElementById('reg-username').value.trim().toLowerCase();
       const regFullname = document.getElementById('reg-fullname').value.trim() || regUsername;
+      const regPassword = document.getElementById('reg-password').value.trim();
 
-      if (!regUsername) {
-        alert("Username unik wajib diisi!");
+      if (!regUsername || !regPassword) {
+        alert("Username dan Password wajib diisi!");
         return;
       }
 
       get(ref(db, `users/${regUsername}`)).then((userSnapshot) => {
         if (userSnapshot.exists()) {
-          alert("Username ini sudah dipakai orang lain! Silakan pilih username lain.");
+          alert("Username ini sudah dipakai orang lain! Pilih username lain.");
           return;
         }
 
@@ -1041,6 +1055,7 @@
         set(ref(db, `users/${regUsername}`), {
           username: regUsername,
           displayName: regFullname,
+          password: regPassword,
           avatar: avatar
         }).then(() => {
           currentUser = regUsername;
