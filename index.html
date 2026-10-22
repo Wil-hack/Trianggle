@@ -362,7 +362,7 @@
     }
     .btn-ngobrol:active { transform: scale(0.96); }
 
-    /* JENDELA CHAT MODERN (TIDAK KAKU & FLUID GLASSMORPHISM) */
+    /* JENDELA CHAT DENGAN EFEK 3D KEDALAMAN TINGGI */
     .chat-backdrop {
       align-items: center;
       padding: 10px;
@@ -372,16 +372,37 @@
       max-width: 440px;
       height: 85vh;
       max-height: 740px;
-      background: rgba(14, 16, 23, 0.94);
+      background: rgba(14, 16, 23, 0.92);
       backdrop-filter: blur(30px);
       -webkit-backdrop-filter: blur(30px);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      border-radius: 26px;
+      
+      border: 1.5px solid rgba(255, 255, 255, 0.22);
+      border-top: 1.5px solid rgba(255, 255, 255, 0.35);
+      border-radius: 28px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.8);
+      
+      box-shadow: 
+        0 35px 80px rgba(0, 0, 0, 0.85),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        inset 0 -3px 8px rgba(0, 0, 0, 0.6);
+      
+      transform: perspective(1000px) translateZ(20px);
+      animation: chatFloat3D 6s ease-in-out infinite alternate;
     }
+
+    @keyframes chatFloat3D {
+      0% {
+        transform: perspective(1000px) translateZ(15px) translateY(0px);
+        box-shadow: 0 30px 70px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 -3px 8px rgba(0, 0, 0, 0.6);
+      }
+      100% {
+        transform: perspective(1000px) translateZ(35px) translateY(-5px);
+        box-shadow: 0 45px 95px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -3px 8px rgba(0, 0, 0, 0.6);
+      }
+    }
+
     .chat-header-full {
       padding: 14px 18px;
       background: rgba(255, 255, 255, 0.04);
@@ -434,7 +455,6 @@
       touch-action: pan-y;
     }
 
-    /* BUBBLE CHAT LUWES & ELEGAN */
     .msg {
       max-width: 80%;
       padding: 11px 15px;
@@ -462,7 +482,6 @@
       box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
     }
     
-    /* CENTANG DUA KECIL MUNGIL ALA WHATSAPP */
     .msg-status {
       position: absolute;
       bottom: 4px;
@@ -709,7 +728,7 @@
     </div>
   </div>
 
-  <!-- CHAT MODAL (TAMPILAN LUWES & TIDAK KAKU) -->
+  <!-- CHAT MODAL DENGAN EFEK 3D KEDALAMAN -->
   <div class="modal-backdrop chat-backdrop" id="chat-modal">
     <div class="chat-card-full">
       <div class="chat-header-full">
