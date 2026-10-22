@@ -17,8 +17,8 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-color: #0d0e12;
-      font-family: 'Segoe UI', Roboto, sans-serif;
+      background-color: #0b0d12;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       color: #e2e8f0;
     }
     .svg-defs {
@@ -27,13 +27,15 @@
       height: 0;
       overflow: hidden;
     }
+
+    /* HEADER UTAMA */
     header {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 60px;
-      background: rgba(13, 14, 18, 0.85);
+      background: rgba(11, 13, 18, 0.85);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -45,7 +47,7 @@
     }
     .brand-title {
       font-weight: 700;
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       letter-spacing: 1.5px;
       text-transform: lowercase;
       color: #f8fafc;
@@ -88,6 +90,7 @@
       font-size: 0.85rem;
     }
 
+    /* VIEWPORT CANVAS KANVAS GESER */
     #viewport {
       width: 100vw;
       height: 100vh;
@@ -114,11 +117,8 @@
       display: flex;
       margin-top: -36px;
     }
-    
     .grid-row:nth-child(odd) { margin-left: 24px; }
     .grid-row:nth-child(even) { margin-left: 68px; }
-    .grid-row:nth-child(3n) { margin-left: 12px; }
-    .grid-row:nth-child(5n) { margin-left: 52px; }
 
     .tile {
       position: relative;
@@ -137,26 +137,26 @@
       height: 100%;
       position: relative;
     }
-    .tile-upright .tile-inner {
-      clip-path: url(#tri-upright-clip);
-    }
-    .tile-inverted .tile-inner {
-      clip-path: url(#tri-inverted-clip);
-    }
+    .tile-upright .tile-inner { clip-path: url(#tri-upright-clip); }
+    .tile-inverted .tile-inner { clip-path: url(#tri-inverted-clip); }
     
-    /* BACKGROUND ANIMASI GELOMBANG LEAS/MOVING WAVE */
+    /* ANIMASI GELOMBANG ORGANIK & BEBAS DENGAN DURATION VARYING */
     .tile-bg {
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, #181a22 0%, #0f1016 50%, #1e202e 100%);
-      background-size: 200% 200%;
+      background: linear-gradient(135deg, #181c28 0%, #0d0f17 50%, #1e2436 100%);
+      background-size: 220% 220%;
       border: 1px solid rgba(255,255,255,0.03);
-      animation: waveGlow 8s ease-in-out infinite alternate;
+      animation: organicWave 9s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
     }
-    @keyframes waveGlow {
-      0% { background-position: 0% 50%; opacity: 0.8; }
-      50% { background-position: 100% 50%; opacity: 1; }
-      100% { background-position: 0% 50%; opacity: 0.8; }
+    .tile:nth-child(3n) .tile-bg { animation-duration: 7s; animation-delay: -2s; }
+    .tile:nth-child(5n) .tile-bg { animation-duration: 11s; animation-delay: -4s; }
+    .tile:nth-child(2n+1) .tile-bg { animation-duration: 13s; animation-delay: -1s; }
+
+    @keyframes organicWave {
+      0% { background-position: 0% 20%; opacity: 0.75; }
+      50% { background-position: 100% 80%; opacity: 1; }
+      100% { background-position: 20% 100%; opacity: 0.8; }
     }
 
     .tile-photo {
@@ -165,7 +165,7 @@
       object-fit: cover;
     }
 
-    /* BADGE NOTIFIKASI ELEGAN & DITATA RAPI */
+    /* NOTIFIKASI BADGE */
     .unread-badge {
       position: absolute;
       top: 6px;
@@ -188,6 +188,7 @@
       100% { transform: scale(1); }
     }
 
+    /* MODAL WINDOW GENERIC */
     .modal-backdrop {
       position: fixed;
       top: 0;
@@ -338,6 +339,7 @@
       transition: transform 0.2s;
     }
 
+    /* TAMPILAN JENDELA CHAT DENGAN DESAIN BARU */
     .chat-backdrop {
       align-items: center;
       padding: 10px;
@@ -347,7 +349,7 @@
       max-width: 440px;
       height: 84vh;
       max-height: 720px;
-      background: rgba(16, 18, 26, 0.88);
+      background: rgba(16, 18, 26, 0.92);
       backdrop-filter: blur(25px);
       -webkit-backdrop-filter: blur(25px);
       border: 1px solid rgba(255, 255, 255, 0.14);
@@ -402,11 +404,13 @@
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       touch-action: pan-y;
     }
+
+    /* BUBBLE CHAT & DESAIN WARNA SEPERTI SIMULASI */
     .msg {
-      max-width: 80%;
+      max-width: 78%;
       padding: 10px 14px;
       border-radius: 16px;
       font-size: 0.88rem;
@@ -423,31 +427,32 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
     .msg-out {
-      background: #3b82f6;
+      background: #1e40af; /* WARNA BIRU GELAP ELEGAN SESUAI SIMULASI */
       color: white;
       align-self: flex-end;
       border-bottom-right-radius: 4px;
-      padding-bottom: 22px;
+      padding-bottom: 20px;
+      padding-right: 32px;
     }
     
-    /* STATUS CENTANG PESAN ALA WHATSAPP */
+    /* CENTANG KECIL MUNGIL ALA WHATSAPP */
     .msg-status {
       position: absolute;
-      bottom: 4px;
-      right: 10px;
-      font-size: 0.75rem;
-      color: rgba(255, 255, 255, 0.6);
+      bottom: 3px;
+      right: 8px;
+      font-size: 0.65rem;
+      color: rgba(255, 255, 255, 0.65);
       letter-spacing: -1.5px;
-      font-weight: bold;
+      font-weight: 600;
     }
     .msg-status.read {
-      color: #38bdf8; /* CENTANG BIRU WA */
+      color: #38bdf8; /* CENTANG BIRU CYAN CERAH */
     }
 
     .chat-footer-full {
       padding: 12px 16px;
       padding-bottom: max(14px, env(safe-area-inset-bottom));
-      background: rgba(10, 11, 15, 0.8);
+      background: rgba(10, 11, 15, 0.85);
       border-top: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       gap: 8px;
@@ -464,24 +469,32 @@
       outline: none;
       font-size: 0.88rem;
     }
+
+    /* TOMBOL KIRIM BULAT DENGAN PANAH PUTIH TEGAS */
     .btn-chat-action {
-      background: #3b82f6;
+      background: #2563eb;
       border: none;
-      width: 40px;
-      height: 40px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       color: white;
-      font-size: 1rem;
+      font-size: 1.1rem;
       cursor: pointer;
       display: flex;
       justify-content: center;
       align-items: center;
       flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+      transition: transform 0.15s ease;
+    }
+    .btn-chat-action:active {
+      transform: scale(0.92);
     }
     .btn-mic {
       background: rgba(239, 68, 68, 0.2);
       border: 1px solid rgba(239, 68, 68, 0.4);
       color: #ef4444;
+      box-shadow: none;
     }
     .btn-mic.recording {
       background: #ef4444;
@@ -800,7 +813,7 @@
       }
     }
 
-    // DESAIN MOSAIK: MENGGABUNGKAN KONTAK DAN UBIN ABSTRAK BERGELOMBANG
+    // BUILD MOSAIC GRID DENGAN ANIMASI GELOMBANG ORGANIK
     function buildGrid() {
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
@@ -818,7 +831,6 @@
           const inner = document.createElement('div');
           inner.className = 'tile-inner';
 
-          // Tampilkan kontak hanya sekali per urutan unik jika kontak tersedia
           if (!isUpright && contactIdx < contacts.length) {
             const person = contacts[contactIdx];
             const img = document.createElement('img');
@@ -842,7 +854,6 @@
             };
             contactIdx++;
           } else {
-            // Ubin Latar Belakang Gelombang Bergerak (Abstract Wave)
             const bg = document.createElement('div');
             bg.className = 'tile-bg';
             inner.appendChild(bg);
@@ -1022,7 +1033,6 @@
       });
     }
 
-    // MENGHITUNG PESAN UNREAD REAL-TIME DARI DATABASE FIREBASE
     function listenIncomingMessages(contactUsername) {
       if (activeListeners[contactUsername]) return;
       activeListeners[contactUsername] = true;
@@ -1245,7 +1255,6 @@
       document.getElementById('call-modal').classList.remove('active');
     }
 
-    // PESAN SUARA (VOICE NOTE)
     window.toggleVoiceRecord = async function() {
       const micBtn = document.getElementById('btn-mic');
       if (!isRecording) {
@@ -1395,11 +1404,10 @@
       document.getElementById('chat-avatar').src = activeContact.avatar;
       document.getElementById('chat-modal').classList.add('active');
       
-      // RESET BADGE NOTIFIKASI SECARA INSTAN PADA UI
       unreadCounts[activeContact.username] = 0;
       buildGrid();
 
-      // PANTAU STATUS ONLINE/OFFLINE KONTAK SECARA REALTIME
+      // PANTAU STATUS ONLINE/OFFLINE KONTAK REALTIME
       const statusElem = document.getElementById('chat-status');
       const contactStatusRef = ref(db, `status/${activeContact.username}`);
 
@@ -1421,7 +1429,6 @@
       return [userA, userB].sort().join('_');
     }
 
-    // MEMUAT PESAN DAN UPDATE STATUS DIBACA ALA WHATSAPP
     function loadMessages() {
       const chatBody = document.getElementById('chat-body');
       chatBody.innerHTML = '';
@@ -1434,7 +1441,6 @@
         const msgKey = snapshot.key;
         const isMe = data.sender === currentUser;
 
-        // BILA PESAN DARI LAWAN CHAT, UPDATE BAHWA SUDAH DIBACA (READ)
         if (!isMe && data.unread !== false) {
           update(ref(db, `chats/${roomId}/${msgKey}`), { unread: false });
         }
@@ -1448,13 +1454,12 @@
 
         msgDiv.className = `msg ${isMe ? 'msg-out' : 'msg-in'}`;
 
-        // CENTANG DINAMIS ALA WHATSAPP
         let statusTicks = '';
         if (isMe) {
           if (data.unread === false) {
-            statusTicks = '<span class="msg-status read">✓✓</span>'; // DIBACA (BIRU)
+            statusTicks = '<span class="msg-status read">✓✓</span>';
           } else {
-            statusTicks = '<span class="msg-status">✓✓</span>'; // DITERIMA (ABU-ABU)
+            statusTicks = '<span class="msg-status">✓✓</span>';
           }
         }
 
@@ -1473,7 +1478,6 @@
         chatBody.scrollTop = chatBody.scrollHeight;
       });
 
-      // PANTAU UPDATE STATUS REALTIME DARI LAWAN CHAT (UNTUK CENTANG BIRU)
       onChildChanged(messagesRef, (snapshot) => {
         const data = snapshot.val();
         const msgKey = snapshot.key;
