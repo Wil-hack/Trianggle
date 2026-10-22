@@ -98,6 +98,7 @@
       position: relative;
       cursor: grab;
       touch-action: none;
+      perspective: 800px;
     }
     #viewport:active {
       cursor: grabbing;
@@ -120,55 +121,65 @@
     .grid-row:nth-child(odd) { margin-left: 24px; }
     .grid-row:nth-child(even) { margin-left: 68px; }
 
+    /* STRUCTURE UBIN DENGAN ANIMASI GERAKAN 3D GELOMBANG */
     .tile {
       position: relative;
       width: 100px;
       height: 115px;
       margin: 0 4px;
-      transition: transform 0.2s ease;
       cursor: pointer;
+      will-change: transform;
+      animation: wave3D 7s ease-in-out infinite alternate;
     }
+    .tile:nth-child(2n) { animation-duration: 6s; animation-delay: -1.5s; }
+    .tile:nth-child(3n) { animation-duration: 8.5s; animation-delay: -3s; }
+    .tile:nth-child(5n) { animation-duration: 10s; animation-delay: -4.5s; }
+
+    @keyframes wave3D {
+      0% {
+        transform: translateY(0px) rotateX(0deg) rotateY(0deg) scale(1);
+      }
+      50% {
+        transform: translateY(-8px) rotateX(6deg) rotateY(-4deg) scale(1.03);
+      }
+      100% {
+        transform: translateY(5px) rotateX(-5deg) rotateY(5deg) scale(0.98);
+      }
+    }
+
     .tile:active {
-      transform: scale(1.12);
-      z-index: 20;
+      transform: scale(1.15) translateZ(20px) !important;
+      z-index: 30;
     }
+
     .tile-inner {
       width: 100%;
       height: 100%;
       position: relative;
+      filter: drop-shadow(0px 8px 12px rgba(0, 0, 0, 0.6));
     }
     .tile-upright .tile-inner { clip-path: url(#tri-upright-clip); }
     .tile-inverted .tile-inner { clip-path: url(#tri-inverted-clip); }
     
-    /* ANIMASI GELOMBANG ORGANIK UBIN BACKGROUND */
+    /* BACKGROUND GRADASI GELOMBANG LEAS */
     .tile-bg {
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, #181c28 0%, #0d0f17 50%, #1e2436 100%);
-      background-size: 220% 220%;
-      border: 1px solid rgba(255,255,255,0.03);
-      animation: organicWave 9s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+      background: linear-gradient(135deg, #181c28 0%, #0d0f17 50%, #22293e 100%);
+      background-size: 200% 200%;
+      animation: colorGlow 9s ease infinite alternate;
     }
-    .tile:nth-child(3n) .tile-bg { animation-duration: 7s; animation-delay: -2s; }
-    .tile:nth-child(5n) .tile-bg { animation-duration: 11s; animation-delay: -4s; }
-    .tile:nth-child(2n+1) .tile-bg { animation-duration: 13s; animation-delay: -1s; }
+    @keyframes colorGlow {
+      0% { background-position: 0% 20%; }
+      100% { background-position: 100% 80%; }
+    }
 
-    /* UBIN FOTO PROFIL DENGAN ANIMASI GERAK + EFEK GRADASI OVERLAY */
+    /* UBIN FOTO PROFIL TERIMBUL EFEK 3D & GRADASI OVERLAY */
     .tile-photo-wrapper {
       position: relative;
       width: 100%;
       height: 100%;
-      animation: floatPhotoTile 8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
     }
-    .tile:nth-child(odd) .tile-photo-wrapper { animation-duration: 6.5s; animation-delay: -1.5s; }
-    .tile:nth-child(even) .tile-photo-wrapper { animation-duration: 10s; animation-delay: -3.5s; }
-
-    @keyframes floatPhotoTile {
-      0% { transform: translateY(0px) scale(1); filter: brightness(0.92); }
-      50% { transform: translateY(-3px) scale(1.02); filter: brightness(1.05); }
-      100% { transform: translateY(2px) scale(0.99); filter: brightness(0.96); }
-    }
-
     .tile-photo {
       width: 100%;
       height: 100%;
@@ -181,17 +192,13 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(180deg, rgba(13, 14, 18, 0.25) 0%, rgba(59, 130, 246, 0.15) 50%, rgba(13, 14, 18, 0.6) 100%);
+      /* GRADASI 3D BEVEL & SHADOW UNTUK PROFIL */
+      background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.1) 40%, rgba(11, 13, 18, 0.75) 100%);
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
       pointer-events: none;
     }
 
-    @keyframes organicWave {
-      0% { background-position: 0% 20%; opacity: 0.75; }
-      50% { background-position: 100% 80%; opacity: 1; }
-      100% { background-position: 20% 100%; opacity: 0.8; }
-    }
-
-    /* NOTIFIKASI BADGE */
+    /* NOTIFIKASI BADGE UNREAD */
     .unread-badge {
       position: absolute;
       top: 6px;
@@ -365,7 +372,7 @@
       transition: transform 0.2s;
     }
 
-    /* TAMPILAN JENDELA CHAT DENGAN IKON & WARNA MASA KINI */
+    /* TAMPILAN CHAT */
     .chat-backdrop {
       align-items: center;
       padding: 10px;
@@ -411,7 +418,6 @@
       gap: 12px;
     }
 
-    /* IKON TELEPON MODERN DI HEADER */
     .btn-icon-call {
       background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       border: 1px solid rgba(255, 255, 255, 0.15);
@@ -438,7 +444,6 @@
       touch-action: pan-y;
     }
 
-    /* BUBBLE CHAT & DESAIN WARNA ELEGAN */
     .msg {
       max-width: 78%;
       padding: 10px 14px;
@@ -465,7 +470,6 @@
       padding-right: 32px;
     }
     
-    /* CENTANG KECIL MUNGIL ALA WHATSAPP */
     .msg-status {
       position: absolute;
       bottom: 3px;
@@ -500,7 +504,6 @@
       font-size: 0.88rem;
     }
 
-    /* TOMBOL KIRIM & MIC DENGAN IKON SVG KEKINIAN */
     .btn-chat-action {
       background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
       border: none;
@@ -697,14 +700,13 @@
     </div>
   </div>
 
-  <!-- PROFILE PREVIEW MODAL DENGAN STATUS REALTIME -->
+  <!-- PROFILE PREVIEW MODAL -->
   <div class="modal-backdrop" id="profile-modal">
     <div class="profile-card">
       <button class="close-btn" onclick="closeModals()">✕</button>
       <img id="preview-avatar" src="" alt="Avatar">
       <h3 id="preview-name" style="margin-bottom: 2px; font-size:1.2rem;">Nama Kontak</h3>
       <p id="preview-username-id" style="color: #94a3b8; font-size: 0.75rem; margin-bottom: 6px;">@username</p>
-      <!-- TEKS STATUS OFFLINE/ONLINE REALTIME HUBUNGAN FIREBASE -->
       <p id="preview-status" style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 20px;">● Offline</p>
       <button class="btn-ngobrol" onclick="openChat()">Ngobrol</button>
     </div>
@@ -718,12 +720,10 @@
           <img id="chat-avatar" src="" alt="Avatar">
           <div>
             <h4 id="chat-name" style="color:white; font-size:0.95rem; font-weight:600;">Nama Kontak</h4>
-            <!-- STATUS ONLINE / OFFLINE REALTIME HEADER CHAT -->
             <span id="chat-status" style="color:#94a3b8; font-size:0.75rem;">Offline</span>
           </div>
         </div>
         <div class="header-actions">
-          <!-- IKON PANGGILAN SUARA SVG MODERN -->
           <button class="btn-icon-call" onclick="startCall()" title="Panggil Suara">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
@@ -735,7 +735,6 @@
       <div class="chat-body-full" id="chat-body"></div>
       <div class="chat-footer-full">
         <input type="text" id="chat-input" placeholder="Ketik pesan..." onkeypress="handleKey(event)">
-        <!-- IKON MIKROFON VOICE NOTE SVG MODERN -->
         <button class="btn-chat-action btn-mic" id="btn-mic" onclick="toggleVoiceRecord()" title="Kirim Pesan Suara">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
@@ -744,7 +743,6 @@
             <line x1="8" y1="23" x2="16" y2="23"/>
           </svg>
         </button>
-        <!-- IKON KIRIM PESAN PESAWAT KERTAS SVG MODERN -->
         <button class="btn-chat-action" onclick="sendMsg()" title="Kirim">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="22" y1="2" x2="11" y2="13"/>
@@ -755,7 +753,7 @@
     </div>
   </div>
 
-  <!-- CALL OUTGOING / ACTIVE OVERLAY -->
+  <!-- CALL OVERLAYS -->
   <div class="modal-backdrop" id="call-modal">
     <div class="call-card">
       <img class="call-avatar" id="call-avatar" src="" alt="Avatar">
@@ -767,7 +765,6 @@
     </div>
   </div>
 
-  <!-- INCOMING CALL OVERLAY -->
   <div class="modal-backdrop" id="incoming-call-modal">
     <div class="call-card">
       <img class="call-avatar" id="incoming-avatar" src="" alt="Avatar">
@@ -780,7 +777,7 @@
     </div>
   </div>
 
-  <!-- Firebase SDKs (CDN Version) -->
+  <!-- Firebase SDKs -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, push, onChildAdded, onChildChanged, set, get, update, remove, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -864,7 +861,7 @@
       }
     }
 
-    // RENDERING MOSAIK GRID DENGAN UBIN PROFIL BERGERAK + GRADASI
+    // RENDERING MOSAIK GRID DENGAN ANIMASI 3D GELOMBANG REAL
     function buildGrid() {
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
@@ -885,7 +882,6 @@
           if (!isUpright && contactIdx < contacts.length) {
             const person = contacts[contactIdx];
             
-            // WRAPPER FOTO PROFIL UNTUK ANIMASI FLOATING GELOMBANG
             const photoWrapper = document.createElement('div');
             photoWrapper.className = 'tile-photo-wrapper';
 
@@ -1056,7 +1052,6 @@
       document.getElementById('current-user-name').innerText = currentDisplayName;
       document.getElementById('current-user-avatar').src = currentAvatarUrl;
 
-      // SINKRONISASI PRESENCE SYSTEM REALTIME FIREBASE
       const userStatusRef = ref(db, `status/${currentUser}`);
       const connectedRef = ref(db, '.info/connected');
 
@@ -1452,7 +1447,6 @@
       document.getElementById('login-modal').classList.add('active');
     }
 
-    // FUNGSI PREVIEW PROFIL TERHUBUNG REALTIME FIREBASE STATUS
     window.openProfile = function(person) {
       activeContact = person;
       document.getElementById('preview-name').innerText = person.name;
@@ -1478,7 +1472,6 @@
       document.getElementById('profile-modal').classList.add('active');
     }
 
-    // FUNGSI CHAT TERHUBUNG REALTIME FIREBASE STATUS
     window.openChat = function() {
       closeModals();
       document.getElementById('chat-name').innerText = activeContact.name;
