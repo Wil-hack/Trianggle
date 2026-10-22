@@ -143,36 +143,48 @@
     .tile-inverted .tile-inner {
       clip-path: url(#tri-inverted-clip);
     }
+    
+    /* BACKGROUND ANIMASI GELOMBANG LEAS/MOVING WAVE */
     .tile-bg {
       width: 100%;
       height: 100%;
-      background: radial-gradient(circle at center, #181a22 0%, #0f1016 100%);
-      border: 1px solid rgba(255,255,255,0.02);
+      background: linear-gradient(135deg, #181a22 0%, #0f1016 50%, #1e202e 100%);
+      background-size: 200% 200%;
+      border: 1px solid rgba(255,255,255,0.03);
+      animation: waveGlow 8s ease-in-out infinite alternate;
     }
+    @keyframes waveGlow {
+      0% { background-position: 0% 50%; opacity: 0.8; }
+      50% { background-position: 100% 50%; opacity: 1; }
+      100% { background-position: 0% 50%; opacity: 0.8; }
+    }
+
     .tile-photo {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
+    /* BADGE NOTIFIKASI ELEGAN & DITATA RAPI */
     .unread-badge {
       position: absolute;
-      top: 8px;
-      right: 8px;
-      background: #ef4444;
+      top: 6px;
+      right: 6px;
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
       color: white;
-      font-size: 0.65rem;
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 10px;
-      border: 2px solid #0d0e12;
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 3px 7px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.6);
       z-index: 10;
       display: none;
-      animation: pulse 1.5s infinite;
+      animation: badgePulse 2s infinite ease-in-out;
     }
-    @keyframes pulse {
+    @keyframes badgePulse {
       0% { transform: scale(1); }
-      50% { transform: scale(1.15); }
+      50% { transform: scale(1.12); }
       100% { transform: scale(1); }
     }
 
@@ -417,14 +429,21 @@
       border-bottom-right-radius: 4px;
       padding-bottom: 22px;
     }
+    
+    /* STATUS CENTANG PESAN ALA WHATSAPP */
     .msg-status {
       position: absolute;
       bottom: 4px;
-      right: 12px;
-      font-size: 0.7rem;
-      color: rgba(255, 255, 255, 0.8);
-      letter-spacing: -1px;
+      right: 10px;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.6);
+      letter-spacing: -1.5px;
+      font-weight: bold;
     }
+    .msg-status.read {
+      color: #38bdf8; /* CENTANG BIRU WA */
+    }
+
     .chat-footer-full {
       padding: 12px 16px;
       padding-bottom: max(14px, env(safe-area-inset-bottom));
@@ -700,7 +719,7 @@
   <!-- Firebase SDKs (CDN Version) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, onChildAdded, set, get, update, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push, onChildAdded, onChildChanged, set, get, update, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBfAvdE0PZMvytkSaofbFAgk0749E-b_pI",
@@ -779,6 +798,7 @@
       }
     }
 
+    // DESAIN MOSAIK: MENGGABUNGKAN KONTAK DAN UBIN ABSTRAK BERGELOMBANG
     function buildGrid() {
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
@@ -796,8 +816,9 @@
           const inner = document.createElement('div');
           inner.className = 'tile-inner';
 
-          if (!isUpright && contacts.length > 0) {
-            const person = contacts[contactIdx % contacts.length];
+          // Tampilkan kontak hanya sekali per urutan unik jika kontak tersedia
+          if (!isUpright && contactIdx < contacts.length) {
+            const person = contacts[contactIdx];
             const img = document.createElement('img');
             img.src = person.avatar || currentAvatarUrl;
             img.className = 'tile-photo';
@@ -806,21 +827,20 @@
             const badge = document.createElement('div');
             badge.className = 'unread-badge';
             badge.id = `badge-${person.username}`;
-            if (unreadCounts[person.username] > 0) {
-              badge.innerText = unreadCounts[person.username];
+            
+            const count = unreadCounts[person.username] || 0;
+            if (count > 0) {
+              badge.innerText = count;
               badge.style.display = 'block';
             }
             tile.appendChild(badge);
 
             tile.onclick = () => {
-              unreadCounts[person.username] = 0;
-              if(document.getElementById(`badge-${person.username}`)) {
-                document.getElementById(`badge-${person.username}`).style.display = 'none';
-              }
               openProfile(person);
             };
             contactIdx++;
           } else {
+            // Ubin Latar Belakang Gelombang Bergerak (Abstract Wave)
             const bg = document.createElement('div');
             bg.className = 'tile-bg';
             inner.appendChild(bg);
@@ -983,6 +1003,7 @@
       });
     }
 
+    // MENGHITUNG PESAN UNREAD REAL-TIME DARI DATABASE FIREBASE
     function listenIncomingMessages(contactUsername) {
       if (activeListeners[contactUsername]) return;
       activeListeners[contactUsername] = true;
@@ -990,21 +1011,40 @@
       const roomId = getRoomId(currentUser, contactUsername);
       const messagesRef = ref(db, `chats/${roomId}`);
 
-      let initialLoad = true;
+      let isInitialLoad = true;
       get(messagesRef).then(() => {
-        initialLoad = false;
+        isInitialLoad = false;
       });
 
       onChildAdded(messagesRef, (snapshot) => {
         const data = snapshot.val();
+        
+        // JIKA PESAN DITERIMA DARI KONTAK DAN BELUM DIBACA
         if (data.sender === contactUsername) {
           const isChatOpen = activeContact && activeContact.username === contactUsername && document.getElementById('chat-modal').classList.contains('active');
-          
-          if (!isChatOpen) {
-            if (!initialLoad) {
-              playNotificationSound();
+
+          if (isChatOpen) {
+            // JIKA RUANG CHAT DIBUKA, TANDAI DIBACA
+            update(ref(db, `chats/${roomId}/${snapshot.key}`), { unread: false });
+          } else {
+            if (data.unread !== false) {
+              if (!isInitialLoad) {
+                playNotificationSound();
+              }
+              unreadCounts[contactUsername] = (unreadCounts[contactUsername] || 0) + 1;
+              buildGrid();
             }
-            unreadCounts[contactUsername] = (unreadCounts[contactUsername] || 0) + 1;
+          }
+        }
+      });
+
+      // BILA TERJADI PERUBAHAN STATUS UNREAD DI DATABASE
+      onChildChanged(messagesRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data.sender === contactUsername && data.unread === false) {
+          if (unreadCounts[contactUsername] > 0) {
+            unreadCounts[contactUsername]--;
+            if (unreadCounts[contactUsername] < 0) unreadCounts[contactUsername] = 0;
             buildGrid();
           }
         }
@@ -1140,7 +1180,7 @@
         await peerConnection.setLocalDescription(answer);
 
         await update(ref(db, `webrtc_signals/${targetUser}`), {
-          answer: { type: answer.type, sdp: answer.sdp }
+          answer: { type: answer.type, sdp: offerSnap.val().offer.sdp }
         });
       }
 
@@ -1241,6 +1281,7 @@
         sender: currentUser,
         type: 'voice',
         audio: audioBase64,
+        unread: true,
         timestamp: Date.now()
       });
     }
@@ -1337,6 +1378,11 @@
       document.getElementById('chat-name').innerText = activeContact.name;
       document.getElementById('chat-avatar').src = activeContact.avatar;
       document.getElementById('chat-modal').classList.add('active');
+      
+      // RESET BADGE NOTIFIKASI SECARA INSTAN PADA UI
+      unreadCounts[activeContact.username] = 0;
+      buildGrid();
+
       loadMessages();
     }
 
@@ -1344,6 +1390,7 @@
       return [userA, userB].sort().join('_');
     }
 
+    // MEMUAT PESAN DAN UPDATE STATUS DIBACA ALA WHATSAPP
     function loadMessages() {
       const chatBody = document.getElementById('chat-body');
       chatBody.innerHTML = '';
@@ -1353,9 +1400,32 @@
 
       onChildAdded(messagesRef, (snapshot) => {
         const data = snapshot.val();
-        const msgDiv = document.createElement('div');
+        const msgKey = snapshot.key;
         const isMe = data.sender === currentUser;
+
+        // BILA PESAN DARI LAWAN CHAT, UPDATE BAHWA SUDAH DIBACA (READ)
+        if (!isMe && data.unread !== false) {
+          update(ref(db, `chats/${roomId}/${msgKey}`), { unread: false });
+        }
+
+        let msgDiv = document.getElementById(`msg-${msgKey}`);
+        if (!msgDiv) {
+          msgDiv = document.createElement('div');
+          msgDiv.id = `msg-${msgKey}`;
+          chatBody.appendChild(msgDiv);
+        }
+
         msgDiv.className = `msg ${isMe ? 'msg-out' : 'msg-in'}`;
+
+        // CENTANG DINAMIS ALA WHATSAPP
+        let statusTicks = '';
+        if (isMe) {
+          if (data.unread === false) {
+            statusTicks = '<span class="msg-status read">✓✓</span>'; // DIBACA (BIRU)
+          } else {
+            statusTicks = '<span class="msg-status">✓✓</span>'; // DITERIMA (ABU-ABU)
+          }
+        }
 
         if (data.type === 'voice') {
           msgDiv.innerHTML = `
@@ -1363,14 +1433,28 @@
               <button onclick="playVoice(this, '${data.audio}')" style="background:#10b981; border:none; color:white; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:0.9rem;">▶</button>
               <span>🎤 Pesan Suara</span>
             </div>
-            ${isMe ? '<span class="msg-status">✓✓</span>' : ''}
+            ${statusTicks}
           `;
         } else {
-          msgDiv.innerHTML = `${data.text}${isMe ? '<span class="msg-status">✓✓</span>' : ''}`;
+          msgDiv.innerHTML = `${data.text} ${statusTicks}`;
         }
 
-        chatBody.appendChild(msgDiv);
         chatBody.scrollTop = chatBody.scrollHeight;
+      });
+
+      // PANTAU UPDATE STATUS REALTIME DARI LAWAN CHAT (UNTUK CENTANG BIRU)
+      onChildChanged(messagesRef, (snapshot) => {
+        const data = snapshot.val();
+        const msgKey = snapshot.key;
+        const isMe = data.sender === currentUser;
+
+        const msgDiv = document.getElementById(`msg-${msgKey}`);
+        if (msgDiv && isMe) {
+          const statusElem = msgDiv.querySelector('.msg-status');
+          if (statusElem && data.unread === false) {
+            statusElem.classList.add('read');
+          }
+        }
       });
     }
 
@@ -1395,6 +1479,7 @@
         sender: currentUser,
         type: 'text',
         text: text,
+        unread: true,
         timestamp: Date.now()
       });
 
