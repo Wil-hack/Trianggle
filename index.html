@@ -121,7 +121,7 @@
     .grid-row:nth-child(odd) { margin-left: 24px; }
     .grid-row:nth-child(even) { margin-left: 68px; }
 
-    /* EFEK OMBAK MENGALIR SELARAS (WAVE FLOW) UNTUK SEMUA UBIN */
+    /* EFEK OMBAK MENGALIR SELARAS (WAVE FLOW) */
     .tile {
       position: relative;
       width: 100px;
@@ -130,20 +130,13 @@
       cursor: pointer;
       will-change: transform;
       animation: oceanWave 6s ease-in-out infinite alternate;
-      /* Mengatur jeda animasi berdasarkan posisi kolom agar mengalir seperti ombak */
       animation-delay: calc(var(--col-index, 0) * 0.15s);
     }
 
     @keyframes oceanWave {
-      0% {
-        transform: translateY(0px) rotateX(0deg) scale(1);
-      }
-      50% {
-        transform: translateY(-9px) rotateX(5deg) scale(1.02);
-      }
-      100% {
-        transform: translateY(4px) rotateX(-4deg) scale(0.98);
-      }
+      0% { transform: translateY(0px) rotateX(0deg) scale(1); }
+      50% { transform: translateY(-9px) rotateX(5deg) scale(1.02); }
+      100% { transform: translateY(4px) rotateX(-4deg) scale(0.98); }
     }
 
     .tile:active {
@@ -160,7 +153,6 @@
     .tile-upright .tile-inner { clip-path: url(#tri-upright-clip); }
     .tile-inverted .tile-inner { clip-path: url(#tri-inverted-clip); }
     
-    /* BACKGROUND GRADASI DINAMIS */
     .tile-bg {
       width: 100%;
       height: 100%;
@@ -173,7 +165,6 @@
       100% { background-position: 100% 80%; }
     }
 
-    /* UBIN FOTO PROFIL DENGAN EFEK 3D & OVERLAY GELAS */
     .tile-photo-wrapper {
       position: relative;
       width: 100%;
@@ -196,7 +187,6 @@
       pointer-events: none;
     }
 
-    /* NOTIFIKASI BADGE */
     .unread-badge {
       position: absolute;
       top: 6px;
@@ -226,9 +216,9 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(10, 11, 15, 0.7);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: rgba(10, 11, 15, 0.75);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       z-index: 200;
       display: flex;
       justify-content: center;
@@ -244,12 +234,12 @@
     }
 
     .card-modal {
-      background: rgba(22, 24, 34, 0.88);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: rgba(20, 22, 32, 0.9);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 20px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      border-radius: 24px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
       color: #e2e8f0;
       width: 90%;
       max-width: 380px;
@@ -264,7 +254,7 @@
       display: flex;
       background: rgba(255, 255, 255, 0.05);
       padding: 4px;
-      border-radius: 8px;
+      border-radius: 10px;
       margin-bottom: 16px;
     }
     .tab-btn {
@@ -275,7 +265,7 @@
       color: #94a3b8;
       font-size: 0.85rem;
       font-weight: 600;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
     }
     .tab-btn.active { background: #3b82f6; color: white; }
@@ -284,20 +274,20 @@
     .form-group label { display: block; font-size: 0.75rem; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; }
     .form-group input {
       width: 100%;
-      padding: 10px 12px;
-      background: rgba(13, 14, 18, 0.8);
+      padding: 11px 14px;
+      background: rgba(13, 14, 18, 0.85);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
+      border-radius: 10px;
       color: white;
       outline: none;
     }
     .btn-file-upload {
       display: block;
       width: 100%;
-      padding: 10px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px dashed rgba(255, 255, 255, 0.3);
-      border-radius: 8px;
+      padding: 11px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px dashed rgba(255, 255, 255, 0.25);
+      border-radius: 10px;
       color: #3b82f6;
       text-align: center;
       font-size: 0.85rem;
@@ -319,7 +309,7 @@
       padding: 12px;
       background: #3b82f6;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       color: white;
       font-weight: 600;
       cursor: pointer;
@@ -337,20 +327,21 @@
     }
 
     .profile-card {
-      background: rgba(22, 24, 34, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: rgba(20, 22, 32, 0.9);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 20px;
+      border-radius: 24px;
       width: 85%;
       max-width: 320px;
       padding: 28px 24px;
       text-align: center;
       position: relative;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
     }
     .profile-card img {
-      width: 85px;
-      height: 85px;
+      width: 88px;
+      height: 88px;
       border-radius: 50%;
       object-fit: cover;
       border: 3px solid #3b82f6;
@@ -360,17 +351,18 @@
       width: 100%;
       padding: 12px;
       border: none;
-      border-radius: 12px;
+      border-radius: 14px;
       font-weight: 700;
       font-size: 0.95rem;
       cursor: pointer;
       background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
       color: white;
-      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35);
-      transition: transform 0.2s;
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+      transition: transform 0.15s;
     }
+    .btn-ngobrol:active { transform: scale(0.96); }
 
-    /* CHAT MODAL STYLES */
+    /* JENDELA CHAT MODERN (TIDAK KAKU & FLUID GLASSMORPHISM) */
     .chat-backdrop {
       align-items: center;
       padding: 10px;
@@ -378,21 +370,21 @@
     .chat-card-full {
       width: 96%;
       max-width: 440px;
-      height: 84vh;
-      max-height: 720px;
-      background: rgba(16, 18, 26, 0.92);
-      backdrop-filter: blur(25px);
-      -webkit-backdrop-filter: blur(25px);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 22px;
+      height: 85vh;
+      max-height: 740px;
+      background: rgba(14, 16, 23, 0.94);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 26px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75);
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.8);
     }
     .chat-header-full {
       padding: 14px 18px;
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.04);
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       align-items: center;
@@ -404,11 +396,11 @@
       gap: 12px;
     }
     .chat-user-full img {
-      width: 40px;
-      height: 40px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid #3b82f6;
+      border: 2px solid #10b981;
     }
     .header-actions {
       display: flex;
@@ -419,63 +411,66 @@
     .btn-icon-call {
       background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       border: 1px solid rgba(255, 255, 255, 0.15);
-      width: 38px;
-      height: 38px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       color: white;
       cursor: pointer;
       display: flex;
       justify-content: center;
       align-items: center;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
       transition: transform 0.15s ease;
     }
     .btn-icon-call:active { transform: scale(0.92); }
 
     .chat-body-full {
       flex: 1;
-      padding: 16px;
+      padding: 18px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       touch-action: pan-y;
     }
 
+    /* BUBBLE CHAT LUWES & ELEGAN */
     .msg {
-      max-width: 78%;
-      padding: 10px 14px;
-      border-radius: 16px;
-      font-size: 0.88rem;
-      line-height: 1.4;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+      max-width: 80%;
+      padding: 11px 15px;
+      border-radius: 18px;
+      font-size: 0.9rem;
+      line-height: 1.45;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       position: relative;
       word-break: break-word;
     }
     .msg-in {
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.09);
       color: #f8fafc;
       align-self: flex-start;
-      border-bottom-left-radius: 4px;
+      border-top-left-radius: 4px;
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
     .msg-out {
-      background: #1e40af;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
       color: white;
       align-self: flex-end;
-      border-bottom-right-radius: 4px;
-      padding-bottom: 20px;
-      padding-right: 32px;
+      border-top-right-radius: 4px;
+      padding-bottom: 22px;
+      padding-right: 36px;
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
     }
     
+    /* CENTANG DUA KECIL MUNGIL ALA WHATSAPP */
     .msg-status {
       position: absolute;
-      bottom: 3px;
-      right: 8px;
-      font-size: 0.65rem;
+      bottom: 4px;
+      right: 10px;
+      font-size: 0.68rem;
       color: rgba(255, 255, 255, 0.65);
       letter-spacing: -1.5px;
-      font-weight: 600;
+      font-weight: 700;
     }
     .msg-status.read {
       color: #38bdf8;
@@ -484,29 +479,33 @@
     .chat-footer-full {
       padding: 12px 16px;
       padding-bottom: max(14px, env(safe-area-inset-bottom));
-      background: rgba(10, 11, 15, 0.85);
+      background: rgba(10, 11, 15, 0.9);
       border-top: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
-      gap: 8px;
+      gap: 10px;
       align-items: center;
     }
     .chat-footer-full input {
       flex: 1;
       min-width: 0;
-      padding: 11px 16px;
-      background: rgba(255, 255, 255, 0.07);
+      padding: 12px 18px;
+      background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 24px;
+      border-radius: 26px;
       color: white;
       outline: none;
-      font-size: 0.88rem;
+      font-size: 0.9rem;
+    }
+    .chat-footer-full input:focus {
+      border-color: rgba(59, 130, 246, 0.5);
+      background: rgba(255, 255, 255, 0.09);
     }
 
     .btn-chat-action {
       background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
       border: none;
-      width: 42px;
-      height: 42px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       color: white;
       cursor: pointer;
@@ -514,15 +513,14 @@
       justify-content: center;
       align-items: center;
       flex-shrink: 0;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45);
       transition: transform 0.15s ease;
     }
-    .btn-chat-action:active {
-      transform: scale(0.92);
-    }
+    .btn-chat-action:active { transform: scale(0.92); }
+    
     .btn-mic {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.14);
       color: #94a3b8;
       box-shadow: none;
     }
@@ -534,19 +532,20 @@
     }
 
     .call-card {
-      background: rgba(22, 24, 34, 0.95);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: rgba(20, 22, 32, 0.95);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 24px;
+      border-radius: 26px;
       width: 85%;
       max-width: 320px;
       padding: 40px 24px;
       text-align: center;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
     }
     .call-avatar {
-      width: 100px;
-      height: 100px;
+      width: 104px;
+      height: 104px;
       border-radius: 50%;
       object-fit: cover;
       border: 4px solid #10b981;
@@ -559,26 +558,26 @@
       margin-top: 25px;
     }
     .btn-accept-call {
-      width: 56px;
-      height: 56px;
+      width: 58px;
+      height: 58px;
       background: #10b981;
       border: none;
       border-radius: 50%;
       color: white;
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       cursor: pointer;
-      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+      box-shadow: 0 8px 22px rgba(16, 185, 129, 0.5);
     }
     .btn-end-call {
-      width: 56px;
-      height: 56px;
+      width: 58px;
+      height: 58px;
       background: #ef4444;
       border: none;
       border-radius: 50%;
       color: white;
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       cursor: pointer;
-      box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+      box-shadow: 0 8px 22px rgba(239, 68, 68, 0.5);
     }
   </style>
 </head>
@@ -710,7 +709,7 @@
     </div>
   </div>
 
-  <!-- CHAT MODAL -->
+  <!-- CHAT MODAL (TAMPILAN LUWES & TIDAK KAKU) -->
   <div class="modal-backdrop chat-backdrop" id="chat-modal">
     <div class="chat-card-full">
       <div class="chat-header-full">
@@ -859,7 +858,6 @@
       }
     }
 
-    // RENDERING MOSAIK GRID DENGAN EFEK OMBAK TERSEBAR SELARAS
     function buildGrid() {
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
@@ -873,7 +871,6 @@
           const tile = document.createElement('div');
           const isUpright = (r + c) % 2 === 0;
           tile.className = `tile ${isUpright ? 'tile-upright' : 'tile-inverted'}`;
-          // Menetapkan indeks kolom agar animasi ombak mengalir secara berurutan
           tile.style.setProperty('--col-index', c + (r * 0.5));
 
           const inner = document.createElement('div');
