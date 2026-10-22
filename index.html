@@ -674,7 +674,8 @@
           <img id="chat-avatar" src="" alt="Avatar">
           <div>
             <h4 id="chat-name" style="color:white; font-size:0.95rem; font-weight:600;">Nama Kontak</h4>
-            <span style="color:#10b981; font-size:0.75rem;">Online</span>
+            <!-- STATUS ONLINE / OFFLINE REALTIME -->
+            <span id="chat-status" style="color:#94a3b8; font-size:0.75rem;">Offline</span>
           </div>
         </div>
         <div class="header-actions">
@@ -719,7 +720,7 @@
   <!-- Firebase SDKs (CDN Version) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, onChildAdded, onChildChanged, set, get, update, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push, onChildAdded, onChildChanged, set, get, update, remove, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBfAvdE0PZMvytkSaofbFAgk0749E-b_pI",
@@ -742,6 +743,7 @@
     let tempUploadAvatar = "";
     let unreadCounts = {};
     let activeListeners = {};
+    let activeStatusListener = null;
 
     let peerConnection = null;
     let localStream = null;
@@ -980,6 +982,23 @@
       document.getElementById('user-pill').style.display = 'flex';
       document.getElementById('current-user-name').innerText = currentDisplayName;
       document.getElementById('current-user-avatar').src = currentAvatarUrl;
+
+      // ATUR STATUS ONLINE / OFFLINE REALTIME PADA FIREBASE
+      const userStatusRef = ref(db, `status/${currentUser}`);
+      const connectedRef = ref(db, '.info/connected');
+
+      onValue(connectedRef, (snap) => {
+        if (snap.val() === true) {
+          onDisconnect(userStatusRef).set({
+            isOnline: false,
+            lastSeen: Date.now()
+          });
+          set(userStatusRef, {
+            isOnline: true,
+            lastSeen: Date.now()
+          });
+        }
+      });
     }
 
     function loadUserContacts() {
@@ -1019,12 +1038,10 @@
       onChildAdded(messagesRef, (snapshot) => {
         const data = snapshot.val();
         
-        // JIKA PESAN DITERIMA DARI KONTAK DAN BELUM DIBACA
         if (data.sender === contactUsername) {
           const isChatOpen = activeContact && activeContact.username === contactUsername && document.getElementById('chat-modal').classList.contains('active');
 
           if (isChatOpen) {
-            // JIKA RUANG CHAT DIBUKA, TANDAI DIBACA
             update(ref(db, `chats/${roomId}/${snapshot.key}`), { unread: false });
           } else {
             if (data.unread !== false) {
@@ -1038,7 +1055,6 @@
         }
       });
 
-      // BILA TERJADI PERUBAHAN STATUS UNREAD DI DATABASE
       onChildChanged(messagesRef, (snapshot) => {
         const data = snapshot.val();
         if (data.sender === contactUsername && data.unread === false) {
@@ -1180,7 +1196,7 @@
         await peerConnection.setLocalDescription(answer);
 
         await update(ref(db, `webrtc_signals/${targetUser}`), {
-          answer: { type: answer.type, sdp: offerSnap.val().offer.sdp }
+          answer: { type: answer.type, sdp: answer.sdp }
         });
       }
 
@@ -1382,6 +1398,21 @@
       // RESET BADGE NOTIFIKASI SECARA INSTAN PADA UI
       unreadCounts[activeContact.username] = 0;
       buildGrid();
+
+      // PANTAU STATUS ONLINE/OFFLINE KONTAK SECARA REALTIME
+      const statusElem = document.getElementById('chat-status');
+      const contactStatusRef = ref(db, `status/${activeContact.username}`);
+
+      activeStatusListener = onValue(contactStatusRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data && data.isOnline) {
+          statusElem.innerText = "Online";
+          statusElem.style.color = "#10b981";
+        } else {
+          statusElem.innerText = "Offline";
+          statusElem.style.color = "#94a3b8";
+        }
+      });
 
       loadMessages();
     }
