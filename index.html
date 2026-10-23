@@ -862,25 +862,13 @@
       ]
     };
 
-    // MINTA IZIN NOTIFIKASI & MIKROFON OTOMATIS SAAT PERTAMA KALI DIBUKA
+    // Minta Izin Rekam Mikrofon Otomatis saat Pertama Buka
     document.addEventListener('deviceready', () => {
-      // 1. Minta Izin Notifikasi Pop-Up (Android 13+)
-      if (window.cordova && cordova.plugins && cordova.plugins.notification) {
-        cordova.plugins.notification.local.hasPermission((granted) => {
-          if (!granted) {
-            cordova.plugins.notification.local.requestPermission((result) => {
-              console.log("Izin Notifikasi HP: " + result);
-            });
-          }
-        });
-      }
-
-      // 2. Minta Izin Rekam Mikrofon Otomatis
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         navigator.mediaDevices.getUserMedia({ audio: true })
           .then((stream) => {
             stream.getTracks().forEach(track => track.stop());
-            console.log("Izin Mikrofon Berhasil Diberikan!");
+            console.log("Izin Mikrofon Berhasil!");
           })
           .catch((err) => {
             console.log("Izin Mikrofon Ditolak:", err);
@@ -905,19 +893,6 @@
         setUserLoggedIn();
         loadUserContacts();
         listenIncomingCalls();
-      }
-    }
-
-    function triggerSystemNotification(titleText, msgText) {
-      if (window.cordova && cordova.plugins && cordova.plugins.notification) {
-        cordova.plugins.notification.local.schedule({
-          id: Date.now(),
-          title: titleText,
-          text: msgText,
-          foreground: true,
-          vibrate: true,
-          priority: 2
-        });
       }
     }
 
@@ -1232,12 +1207,6 @@
             if (data.unread !== false) {
               if (!isInitialLoad) {
                 playNotificationSound();
-                
-                // Notifikasi Pop-up Sistem HP WhatsApp Style
-                const senderObj = contacts.find(c => c.username === contactUsername);
-                const senderTitle = senderObj ? senderObj.name : contactUsername;
-                const msgBody = data.type === 'voice' ? '🎤 Pesan Suara' : data.text;
-                triggerSystemNotification(senderTitle, msgBody);
               }
               unreadCounts[contactUsername] = (unreadCounts[contactUsername] || 0) + 1;
               buildGrid();
