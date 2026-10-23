@@ -25,14 +25,13 @@ jobs:
         cordova create myApp com.trihive.app TriHive
         cp index.html myApp/www/
         
-        # Salin file logo.png jika tersedia
         if [ -f logo.png ]; then
           cp logo.png myApp/www/logo.png
         fi
         
         cd myApp
         
-        # Buat file config.xml resmi Cordova untuk Pemasangan Ikon & Splash Screen
+        # Config.xml resmi Cordova dengan pengaturan Splash Screen Gelap
         cat <<EOT > config.xml
         <?xml version='1.0' encoding='utf-8'?>
         <widget id="com.trihive.app" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
@@ -42,6 +41,7 @@ jobs:
             <content src="index.html" />
             <allow-intent href="http://*/*" />
             <allow-intent href="https://*/*" />
+            <preference name="BackgroundColor" value="0xff0b0d12" />
             <preference name="SplashScreen" value="screen" />
             <preference name="AutoHideSplashScreen" value="true" />
             <preference name="SplashScreenDelay" value="2000" />
@@ -58,6 +58,36 @@ jobs:
         cordova plugin add cordova-plugin-android-permissions
         cordova plugin add cordova-plugin-splashscreen
         
+        # Pemasangan Ikon Aplikasi Launcher
+        if [ -f www/logo.png ]; then
+          mkdir -p platforms/android/app/src/main/res/mipmap-hdpi
+          mkdir -p platforms/android/app/src/main/res/mipmap-mdpi
+          mkdir -p platforms/android/app/src/main/res/mipmap-xhdpi
+          mkdir -p platforms/android/app/src/main/res/mipmap-xxhdpi
+          mkdir -p platforms/android/app/src/main/res/mipmap-xxxhdpi
+          
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png
+        fi
+
+        # Paksa Latar Belakang Splash Screen Android 12+ Menjadi Gelap Hitam
+        mkdir -p platforms/android/app/src/main/res/values
+        cat <<EOT > platforms/android/app/src/main/res/values/colors.xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <resources>
+            <color name="cdv_splashscreen_background">#0b0d12</color>
+        </resources>
+        EOT
+
         # Injeksi Izin Android
         sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.INTERNET" />' platforms/android/app/src/main/AndroidManifest.xml
         
