@@ -504,7 +504,6 @@
       box-shadow: inset 0 2px 5px rgba(0,0,0,0.6);
     }
 
-    /* KONTAINER PESAN SUARA SEJAJAR RAPI (TANPA WAVEFORM MELENGKUNG) */
     .voice-msg-container {
       display: flex;
       align-items: center;
@@ -863,6 +862,14 @@
       ]
     };
 
+    document.addEventListener('deviceready', () => {
+      if (window.cordova && cordova.plugins && cordova.plugins.notification) {
+        cordova.plugins.notification.local.requestPermission((granted) => {
+          console.log("Izin Notifikasi HP: " + granted);
+        });
+      }
+    }, false);
+
     window.addEventListener('DOMContentLoaded', () => {
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         navigator.mediaDevices.getUserMedia({ audio: true })
@@ -890,6 +897,19 @@
         setUserLoggedIn();
         loadUserContacts();
         listenIncomingCalls();
+      }
+    }
+
+    function triggerSystemNotification(titleText, msgText) {
+      if (window.cordova && cordova.plugins && cordova.plugins.notification) {
+        cordova.plugins.notification.local.schedule({
+          id: Date.now(),
+          title: titleText,
+          text: msgText,
+          foreground: true,
+          vibrate: true,
+          priority: 2
+        });
       }
     }
 
@@ -1204,6 +1224,12 @@
             if (data.unread !== false) {
               if (!isInitialLoad) {
                 playNotificationSound();
+                
+                // Pemicu Notifikasi Pop-up HP WhatsApp Style
+                const senderObj = contacts.find(c => c.username === contactUsername);
+                const senderTitle = senderObj ? senderObj.name : contactUsername;
+                const msgBody = data.type === 'voice' ? '🎤 Pesan Suara' : data.text;
+                triggerSystemNotification(senderTitle, msgBody);
               }
               unreadCounts[contactUsername] = (unreadCounts[contactUsername] || 0) + 1;
               buildGrid();
