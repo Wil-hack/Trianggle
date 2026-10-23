@@ -51,7 +51,7 @@
       font-weight: 700;
       font-size: 1.15rem;
       letter-spacing: 1.5px;
-      text-transform: none; /* Huruf T dan H Kapital */
+      text-transform: none;
       color: #f8fafc;
     }
     .header-controls {
@@ -364,7 +364,7 @@
     }
     .btn-ngobrol:active { transform: scale(0.96); }
 
-    /* JENDELA CHAT LUAR */
+    /* JENDELA CHAT LUAR DARK METALLIC */
     .chat-backdrop {
       align-items: center;
       padding: 10px;
@@ -374,21 +374,19 @@
       max-width: 440px;
       height: 85vh;
       max-height: 740px;
-      background: rgba(14, 16, 23, 0.98);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 24px;
+      background: #191c24;
+      border: 1.5px solid #2d3342;
+      border-radius: 28px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.9);
     }
 
     .chat-header-full {
-      padding: 14px 18px;
-      background: rgba(255, 255, 255, 0.03);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 16px 20px;
+      background: #202430;
+      border-bottom: 1px solid #2d3342;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -399,11 +397,11 @@
       gap: 12px;
     }
     .chat-user-full img {
-      width: 42px;
-      height: 42px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid #10b981;
+      border: 2px solid #dfb76c;
     }
     .header-actions {
       display: flex;
@@ -413,90 +411,83 @@
 
     .btn-icon-call {
       background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      width: 40px;
-      height: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       color: white;
       cursor: pointer;
       display: flex;
       justify-content: center;
       align-items: center;
-      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
-      transition: transform 0.15s ease;
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
     }
     .btn-icon-call:active { transform: scale(0.92); }
 
     .chat-body-full {
       flex: 1;
-      padding: 18px;
+      padding: 20px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      touch-action: pan-y;
+      gap: 14px;
+      background: #14161d;
     }
 
-    /* GELEMBUNG PESAN KACA AIR / GLASSMORPHISM */
+    /* GELEMBUNG PESAN BRUSHED METALLIC + GOLD TRIM */
     .msg {
-      max-width: 80%;
-      padding: 12px 16px;
-      font-size: 0.9rem;
+      max-width: 82%;
+      padding: 13px 18px;
+      font-size: 0.92rem;
       line-height: 1.45;
       position: relative;
       word-break: break-word;
     }
+    
+    /* RECEIVER: METALLIC DARK GREY */
     .msg-in {
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      color: #f8fafc;
+      background: linear-gradient(145deg, #323846 0%, #202430 100%);
+      color: #e2e8f0;
       align-self: flex-start;
-      border-radius: 20px 20px 20px 4px;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      border-top: 1.5px solid rgba(255, 255, 255, 0.5);
+      border-radius: 22px 22px 22px 6px;
+      border: 1.5px solid #dfb76c; /* LIS EMAS */
       box-shadow: 
-        0 8px 32px 0 rgba(0, 0, 0, 0.37),
-        inset 0 1px 2px rgba(255, 255, 255, 0.4);
+        0 8px 20px rgba(0, 0, 0, 0.6),
+        inset 0 1px 1px rgba(255, 255, 255, 0.2);
     }
+
+    /* SENDER: METALLIC ROYAL BLUE */
     .msg-out {
-      background: linear-gradient(135deg, rgba(37, 99, 235, 0.55) 0%, rgba(29, 78, 216, 0.35) 100%);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: linear-gradient(145deg, #1e3a8a 0%, #1e293b 100%);
       color: #ffffff;
       align-self: flex-end;
-      border-radius: 20px 20px 4px 20px;
-      padding-bottom: 22px;
-      padding-right: 36px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-top: 1.5px solid rgba(255, 255, 255, 0.6);
+      border-radius: 22px 22px 6px 22px;
+      padding-bottom: 24px;
+      padding-right: 40px;
+      border: 1.5px solid #dfb76c; /* LIS EMAS */
       box-shadow: 
-        0 8px 32px 0 rgba(0, 0, 0, 0.4),
-        inset 0 1px 2px rgba(255, 255, 255, 0.5),
-        0 0 15px rgba(37, 99, 235, 0.3);
+        0 8px 20px rgba(0, 0, 0, 0.6),
+        inset 0 1px 1px rgba(255, 255, 255, 0.25),
+        0 0 12px rgba(30, 58, 138, 0.5);
     }
     
     .msg-status {
       position: absolute;
-      bottom: 4px;
-      right: 10px;
-      font-size: 0.68rem;
-      color: rgba(255, 255, 255, 0.65);
+      bottom: 5px;
+      right: 12px;
+      font-size: 0.72rem;
+      color: #dfb76c; /* CENTANG EMAS */
       letter-spacing: -1.5px;
-      font-weight: 700;
+      font-weight: 800;
     }
-    .msg-status.read { color: #38bdf8; }
 
-    /* TOMBOL PLAY PESAN SUARA KACA KRISTAL BENING */
+    /* TOMBOL PLAY EMAS 3D TIMBUL */
     .btn-play-voice {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      border-top: 1.5px solid rgba(255, 255, 255, 0.9);
-      color: #ffffff;
-      width: 36px;
-      height: 36px;
+      background: linear-gradient(145deg, #dfb76c 0%, #9a7632 100%);
+      border: 1px solid #fef08a;
+      color: #1e293b;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       cursor: pointer;
       font-size: 0.85rem;
@@ -504,84 +495,91 @@
       align-items: center;
       justify-content: center;
       box-shadow: 
-        0 4px 12px rgba(0, 0, 0, 0.25),
+        0 4px 10px rgba(0, 0, 0, 0.5),
         inset 0 1px 2px rgba(255, 255, 255, 0.8);
-      transition: all 0.2s ease;
+      transition: transform 0.15s ease;
     }
     .btn-play-voice:active {
       transform: scale(0.92);
-      background: rgba(255, 255, 255, 0.5);
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.6);
     }
 
     .voice-msg-container {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .voice-top-row {
       display: flex;
       align-items: center;
       gap: 10px;
     }
     .voice-tag {
-      font-size: 0.85rem;
-      font-weight: 600;
-      letter-spacing: 0.3px;
-      color: rgba(255, 255, 255, 0.95);
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #dfb76c; /* TEKS EMAS */
       display: flex;
       align-items: center;
       gap: 6px;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+    
+    /* GARIS GELOMBANG SUARA (GOLD WAVEFORM LINE) */
+    .waveform-svg {
+      width: 100%;
+      height: 18px;
+      stroke: #dfb76c;
+      stroke-width: 2.2;
+      fill: none;
+      stroke-linecap: round;
+      margin-top: 2px;
     }
 
+    /* INPUT CHAT FOOTER */
     .chat-footer-full {
-      padding: 12px 16px;
-      padding-bottom: max(14px, env(safe-area-inset-bottom));
-      background: rgba(10, 11, 15, 0.9);
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 14px 18px;
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+      background: #191c24;
+      border-top: 1px solid #2d3342;
       display: flex;
-      gap: 10px;
+      gap: 12px;
       align-items: center;
     }
     .chat-footer-full input {
       flex: 1;
       min-width: 0;
-      padding: 12px 18px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 13px 20px;
+      background: #202430;
+      border: 1px solid #2d3342;
       border-radius: 26px;
       color: white;
       outline: none;
-      font-size: 0.9rem;
+      font-size: 0.92rem;
     }
     .chat-footer-full input:focus {
-      border-color: rgba(59, 130, 246, 0.5);
-      background: rgba(255, 255, 255, 0.09);
+      border-color: #dfb76c;
     }
 
     .btn-chat-action {
-      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      background: linear-gradient(135deg, #dfb76c 0%, #b48c40 100%);
       border: none;
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      color: white;
+      color: #10141d;
       cursor: pointer;
       display: flex;
       justify-content: center;
       align-items: center;
       flex-shrink: 0;
-      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45);
-      transition: transform 0.15s ease;
+      box-shadow: 0 4px 15px rgba(223, 183, 108, 0.35);
     }
     .btn-chat-action:active { transform: scale(0.92); }
     
     .btn-mic {
-      background: rgba(255, 255, 255, 0.07);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      color: #94a3b8;
+      background: #202430;
+      border: 1px solid #2d3342;
+      color: #dfb76c;
       box-shadow: none;
-    }
-    .btn-mic.recording {
-      background: #ef4444;
-      color: white;
-      border-color: transparent;
-      animation: pulse 1s infinite;
     }
 
     .call-card {
@@ -801,7 +799,7 @@
           </svg>
         </button>
         <button class="btn-chat-action" onclick="sendMsg()" title="Kirim">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10141d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="22" y1="2" x2="11" y2="13"/>
             <polygon points="22 2 15 22 11 13 2 9 22 2"/>
           </svg>
@@ -1674,16 +1672,21 @@
         if (data.type === 'voice') {
           msgDiv.innerHTML = `
             <div class="voice-msg-container">
-              <button class="btn-play-voice" onclick="playVoice(this, '${data.audio}')">▶</button>
-              <span class="voice-tag">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                  <line x1="12" y1="19" x2="12" y2="23"/>
-                  <line x1="8" y1="23" x2="16" y2="23"/>
-                </svg>
-                Pesan Suara
-              </span>
+              <div class="voice-top-row">
+                <button class="btn-play-voice" onclick="playVoice(this, '${data.audio}')">▶</button>
+                <span class="voice-tag">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dfb76c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" y1="19" x2="12" y2="23"/>
+                    <line x1="8" y1="23" x2="16" y2="23"/>
+                  </svg>
+                  Pesan Suara
+                </span>
+              </div>
+              <svg class="waveform-svg" viewBox="0 0 100 15">
+                <path d="M0,7 Q10,1 20,7 T40,7 T60,2 T80,12 T100,7" />
+              </svg>
             </div>
             ${statusTicks}
           `;
