@@ -33,14 +33,13 @@ jobs:
           cp index.html myApp/www/index.html
         fi
         
-        # Salin logo utama jika file logo.png tersedia
         if [ -f logo.png ]; then
           cp logo.png myApp/www/logo.png
         fi
         
         cd myApp
         
-        # Config.xml Resmi Menggunakan Logo Kustom
+        # Config.xml Resmi: Matikan SplashScreen Bawaan Cordova Secara Total
         cat <<EOT > config.xml
         <?xml version='1.0' encoding='utf-8'?>
         <widget id="com.trihive.app" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
@@ -51,8 +50,10 @@ jobs:
             <allow-intent href="http://*/*" />
             <allow-intent href="https://*/*" />
             <preference name="BackgroundColor" value="#0b0d12" />
-            <preference name="SplashScreenDelay" value="0" />
+            <preference name="ShowSplashScreen" value="false" />
             <preference name="AutoHideSplashScreen" value="true" />
+            <preference name="SplashScreenDelay" value="0" />
+            <preference name="FadeSplashScreen" value="false" />
             <platform name="android">
                 <icon src="www/logo.png" />
             </platform>
@@ -61,7 +62,7 @@ jobs:
 
         cordova platform add android
         
-        # Pengantian Ikon & Splash Screen Bawaan dengan logo.png
+        # Timpa gambar splashscreen default bawaan Cordova dengan file transparan/logo jika ada
         if [ -f www/logo.png ]; then
           mkdir -p platforms/android/app/src/main/res/mipmap-hdpi
           mkdir -p platforms/android/app/src/main/res/mipmap-mdpi
