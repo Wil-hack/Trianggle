@@ -22,7 +22,14 @@ jobs:
         cp index.html myApp/www/
         cd myApp
         cordova platform add android
+        
+        # Tambahkan plugin izin mikrofon resmi Cordova
+        cordova plugin add cordova-plugin-media
         cordova plugin add cordova-plugin-android-permissions
+        
+        # Injeksi permission langsung ke AndroidManifest.xml
+        sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.INTERNET" />' platforms/android/app/src/main/AndroidManifest.xml
+        
         cordova build android --debug
     - uses: actions/upload-artifact@v4
       with:
