@@ -8,26 +8,30 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
     - name: Setup Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: 18
 
-    - name: Setup Java JDK
-      uses: actions/setup-java@v3
+    - name: Setup Java JDK 11 (Solusi XmlParser)
+      uses: actions/setup-java@v4
       with:
         distribution: 'zulu'
-        java-version: '17'
+        java-version: '11'
 
     - name: Install Cordova Global
       run: npm install -g cordova@12.0.0
 
-    - name: Create and Build Project
+    - name: Create and Build Android APK
       run: |
         cordova create myApp com.trihive.app TriHive
-        cp index.html myApp/www/
+        
+        if [ -f index.html ]; then
+          cp index.html myApp/www/index.html
+        fi
         
         if [ -f logo.png ]; then
           cp logo.png myApp/www/logo.png
@@ -35,6 +39,7 @@ jobs:
         
         cd myApp
         
+        # Config.xml Resmi
         cat <<EOT > config.xml
         <?xml version='1.0' encoding='utf-8'?>
         <widget id="com.trihive.app" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
