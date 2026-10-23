@@ -90,7 +90,7 @@ jobs:
         </resources>
         EOT
 
-        # Injeksi Izin Android Termasuk Notifikasi & Vibrate
+        # Injeksi Izin Android Termasuk Notifikasi & Vibrate & Record Audio
         sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.VIBRATE" />\n    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />' platforms/android/app/src/main/AndroidManifest.xml
         
         cordova build android --debug
