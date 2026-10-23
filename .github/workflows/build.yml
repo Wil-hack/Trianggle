@@ -54,11 +54,10 @@ jobs:
 
         cordova platform add android
         
-        # Plugin Utama & Plugin Notifikasi Sistem (WhatsApp Style)
+        # Plugin Aman & Stabil (Tanpa Plugin Notifikasi Eksternal yang Sering Bentrok)
         cordova plugin add cordova-plugin-media
         cordova plugin add cordova-plugin-android-permissions
         cordova plugin add cordova-plugin-splashscreen
-        cordova plugin add cordova-plugin-local-notification
         
         # Pemasangan Ikon Aplikasi
         if [ -f www/logo.png ]; then
@@ -90,8 +89,8 @@ jobs:
         </resources>
         EOT
 
-        # Injeksi Izin Android Termasuk Notifikasi & Vibrate & Record Audio
-        sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.VIBRATE" />\n    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />' platforms/android/app/src/main/AndroidManifest.xml
+        # Injeksi Izin Android
+        sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.INTERNET" />' platforms/android/app/src/main/AndroidManifest.xml
         
         cordova build android --debug
 
