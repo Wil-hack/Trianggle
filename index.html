@@ -862,6 +862,19 @@
     };
 
     document.addEventListener('deviceready', () => {
+      // Mengaktifkan Background Mode agar proses tidak mati saat di-minimize
+      if (window.cordova && cordova.plugins && cordova.plugins.backgroundMode) {
+        cordova.plugins.backgroundMode.enable();
+        cordova.plugins.backgroundMode.setDefaults({
+          title: "TriHive Aktif",
+          text: "Aplikasi berjalan di latar belakang",
+          ticker: "TriHive siap menerima pesan",
+          hidden: false,
+          resume: true,
+          silent: false
+        });
+      }
+
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         navigator.mediaDevices.getUserMedia({ audio: true })
           .then((stream) => {
@@ -1159,7 +1172,7 @@
         }
       });
 
-      // PENGAMANAN KONEKSI BACKGROUND (HEARTBEAT SETIAP 15 DETIK)
+      // Keep-Alive Heartbeat setiap 15 detik
       setInterval(() => {
         if (currentUser) {
           set(ref(db, `status/${currentUser}/lastSeen`), Date.now());
