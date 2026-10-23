@@ -61,7 +61,10 @@ jobs:
 
         cordova platform add android
         
-        # Injeksi Izin Android Lengkap untuk Layar Tetap Siaga & Layanan Data Latar Belakang
+        # Tambahkan Plugin Background Mode Resmi
+        cordova plugin add cordova-plugin-background-mode || true
+        
+        # Injeksi Izin Android Lengkap untuk Foreground Service & Keep Alive
         sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.WAKE_LOCK" />\n    <uses-permission android:name="android.permission.VIBRATE" />\n    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />\n    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />' platforms/android/app/src/main/AndroidManifest.xml
         
         cordova build android --debug
