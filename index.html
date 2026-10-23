@@ -30,6 +30,7 @@
       overflow: hidden;
     }
 
+    /* HEADER UTAMA */
     header {
       position: fixed;
       top: 0;
@@ -50,7 +51,7 @@
       font-weight: 700;
       font-size: 1.15rem;
       letter-spacing: 1.5px;
-      text-transform: lowercase;
+      text-transform: none; /* Huruf T dan H Kapital */
       color: #f8fafc;
     }
     .header-controls {
@@ -91,6 +92,7 @@
       font-size: 0.85rem;
     }
 
+    /* VIEWPORT CANVAS KANVAS GESER */
     #viewport {
       width: 100vw;
       height: 100vh;
@@ -209,6 +211,7 @@
       100% { transform: scale(1); }
     }
 
+    /* MODAL WINDOW GENERIC */
     .modal-backdrop {
       position: fixed;
       top: 0;
@@ -361,6 +364,7 @@
     }
     .btn-ngobrol:active { transform: scale(0.96); }
 
+    /* JENDELA CHAT LUAR */
     .chat-backdrop {
       align-items: center;
       padding: 10px;
@@ -433,36 +437,43 @@
       touch-action: pan-y;
     }
 
+    /* GELEMBUNG PESAN KACA AIR / GLASSMORPHISM */
     .msg {
       max-width: 80%;
-      padding: 11px 15px;
-      border-radius: 18px;
+      padding: 12px 16px;
       font-size: 0.9rem;
       line-height: 1.45;
       position: relative;
       word-break: break-word;
     }
     .msg-in {
-      background: rgba(255, 255, 255, 0.07);
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       color: #f8fafc;
       align-self: flex-start;
-      border-top-left-radius: 4px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+      border-radius: 20px 20px 20px 4px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-top: 1.5px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 
+        0 8px 32px 0 rgba(0, 0, 0, 0.37),
+        inset 0 1px 2px rgba(255, 255, 255, 0.4);
     }
     .msg-out {
-      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-      color: white;
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.55) 0%, rgba(29, 78, 216, 0.35) 100%);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: #ffffff;
       align-self: flex-end;
-      border-top-right-radius: 4px;
+      border-radius: 20px 20px 4px 20px;
       padding-bottom: 22px;
       padding-right: 36px;
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      border-top: 1.5px solid rgba(255, 255, 255, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-top: 1.5px solid rgba(255, 255, 255, 0.6);
       box-shadow: 
-        0 6px 16px rgba(0, 0, 0, 0.4),
-        inset 0 1px 1px rgba(255, 255, 255, 0.35),
-        inset 0 -2px 4px rgba(0, 0, 0, 0.4);
+        0 8px 32px 0 rgba(0, 0, 0, 0.4),
+        inset 0 1px 2px rgba(255, 255, 255, 0.5),
+        0 0 15px rgba(37, 99, 235, 0.3);
     }
     
     .msg-status {
@@ -475,6 +486,48 @@
       font-weight: 700;
     }
     .msg-status.read { color: #38bdf8; }
+
+    /* TOMBOL PLAY PESAN SUARA KACA KRISTAL BENING */
+    .btn-play-voice {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-top: 1.5px solid rgba(255, 255, 255, 0.9);
+      color: #ffffff;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.25),
+        inset 0 1px 2px rgba(255, 255, 255, 0.8);
+      transition: all 0.2s ease;
+    }
+    .btn-play-voice:active {
+      transform: scale(0.92);
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .voice-msg-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .voice-tag {
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      color: rgba(255, 255, 255, 0.95);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
 
     .chat-footer-full {
       padding: 12px 16px;
@@ -596,7 +649,7 @@
 
   <header>
     <div class="brand">
-      <span class="brand-title">trihive</span>
+      <span class="brand-title">TriHive</span>
     </div>
     <div class="header-controls">
       <button class="btn-add-contact" onclick="openAddContactModal()">+ Kontak</button>
@@ -813,7 +866,7 @@
     let peerConnection = null;
     let localStream = null;
     let targetUser = null;
-    let pendingCandidates = []; // BUFFER STABILIZER PANGGILAN
+    let pendingCandidates = [];
     let mediaRecorder = null;
     let audioChunks = [];
     let isRecording = false;
@@ -1620,9 +1673,17 @@
 
         if (data.type === 'voice') {
           msgDiv.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <button onclick="playVoice(this, '${data.audio}')" style="background:#10b981; border:none; color:white; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:0.9rem;">▶</button>
-              <span>🎤 Pesan Suara</span>
+            <div class="voice-msg-container">
+              <button class="btn-play-voice" onclick="playVoice(this, '${data.audio}')">▶</button>
+              <span class="voice-tag">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                  <line x1="12" y1="19" x2="12" y2="23"/>
+                  <line x1="8" y1="23" x2="16" y2="23"/>
+                </svg>
+                Pesan Suara
+              </span>
             </div>
             ${statusTicks}
           `;
