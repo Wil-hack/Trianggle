@@ -6,22 +6,26 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
 
-    - uses: actions/setup-node@v3
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
       with:
         node-version: 18
 
-    - uses: actions/setup-java@v3
+    - name: Setup Java JDK
+      uses: actions/setup-java@v3
       with:
         distribution: 'zulu'
         java-version: '17'
 
-    - run: npm install -g cordova
+    - name: Install Cordova Global
+      run: npm install -g cordova@12.0.0
 
-    - run: |
+    - name: Create and Build Project
+      run: |
         cordova create myApp com.trihive.app TriHive
         cp index.html myApp/www/
         
@@ -31,7 +35,6 @@ jobs:
         
         cd myApp
         
-        # Config.xml resmi Cordova
         cat <<EOT > config.xml
         <?xml version='1.0' encoding='utf-8'?>
         <widget id="com.trihive.app" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
@@ -42,59 +45,21 @@ jobs:
             <allow-intent href="http://*/*" />
             <allow-intent href="https://*/*" />
             <preference name="BackgroundColor" value="0xff0b0d12" />
-            <preference name="SplashScreen" value="screen" />
-            <preference name="AutoHideSplashScreen" value="true" />
-            <preference name="SplashScreenDelay" value="2000" />
             <platform name="android">
                 <icon src="www/logo.png" />
-                <splash src="www/logo.png" />
             </platform>
         </widget>
         EOT
 
-        cordova platform add android
+        cordova platform add android@12.0.1
         
-        # Plugin Utama yang Stabil & Bebas Error Build
-        cordova plugin add cordova-plugin-media
-        cordova plugin add cordova-plugin-android-permissions
-        cordova plugin add cordova-plugin-splashscreen
-        
-        # Pemasangan Ikon Aplikasi
-        if [ -f www/logo.png ]; then
-          mkdir -p platforms/android/app/src/main/res/mipmap-hdpi
-          mkdir -p platforms/android/app/src/main/res/mipmap-mdpi
-          mkdir -p platforms/android/app/src/main/res/mipmap-xhdpi
-          mkdir -p platforms/android/app/src/main/res/mipmap-xxhdpi
-          mkdir -p platforms/android/app/src/main/res/mipmap-xxxhdpi
-          
-          cp www/logo.png platforms/android/app/src/main/res/mipmap-hdpi/ic_launcher.png
-          cp www/logo.png platforms/android/app/src/main/res/mipmap-mdpi/ic_launcher.png
-          cp www/logo.png platforms/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
-          cp www/logo.png platforms/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
-          cp www/logo.png platforms/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
-
-          cp www/logo.png platforms/android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png
-          cp www/logo.png platforms/android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png
-          cp www/logo.png platforms/android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png
-          cp www/logo.png platforms/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png
-          cp www/logo.png platforms/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png
-        fi
-
-        # Splash Screen Warna Gelap
-        mkdir -p platforms/android/app/src/main/res/values
-        cat <<EOT > platforms/android/app/src/main/res/values/colors.xml
-        <?xml version="1.0" encoding="utf-8"?>
-        <resources>
-            <color name="cdv_splashscreen_background">#0b0d12</color>
-        </resources>
-        EOT
-
         # Injeksi Izin Android
         sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.INTERNET" />' platforms/android/app/src/main/AndroidManifest.xml
         
         cordova build android --debug
 
-    - uses: actions/upload-artifact@v4
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
       with:
         name: TriHive-APK
         path: myApp/platforms/android/app/build/outputs/apk/debug/app-debug.apk
