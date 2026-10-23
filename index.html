@@ -862,25 +862,33 @@
       ]
     };
 
+    // MINTA IZIN NOTIFIKASI & MIKROFON OTOMATIS SAAT PERTAMA KALI DIBUKA
     document.addEventListener('deviceready', () => {
+      // 1. Minta Izin Notifikasi Pop-Up (Android 13+)
       if (window.cordova && cordova.plugins && cordova.plugins.notification) {
-        cordova.plugins.notification.local.requestPermission((granted) => {
-          console.log("Izin Notifikasi HP: " + granted);
+        cordova.plugins.notification.local.hasPermission((granted) => {
+          if (!granted) {
+            cordova.plugins.notification.local.requestPermission((result) => {
+              console.log("Izin Notifikasi HP: " + result);
+            });
+          }
         });
       }
-    }, false);
 
-    window.addEventListener('DOMContentLoaded', () => {
+      // 2. Minta Izin Rekam Mikrofon Otomatis
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         navigator.mediaDevices.getUserMedia({ audio: true })
           .then((stream) => {
             stream.getTracks().forEach(track => track.stop());
-            console.log("Izin Mikrofon Aktif!");
+            console.log("Izin Mikrofon Berhasil Diberikan!");
           })
           .catch((err) => {
-            console.log("Izin mikrofon belum diberikan:", err);
+            console.log("Izin Mikrofon Ditolak:", err);
           });
       }
+    }, false);
+
+    window.addEventListener('DOMContentLoaded', () => {
       checkAutoLogin();
     });
 
@@ -1225,7 +1233,7 @@
               if (!isInitialLoad) {
                 playNotificationSound();
                 
-                // Pemicu Notifikasi Pop-up HP WhatsApp Style
+                // Notifikasi Pop-up Sistem HP WhatsApp Style
                 const senderObj = contacts.find(c => c.username === contactUsername);
                 const senderTitle = senderObj ? senderObj.name : contactUsername;
                 const msgBody = data.type === 'voice' ? '🎤 Pesan Suara' : data.text;
