@@ -49,7 +49,6 @@
       font-weight: 700;
       font-size: 1.15rem;
       letter-spacing: 1.5px;
-      text-transform: none;
       color: #f8fafc;
     }
     .header-controls {
@@ -1160,6 +1159,19 @@
           });
         }
       });
+
+      // PENGAMANAN KONEKSI BACKGROUND (KEEP-ALIVE)
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && currentUser) {
+          set(userStatusRef, { isOnline: true, lastSeen: Date.now() });
+        }
+      });
+
+      document.addEventListener('resume', () => {
+        if (currentUser) {
+          set(userStatusRef, { isOnline: true, lastSeen: Date.now() });
+        }
+      }, false);
     }
 
     function loadUserContacts() {
@@ -1552,6 +1564,9 @@
     }
 
     window.logout = function() {
+      if (currentUser) {
+        set(ref(db, `status/${currentUser}`), { isOnline: false, lastSeen: Date.now() });
+      }
       localStorage.removeItem('trihive_user');
       localStorage.removeItem('trihive_name');
       localStorage.removeItem('trihive_avatar');
