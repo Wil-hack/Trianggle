@@ -11,7 +11,6 @@
       padding: 0;
       user-select: none;
       -webkit-user-select: none;
-      touch-action: none;
     }
     body, html {
       width: 100%;
@@ -21,7 +20,6 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       color: #e2e8f0;
       overscroll-behavior-y: none;
-      touch-action: pan-x pan-y;
     }
     .svg-defs {
       position: absolute;
@@ -99,7 +97,6 @@
       overflow: hidden;
       position: relative;
       cursor: grab;
-      touch-action: none;
       perspective: 900px;
     }
     #viewport:active {
@@ -228,7 +225,6 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
-      touch-action: auto;
     }
     .modal-backdrop.active {
       opacity: 1;
@@ -424,20 +420,23 @@
     }
     .btn-icon-call:active { transform: scale(0.92); }
 
+    /* RUANG CHAT SCROLL NORMAL */
     .chat-body-full {
       flex: 1;
       padding: 20px;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       display: flex;
       flex-direction: column;
       gap: 14px;
       background: #14161d;
+      touch-action: pan-y !important;
     }
 
-    /* GELEMBUNG PESAN BRUSHED METALLIC + GOLD TRIM */
+    /* GELEMBUNG PESAN METALLIC + GOLD TRIM */
     .msg {
       max-width: 82%;
-      padding: 13px 18px;
+      padding: 12px 18px;
       font-size: 0.92rem;
       line-height: 1.45;
       position: relative;
@@ -449,8 +448,8 @@
       background: linear-gradient(145deg, #323846 0%, #202430 100%);
       color: #e2e8f0;
       align-self: flex-start;
-      border-radius: 22px 22px 22px 6px;
-      border: 1.5px solid #dfb76c; /* LIS EMAS */
+      border-radius: 20px 20px 20px 6px;
+      border: 1.5px solid #dfb76c;
       box-shadow: 
         0 8px 20px rgba(0, 0, 0, 0.6),
         inset 0 1px 1px rgba(255, 255, 255, 0.2);
@@ -461,10 +460,10 @@
       background: linear-gradient(145deg, #1e3a8a 0%, #1e293b 100%);
       color: #ffffff;
       align-self: flex-end;
-      border-radius: 22px 22px 6px 22px;
-      padding-bottom: 24px;
-      padding-right: 40px;
-      border: 1.5px solid #dfb76c; /* LIS EMAS */
+      border-radius: 20px 20px 6px 20px;
+      padding-bottom: 22px;
+      padding-right: 38px;
+      border: 1.5px solid #dfb76c;
       box-shadow: 
         0 8px 20px rgba(0, 0, 0, 0.6),
         inset 0 1px 1px rgba(255, 255, 255, 0.25),
@@ -473,10 +472,10 @@
     
     .msg-status {
       position: absolute;
-      bottom: 5px;
+      bottom: 4px;
       right: 12px;
       font-size: 0.72rem;
-      color: #dfb76c; /* CENTANG EMAS */
+      color: #dfb76c;
       letter-spacing: -1.5px;
       font-weight: 800;
     }
@@ -486,14 +485,15 @@
       background: linear-gradient(145deg, #dfb76c 0%, #9a7632 100%);
       border: 1px solid #fef08a;
       color: #1e293b;
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       cursor: pointer;
       font-size: 0.85rem;
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
       box-shadow: 
         0 4px 10px rgba(0, 0, 0, 0.5),
         inset 0 1px 2px rgba(255, 255, 255, 0.8);
@@ -504,12 +504,8 @@
       box-shadow: inset 0 2px 5px rgba(0,0,0,0.6);
     }
 
+    /* KONTAINER PESAN SUARA SEJAJAR RAPI (TANPA WAVEFORM MELENGKUNG) */
     .voice-msg-container {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .voice-top-row {
       display: flex;
       align-items: center;
       gap: 10px;
@@ -517,21 +513,10 @@
     .voice-tag {
       font-size: 0.88rem;
       font-weight: 700;
-      color: #dfb76c; /* TEKS EMAS */
+      color: #dfb76c;
       display: flex;
       align-items: center;
       gap: 6px;
-    }
-    
-    /* GARIS GELOMBANG SUARA (GOLD WAVEFORM LINE) */
-    .waveform-svg {
-      width: 100%;
-      height: 18px;
-      stroke: #dfb76c;
-      stroke-width: 2.2;
-      fill: none;
-      stroke-linecap: round;
-      margin-top: 2px;
     }
 
     /* INPUT CHAT FOOTER */
@@ -1672,21 +1657,16 @@
         if (data.type === 'voice') {
           msgDiv.innerHTML = `
             <div class="voice-msg-container">
-              <div class="voice-top-row">
-                <button class="btn-play-voice" onclick="playVoice(this, '${data.audio}')">▶</button>
-                <span class="voice-tag">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dfb76c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                    <line x1="12" y1="19" x2="12" y2="23"/>
-                    <line x1="8" y1="23" x2="16" y2="23"/>
-                  </svg>
-                  Pesan Suara
-                </span>
-              </div>
-              <svg class="waveform-svg" viewBox="0 0 100 15">
-                <path d="M0,7 Q10,1 20,7 T40,7 T60,2 T80,12 T100,7" />
-              </svg>
+              <button class="btn-play-voice" onclick="playVoice(this, '${data.audio}')">▶</button>
+              <span class="voice-tag">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dfb76c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                  <line x1="12" y1="19" x2="12" y2="23"/>
+                  <line x1="8" y1="23" x2="16" y2="23"/>
+                </svg>
+                Pesan Suara
+              </span>
             </div>
             ${statusTicks}
           `;
