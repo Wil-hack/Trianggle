@@ -33,13 +33,14 @@ jobs:
           cp index.html myApp/www/index.html
         fi
         
+        # Salin logo utama jika file logo.png tersedia
         if [ -f logo.png ]; then
           cp logo.png myApp/www/logo.png
         fi
         
         cd myApp
         
-        # Config.xml Resmi dengan Format Warna Valid
+        # Config.xml Resmi Menggunakan Logo Kustom
         cat <<EOT > config.xml
         <?xml version='1.0' encoding='utf-8'?>
         <widget id="com.trihive.app" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
@@ -50,6 +51,8 @@ jobs:
             <allow-intent href="http://*/*" />
             <allow-intent href="https://*/*" />
             <preference name="BackgroundColor" value="#0b0d12" />
+            <preference name="SplashScreenDelay" value="0" />
+            <preference name="AutoHideSplashScreen" value="true" />
             <platform name="android">
                 <icon src="www/logo.png" />
             </platform>
@@ -58,6 +61,21 @@ jobs:
 
         cordova platform add android
         
+        # Pengantian Ikon & Splash Screen Bawaan dengan logo.png
+        if [ -f www/logo.png ]; then
+          mkdir -p platforms/android/app/src/main/res/mipmap-hdpi
+          mkdir -p platforms/android/app/src/main/res/mipmap-mdpi
+          mkdir -p platforms/android/app/src/main/res/mipmap-xhdpi
+          mkdir -p platforms/android/app/src/main/res/mipmap-xxhdpi
+          mkdir -p platforms/android/app/src/main/res/mipmap-xxxhdpi
+          
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+        fi
+
         # Injeksi Izin Android
         sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.INTERNET" />' platforms/android/app/src/main/AndroidManifest.xml
         
