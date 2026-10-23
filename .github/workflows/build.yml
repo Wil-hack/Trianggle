@@ -54,7 +54,7 @@ jobs:
 
         cordova platform add android
         
-        # Plugin Aman & Stabil (Tanpa Plugin Notifikasi Eksternal yang Sering Bentrok)
+        # Plugin Utama yang Stabil & Bebas Error Build
         cordova plugin add cordova-plugin-media
         cordova plugin add cordova-plugin-android-permissions
         cordova plugin add cordova-plugin-splashscreen
@@ -80,7 +80,7 @@ jobs:
           cp www/logo.png platforms/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png
         fi
 
-        # Latar Belakang Splash Screen Gelap
+        # Splash Screen Warna Gelap
         mkdir -p platforms/android/app/src/main/res/values
         cat <<EOT > platforms/android/app/src/main/res/values/colors.xml
         <?xml version="1.0" encoding="utf-8"?>
