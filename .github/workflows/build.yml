@@ -39,7 +39,7 @@ jobs:
         
         cd myApp
         
-        # Config.xml dengan Pengaturan Layar & Notifikasi Latar Belakang
+        # Config.xml Resmi Tanpa Plugin Eksternal yang Rewel
         cat <<EOT > config.xml
         <?xml version='1.0' encoding='utf-8'?>
         <widget id="com.trihive.app" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
@@ -61,11 +61,8 @@ jobs:
 
         cordova platform add android
         
-        # Tambahkan Plugin Push Notification & Local Notification yang Andal
-        cordova plugin add cordova-plugin-fcm-with-dependecy-updated || cordova plugin add cordova-plugin-device
-        
-        # Injeksi Izin Android Lengkap untuk Audio & Notifikasi Latar Belakang
-        sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.WAKE_LOCK" />\n    <uses-permission android:name="android.permission.VIBRATE" />\n    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />' platforms/android/app/src/main/AndroidManifest.xml
+        # Injeksi Izin Android Lengkap agar Layar Tetap Siaga & Bergetar
+        sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.WAKE_LOCK" />\n    <uses-permission android:name="android.permission.VIBRATE" />\n    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />' platforms/android/app/src/main/AndroidManifest.xml
         
         cordova build android --debug
 
