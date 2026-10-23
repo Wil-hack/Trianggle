@@ -31,7 +31,7 @@ jobs:
         
         cd myApp
         
-        # Config.xml resmi Cordova dengan pengaturan Splash Screen Gelap
+        # Config.xml resmi Cordova
         cat <<EOT > config.xml
         <?xml version='1.0' encoding='utf-8'?>
         <widget id="com.trihive.app" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
@@ -54,11 +54,13 @@ jobs:
 
         cordova platform add android
         
+        # Plugin Utama & Plugin Notifikasi Sistem (WhatsApp Style)
         cordova plugin add cordova-plugin-media
         cordova plugin add cordova-plugin-android-permissions
         cordova plugin add cordova-plugin-splashscreen
+        cordova plugin add cordova-plugin-local-notification
         
-        # Pemasangan Ikon Aplikasi Launcher
+        # Pemasangan Ikon Aplikasi
         if [ -f www/logo.png ]; then
           mkdir -p platforms/android/app/src/main/res/mipmap-hdpi
           mkdir -p platforms/android/app/src/main/res/mipmap-mdpi
@@ -79,7 +81,7 @@ jobs:
           cp www/logo.png platforms/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png
         fi
 
-        # Paksa Latar Belakang Splash Screen Android 12+ Menjadi Gelap Hitam
+        # Latar Belakang Splash Screen Gelap
         mkdir -p platforms/android/app/src/main/res/values
         cat <<EOT > platforms/android/app/src/main/res/values/colors.xml
         <?xml version="1.0" encoding="utf-8"?>
@@ -88,8 +90,8 @@ jobs:
         </resources>
         EOT
 
-        # Injeksi Izin Android
-        sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.INTERNET" />' platforms/android/app/src/main/AndroidManifest.xml
+        # Injeksi Izin Android Termasuk Notifikasi & Vibrate
+        sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.VIBRATE" />\n    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />' platforms/android/app/src/main/AndroidManifest.xml
         
         cordova build android --debug
 
