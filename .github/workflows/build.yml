@@ -21,40 +21,73 @@ jobs:
         cordova create myApp com.trihive.app TriHive
         cp index.html myApp/www/
         
-        # Salin file logo.png jika tersedia ke folder www
         if [ -f logo.png ]; then
-          cp logo.png myApp/www/icon.png
+          cp logo.png myApp/www/logo.png
         fi
         
         cd myApp
+        
+        # Konfigurasi config.xml agar Cordova mendaftarkan logo sebagai ikon dan splash screen
+        cat <<EOT > config.xml
+        <?xml version='1.0' encoding='utf-8'?>
+        <widget id="com.trihive.app" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+            <name>TriHive</name>
+            <description>Aplikasi Chat & Call TriHive</description>
+            <author email="dev@trihive.com">TriHive Team</author>
+            <content src="index.html" />
+            <allow-intent href="http://*/*" />
+            <allow-intent href="https://*/*" />
+            <preference name="SplashScreen" value="screen" />
+            <preference name="AutoHideSplashScreen" value="true" />
+            <preference name="SplashScreenDelay" value="2000" />
+            <platform name="android">
+                <icon src="www/logo.png" />
+                <splash src="www/logo.png" />
+            </platform>
+        </widget>
+        EOT
+
         cordova platform add android
         
-        # Tambahkan plugin izin mikrofon & splashscreen
         cordova plugin add cordova-plugin-media
         cordova plugin add cordova-plugin-android-permissions
+        cordova plugin add cordova-plugin-splashscreen
         
-        # Jika file icon.png ada, ganti ikon default Android Cordova & Splash
-        if [ -f www/icon.png ]; then
+        if [ -f www/logo.png ]; then
           mkdir -p platforms/android/app/src/main/res/mipmap-hdpi
           mkdir -p platforms/android/app/src/main/res/mipmap-mdpi
           mkdir -p platforms/android/app/src/main/res/mipmap-xhdpi
           mkdir -p platforms/android/app/src/main/res/mipmap-xxhdpi
           mkdir -p platforms/android/app/src/main/res/mipmap-xxxhdpi
           
-          cp www/icon.png platforms/android/app/src/main/res/mipmap-hdpi/ic_launcher.png
-          cp www/icon.png platforms/android/app/src/main/res/mipmap-mdpi/ic_launcher.png
-          cp www/icon.png platforms/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
-          cp www/icon.png platforms/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
-          cp www/icon.png platforms/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png
+          cp www/logo.png platforms/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png
           
-          cp www/icon.png platforms/android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png
-          cp www/icon.png platforms/android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png
-          cp www/icon.png platforms/android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png
-          cp www/icon.png platforms/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png
-          cp www/icon.png platforms/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png
+          # Timpa gambar splash bawaan Cordova
+          mkdir -p platforms/android/app/src/main/res/drawable
+          mkdir -p platforms/android/app/src/main/res/drawable-port-hdpi
+          mkdir -p platforms/android/app/src/main/res/drawable-port-mdpi
+          mkdir -p platforms/android/app/src/main/res/drawable-port-xhdpi
+          mkdir -p platforms/android/app/src/main/res/drawable-port-xxhdpi
+          mkdir -p platforms/android/app/src/main/res/drawable-port-xxxhdpi
+          
+          cp www/logo.png platforms/android/app/src/main/res/drawable/screen.png
+          cp www/logo.png platforms/android/app/src/main/res/drawable-port-hdpi/screen.png
+          cp www/logo.png platforms/android/app/src/main/res/drawable-port-mdpi/screen.png
+          cp www/logo.png platforms/android/app/src/main/res/drawable-port-xhdpi/screen.png
+          cp www/logo.png platforms/android/app/src/main/res/drawable-port-xxhdpi/screen.png
+          cp www/logo.png platforms/android/app/src/main/res/drawable-port-xxxhdpi/screen.png
         fi
         
-        # Injeksi permission langsung ke AndroidManifest.xml
         sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.INTERNET" />' platforms/android/app/src/main/AndroidManifest.xml
         
         cordova build android --debug
