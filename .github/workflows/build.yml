@@ -20,12 +20,39 @@ jobs:
     - run: |
         cordova create myApp com.trihive.app TriHive
         cp index.html myApp/www/
+        
+        # Salin file logo.png jika tersedia ke folder www
+        if [ -f logo.png ]; then
+          cp logo.png myApp/www/icon.png
+        fi
+        
         cd myApp
         cordova platform add android
         
-        # Tambahkan plugin izin mikrofon resmi Cordova
+        # Tambahkan plugin izin mikrofon & splashscreen
         cordova plugin add cordova-plugin-media
         cordova plugin add cordova-plugin-android-permissions
+        
+        # Jika file icon.png ada, ganti ikon default Android Cordova & Splash
+        if [ -f www/icon.png ]; then
+          mkdir -p platforms/android/app/src/main/res/mipmap-hdpi
+          mkdir -p platforms/android/app/src/main/res/mipmap-mdpi
+          mkdir -p platforms/android/app/src/main/res/mipmap-xhdpi
+          mkdir -p platforms/android/app/src/main/res/mipmap-xxhdpi
+          mkdir -p platforms/android/app/src/main/res/mipmap-xxxhdpi
+          
+          cp www/icon.png platforms/android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+          cp www/icon.png platforms/android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+          cp www/icon.png platforms/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+          cp www/icon.png platforms/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+          cp www/icon.png platforms/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+          
+          cp www/icon.png platforms/android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png
+          cp www/icon.png platforms/android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png
+          cp www/icon.png platforms/android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png
+          cp www/icon.png platforms/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png
+          cp www/icon.png platforms/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png
+        fi
         
         # Injeksi permission langsung ke AndroidManifest.xml
         sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.INTERNET" />' platforms/android/app/src/main/AndroidManifest.xml
