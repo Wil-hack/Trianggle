@@ -402,6 +402,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      z-index: 10;
     }
 
     .btn-round-call {
@@ -416,7 +417,8 @@
       justify-content: center;
       align-items: center;
       box-shadow: 0 4px 15px rgba(223, 183, 108, 0.35);
-      transition: transform 0.15s ease;
+      pointer-events: auto !important;
+      z-index: 20;
     }
     .btn-round-call:active { transform: scale(0.92); }
 
@@ -442,7 +444,6 @@
       word-break: break-word;
       display: flex;
       flex-direction: column;
-      cursor: pointer;
     }
     
     .msg-in {
@@ -508,12 +509,9 @@
       gap: 10px;
       font-size: 0.85rem;
       color: #e2e8f0;
-      cursor: pointer;
       position: relative;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-      transition: transform 0.15s ease;
     }
-    .msg-call-log:active { transform: scale(0.96); }
     .msg-call-log.missed {
       border-color: #ef4444;
       color: #fca5a5;
@@ -605,7 +603,7 @@
     }
     @keyframes pulseMic { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
 
-    /* OVERLAY VIDEO & VOICE CALL MODERN SVG */
+    /* OVERLAY VIDEO & VOICE CALL */
     .call-card-full {
       width: 100vw;
       height: 100vh;
@@ -659,7 +657,6 @@
       margin: 0 auto 20px;
     }
 
-    /* TOMBOL KONTROL PANGGILAN PRESISI */
     .call-actions {
       display: flex;
       justify-content: center;
@@ -683,6 +680,8 @@
       justify-content: center;
       align-items: center;
       box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4);
+      pointer-events: auto !important;
+      z-index: 20;
       transition: all 0.2s ease;
     }
     .btn-call-opt.active {
@@ -704,6 +703,8 @@
       justify-content: center;
       align-items: center;
       box-shadow: 0 8px 22px rgba(16, 185, 129, 0.5);
+      pointer-events: auto !important;
+      z-index: 20;
     }
     .btn-end-call {
       width: 58px;
@@ -717,6 +718,8 @@
       justify-content: center;
       align-items: center;
       box-shadow: 0 8px 22px rgba(239, 68, 68, 0.5);
+      pointer-events: auto !important;
+      z-index: 20;
     }
   </style>
 </head>
@@ -754,7 +757,6 @@
 
   <audio id="notif-audio" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
   <audio id="ring-audio" src="https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3" loop preload="auto"></audio>
-  <!-- NADA PANGGULAN "TUT TUT" BARU YANG LEMBUT DAN MERDU -->
   <audio id="ringback-audio" src="https://assets.mixkit.co/active_storage/sfx/2043/2043-preview.mp3" loop preload="auto"></audio>
   <audio id="remote-audio" autoplay playsinline></audio>
 
@@ -898,7 +900,31 @@
     </div>
   </div>
 
-  <!-- CALL OVERLAYS (VOICE & VIDEO) DENGAN IKON NATIVE MODERN -->
+  <!-- BOTTOM SHEET MODAL -->
+  <div class="modal-backdrop bottom-sheet-backdrop" id="call-sheet-modal" onclick="closeCallSheet(event)">
+    <div class="bottom-sheet-card" style="background:#191c24; border-top:1.5px solid #2d3342; border-radius:24px 24px 0 0; padding:20px 24px 36px; color:white; width:100%; max-width:500px; margin:auto 0 0 0;">
+      <div class="bottom-sheet-drag" style="width:42px; height:4px; background:#475569; border-radius:2px; margin:0 auto 16px;"></div>
+      <div class="bottom-sheet-title" style="font-size:0.88rem; color:#94a3b8; margin-bottom:16px; text-transform:uppercase;">Pilih tipe panggilan</div>
+      
+      <div class="bottom-sheet-option" onclick="startCall('voice')" style="display:flex; align-items:center; gap:16px; padding:14px 16px; border-radius:16px; background:#202430; border:1px solid #2d3342; margin-bottom:10px; cursor:pointer;">
+        <div class="opt-icon" style="width:40px; height:40px; border-radius:50%; background:rgba(223, 183, 108, 0.15); border:1px solid #dfb76c; display:flex; align-items:center; justify-content:center; color:#dfb76c;">📞</div>
+        <div>
+          <div style="font-weight: 600; font-size: 0.95rem;">Panggilan suara</div>
+          <div style="font-size: 0.78rem; color: #94a3b8;">Bicara via jaringan audio live</div>
+        </div>
+      </div>
+
+      <div class="bottom-sheet-option" onclick="startCall('video')" style="display:flex; align-items:center; gap:16px; padding:14px 16px; border-radius:16px; background:#202430; border:1px solid #2d3342; margin-bottom:10px; cursor:pointer;">
+        <div class="opt-icon" style="width:40px; height:40px; border-radius:50%; background:rgba(223, 183, 108, 0.15); border:1px solid #dfb76c; display:flex; align-items:center; justify-content:center; color:#dfb76c;">📹</div>
+        <div>
+          <div style="font-weight: 600; font-size: 0.95rem;">Panggilan video</div>
+          <div style="font-size: 0.78rem; color: #94a3b8;">Tatap muka langsung dengan kamera HP</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALL OVERLAYS -->
   <div class="modal-backdrop" id="call-modal">
     <div class="call-card-full">
       <video id="remote-video" autoplay playsinline></video>
@@ -911,7 +937,7 @@
       </div>
 
       <div class="call-actions">
-        <!-- TOMBOL MUTE MIC SVG -->
+        <!-- TOMBOL MUTE MIC -->
         <button class="btn-call-opt" id="btn-toggle-mic" onclick="toggleMuteMic()" title="Mute Mic">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
@@ -921,7 +947,7 @@
           </svg>
         </button>
         
-        <!-- TOMBOL LOUDSPEAKER SVG -->
+        <!-- TOMBOL LOUDSPEAKER -->
         <button class="btn-call-opt" id="btn-toggle-speaker" onclick="toggleSpeakerSwitch()" title="Loudspeaker">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
@@ -929,7 +955,7 @@
           </svg>
         </button>
 
-        <!-- TOMBOL FLIP CAMERA SVG -->
+        <!-- TOMBOL FLIP CAMERA -->
         <button class="btn-call-opt" id="btn-switch-camera" onclick="switchCamera()" title="Tukar Kamera" style="display:none;">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M20 10c0-4.4-3.6-8-8-8s-8 3.6-8 8c0 2.1.8 4 2.2 5.5"/>
@@ -1023,7 +1049,6 @@
       return `${hours}:${minutes}`;
     }
 
-    // TYPING INDICATOR
     window.handleTypingNotification = function() {
       if (!activeContact) return;
       const typingRef = ref(db, `typing/${activeContact.username}/${currentUser}`);
@@ -1035,7 +1060,6 @@
       }, 2000);
     }
 
-    // NADA DERING MEMANGGIL LEMBUT
     function playRingbackSound() {
       const audio = document.getElementById('ringback-audio');
       if (audio) { audio.currentTime = 0; audio.play().catch(e => {}); }
@@ -1046,7 +1070,6 @@
       if (audio) { audio.pause(); audio.currentTime = 0; }
     }
 
-    // FITUR LOUDSPEAKER / EARPIECE SWITCH
     window.toggleSpeakerSwitch = function() {
       isSpeakerOn = !isSpeakerOn;
       const btn = document.getElementById('btn-toggle-speaker');
@@ -1064,7 +1087,6 @@
       }
     }
 
-    // FITUR MUTE / UNMUTE MIC
     window.toggleMuteMic = function() {
       if (localStream) {
         const audioTrack = localStream.getAudioTracks()[0];
@@ -1077,7 +1099,7 @@
       }
     }
 
-    // FITUR HAPUS PESAN RESMI DENGAN CONFIRMATION
+    // FUNGSI HAPUS PESAN DENGAN LONG PRESS AMAN (800ms)
     window.deleteMessage = function(msgKey) {
       if (!activeContact) return;
       if (confirm("Hapus pesan ini untuk semua orang?")) {
@@ -1202,7 +1224,7 @@
       const audio = document.getElementById('notif-audio');
       if (audio) {
         audio.currentTime = 0;
-        audio.play().catch(e => console.log("Audio notify blocked:", e));
+        audio.play().catch(e => {});
       }
     }
 
@@ -1210,7 +1232,7 @@
       const audio = document.getElementById('ring-audio');
       if (audio) {
         audio.currentTime = 0;
-        audio.play().catch(e => console.log("Ring audio blocked:", e));
+        audio.play().catch(e => {});
       }
     }
 
@@ -2052,7 +2074,6 @@
         }
       });
 
-      // TYPING STATUS
       onValue(ref(db, `typing/${currentUser}/${activeContact.username}`), (snapshot) => {
         if (snapshot.val() === true) {
           statusElem.innerText = "sedang mengetik...";
@@ -2092,22 +2113,16 @@
           chatBody.appendChild(msgDiv);
         }
 
-        // DETEKSI TAHAN PESAN (LONG PRESS) UNTUK HAPUS DI ANDROID
+        // AMAN: LONG PRESS 800ms BARU MUNCUL KONFIRMASI HAPUS (TIDAK SENSITIF)
         let pressTimer;
-        msgDiv.addEventListener('touchstart', (e) => {
+        msgDiv.onpointerdown = (e) => {
           pressTimer = setTimeout(() => {
             window.deleteMessage(msgKey);
-          }, 500);
-        }, { passive: true });
+          }, 800);
+        };
 
-        msgDiv.addEventListener('touchend', () => {
-          clearTimeout(pressTimer);
-        });
-
-        msgDiv.addEventListener('contextmenu', (e) => {
-          e.preventDefault();
-          window.deleteMessage(msgKey);
-        });
+        msgDiv.onpointerup = () => clearTimeout(pressTimer);
+        msgDiv.onpointerleave = () => clearTimeout(pressTimer);
 
         if (data.type === 'call_log') {
           const isMissed = data.status === 'missed';
