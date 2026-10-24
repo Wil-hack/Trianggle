@@ -737,7 +737,7 @@
       border-radius: 50%;
       color: white;
       cursor: pointer;
-      display: none; /* Otomatis aktif saat Video Call */
+      display: none;
       justify-content: center;
       align-items: center;
       box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4);
@@ -993,7 +993,7 @@
       </div>
 
       <div class="call-actions">
-        <!-- TOMBOL FLIP CAMERA (GANTI KAMERA DEPAN/BELAKANG) -->
+        <!-- TOMBOL FLIP CAMERA -->
         <button class="btn-switch-camera" id="btn-switch-camera" onclick="switchCamera()" title="Tukar Kamera">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M11 19H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2v3"/>
@@ -1057,7 +1057,7 @@
     let isRecording = false;
     let currentCallType = 'voice'; 
     let callStartTime = null;
-    let currentFacingMode = 'user'; // 'user' (kamera depan) atau 'environment' (kamera belakang)
+    let currentFacingMode = 'user';
 
     const rtcConfig = {
       iceServers: [
@@ -1082,7 +1082,7 @@
         cordova.plugins.backgroundMode.overrideBackButton();
         cordova.plugins.backgroundMode.setDefaults({
           title: "TriHive Panggilan Aktif",
-          text: "Suara telepon tetap aktif di latar belakang",
+          text: "Panggilan suara & video aktif di latar belakang",
           icon: 'icon',
           color: '10141d',
           resume: true,
@@ -1620,6 +1620,13 @@
               sender.replaceTrack(videoTrack);
             }
           }
+          const audioTrack = localStream.getAudioTracks()[0];
+          if (audioTrack) {
+            const audioSender = peerConnection.getSenders().find(s => s.track && s.track.kind === 'audio');
+            if (audioSender) {
+              audioSender.replaceTrack(audioTrack);
+            }
+          }
         }
       } catch (err) {
         alert("Mohon izinkan akses Kamera/Mikrofon di HP Anda!");
@@ -1650,12 +1657,12 @@
             remoteVideo.style.display = 'block';
             document.getElementById('call-avatar').style.display = 'none';
           }
-        } else {
-          const remoteAudio = document.getElementById('remote-audio');
-          if (remoteAudio && event.streams[0]) {
-            remoteAudio.srcObject = event.streams[0];
-            remoteAudio.play().catch(e => console.log(e));
-          }
+        }
+        
+        const remoteAudio = document.getElementById('remote-audio');
+        if (remoteAudio && event.streams[0]) {
+          remoteAudio.srcObject = event.streams[0];
+          remoteAudio.play().catch(e => console.log("Audio play error:", e));
         }
       };
 
@@ -1710,7 +1717,7 @@
 
       document.getElementById('call-name').innerText = activeContact.name;
       document.getElementById('call-avatar').src = activeContact.avatar;
-      document.getElementById('call-avatar').style.display = 'block';
+      document.getElementById('call-avatar').style.display = type === 'video' ? 'none' : 'block';
       document.getElementById('call-status-text').innerText = "Memanggil...";
       document.getElementById('call-modal').classList.add('active');
     }
