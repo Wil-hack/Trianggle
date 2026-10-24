@@ -1045,6 +1045,28 @@
       return `${hours}:${minutes}`;
     }
 
+    function enableBackgroundCallService() {
+      if (window.cordova && cordova.plugins && cordova.plugins.backgroundMode) {
+        cordova.plugins.backgroundMode.enable();
+        cordova.plugins.backgroundMode.overrideBackButton();
+        cordova.plugins.backgroundMode.setDefaults({
+          title: "TriHive Panggilan Aktif",
+          text: "Suara telepon tetap aktif di latar belakang",
+          icon: 'icon',
+          color: '10141d',
+          resume: true,
+          hidden: false,
+          bigText: true
+        });
+      }
+    }
+
+    function disableBackgroundCallService() {
+      if (window.cordova && cordova.plugins && cordova.plugins.backgroundMode) {
+        cordova.plugins.backgroundMode.disable();
+      }
+    }
+
     function showAndroidNotification(title, message, isCall = false) {
       if ("Notification" in window) {
         if (Notification.permission === "granted") {
@@ -1071,12 +1093,6 @@
         cordova.plugins.backgroundMode.enable();
         cordova.plugins.backgroundMode.wakeUp();
         cordova.plugins.backgroundMode.unlock();
-        cordova.plugins.backgroundMode.setDefaults({
-          title: "TriHive Siaga",
-          text: "Menerima Pesan & Panggilan Live",
-          hidden: false,
-          silent: false
-        });
       }
 
       if ("Notification" in window && Notification.permission !== "granted") {
@@ -1533,7 +1549,11 @@
     async function initLocalMedia(type) {
       try {
         const constraints = { 
-          audio: true, 
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          }, 
           video: type === 'video' ? { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" } : false 
         };
         localStream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -1603,6 +1623,7 @@
         await initLocalMedia(type);
       } catch (e) { return; }
 
+      enableBackgroundCallService();
       playRingingSound();
       remove(ref(db, `webrtc_signals/${remoteUsername}`));
       remove(ref(db, `webrtc_signals/${currentUser}`));
@@ -1637,6 +1658,7 @@
         await initLocalMedia(currentCallType);
       } catch (e) { return; }
 
+      enableBackgroundCallService();
       const callerUsername = targetUser;
       createPeerConnection(callerUsername, currentCallType);
 
@@ -1664,6 +1686,7 @@
 
     window.rejectCall = function() {
       stopRingingSound();
+      disableBackgroundCallService();
       logCallHistory('missed', 0);
       if (targetUser) {
         remove(ref(db, `calls/${targetUser}`));
@@ -1675,6 +1698,7 @@
     }
 
     function cleanupWebRTC() {
+      disableBackgroundCallService();
       if (peerConnection) {
         peerConnection.close();
         peerConnection = null;
@@ -1930,7 +1954,7 @@
 
       activeStatusListener = onValue(contactStatusRef, (snapshot) => {
         const data = snapshot.val();
-        if (data && data.isOnline) {
+        if (data.isOnline) {
           statusElem.innerText = "Online";
           statusElem.style.color = "#10b981";
         } else {
