@@ -1073,8 +1073,10 @@
           const notif = new Notification(title, {
             body: message,
             icon: 'logo.png',
+            tag: 'trihive-notification',
+            renotify: true,
             requireInteraction: isCall,
-            vibrate: [200, 100, 200]
+            vibrate: [300, 100, 300, 100, 300]
           });
           notif.onclick = function() {
             window.focus();
@@ -1083,7 +1085,11 @@
             }
           };
         } else if (Notification.permission !== "denied") {
-          Notification.requestPermission();
+          Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+              showAndroidNotification(title, message, isCall);
+            }
+          });
         }
       }
     }
@@ -1490,7 +1496,7 @@
 
           showAndroidNotification(
             currentCallType === 'video' ? `📹 Panggilan Video Masuk` : `📞 Panggilan Suara Masuk`,
-            `${callData.callerName} memanggil Anda...`,
+            `${callData.callerName} memanggil Anda... Ketuk untuk mengangkat.`,
             true
           );
 
@@ -1954,7 +1960,7 @@
 
       activeStatusListener = onValue(contactStatusRef, (snapshot) => {
         const data = snapshot.val();
-        if (data.isOnline) {
+        if (data && data.isOnline) {
           statusElem.innerText = "Online";
           statusElem.style.color = "#10b981";
         } else {
