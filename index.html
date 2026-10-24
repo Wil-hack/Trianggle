@@ -207,7 +207,7 @@
       100% { transform: scale(1); }
     }
 
-    /* MODAL WINDOW GENERIC (PERBAIKAN INPUT TOUCH) */
+    /* MODAL WINDOW GENERIC */
     .modal-backdrop {
       position: fixed;
       top: 0;
@@ -807,11 +807,11 @@
       <div id="form-login">
         <div class="form-group">
           <label>Username Unik</label>
-          <input type="text" id="login-username" placeholder="Masukkan username unik...">
+          <input type="text" id="login-username" placeholder="Masukkan username unik..." onpointerdown="this.focus(); event.stopPropagation();">
         </div>
         <div class="form-group">
           <label>Password</label>
-          <input type="password" id="login-password" placeholder="Masukkan password...">
+          <input type="password" id="login-password" placeholder="Masukkan password..." onpointerdown="this.focus(); event.stopPropagation();">
         </div>
         <button class="btn-submit" onclick="submitLogin()">Masuk</button>
       </div>
@@ -819,15 +819,15 @@
       <div id="form-register" style="display: none;">
         <div class="form-group">
           <label>Username Unik (Huruf Kecil Semua)</label>
-          <input type="text" id="reg-username" placeholder="Contoh: wildan">
+          <input type="text" id="reg-username" placeholder="Contoh: wildan" onpointerdown="this.focus(); event.stopPropagation();">
         </div>
         <div class="form-group">
           <label>Nama Tampilan</label>
-          <input type="text" id="reg-fullname" placeholder="Contoh: Wildan Jaka">
+          <input type="text" id="reg-fullname" placeholder="Contoh: Wildan Jaka" onpointerdown="this.focus(); event.stopPropagation();">
         </div>
         <div class="form-group">
           <label>Password Akun</label>
-          <input type="password" id="reg-password" placeholder="Buat password aman...">
+          <input type="password" id="reg-password" placeholder="Buat password aman..." onpointerdown="this.focus(); event.stopPropagation();">
         </div>
         <div class="form-group">
           <label>Foto Profil (Upload HP)</label>
@@ -849,7 +849,7 @@
 
       <div class="form-group">
         <label>Nama Tampilan Baru</label>
-        <input type="text" id="edit-fullname" placeholder="Masukkan nama baru...">
+        <input type="text" id="edit-fullname" placeholder="Masukkan nama baru..." onpointerdown="this.focus(); event.stopPropagation();">
       </div>
 
       <div class="form-group">
@@ -873,7 +873,7 @@
 
       <div class="form-group">
         <label>Username Teman</label>
-        <input type="text" id="add-contact-username" placeholder="Masukkan username teman...">
+        <input type="text" id="add-contact-username" placeholder="Masukkan username teman..." onpointerdown="this.focus(); event.stopPropagation();">
       </div>
 
       <button class="btn-submit" onclick="submitAddContact()">+ Tambahkan Kontak</button>
@@ -914,7 +914,7 @@
       </div>
       <div class="chat-body-full" id="chat-body"></div>
       <div class="chat-footer-full">
-        <input type="text" id="chat-input" placeholder="Ketik pesan..." onkeypress="handleKey(event)">
+        <input type="text" id="chat-input" placeholder="Ketik pesan..." onkeypress="handleKey(event)" onpointerdown="this.focus(); event.stopPropagation();">
         <button class="btn-chat-action btn-mic" id="btn-mic" onclick="toggleVoiceRecord()" title="Kirim Pesan Suara">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
@@ -1094,13 +1094,8 @@
     window.addEventListener('DOMContentLoaded', () => {
       checkAutoLogin();
       
-      // Paksa fokus dan cegah benturan sentuh pada semua kotak input
       document.querySelectorAll('input').forEach(input => {
-        input.addEventListener('touchstart', (e) => {
-          e.stopPropagation();
-        }, { passive: true });
-        
-        input.addEventListener('click', (e) => {
+        input.addEventListener('pointerdown', (e) => {
           e.stopPropagation();
           input.focus();
         });
