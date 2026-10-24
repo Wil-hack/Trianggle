@@ -722,9 +722,30 @@
     .call-actions {
       display: flex;
       justify-content: center;
+      align-items: center;
       gap: 20px;
       margin-top: 25px;
       z-index: 10;
+    }
+    .btn-switch-camera {
+      width: 58px;
+      height: 58px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      display: none; /* Otomatis aktif saat Video Call */
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4);
+      transition: transform 0.15s ease, background 0.2s ease;
+    }
+    .btn-switch-camera:active {
+      transform: scale(0.92);
+      background: rgba(255, 255, 255, 0.3);
     }
     .btn-accept-call {
       width: 58px;
@@ -972,6 +993,15 @@
       </div>
 
       <div class="call-actions">
+        <!-- TOMBOL FLIP CAMERA (GANTI KAMERA DEPAN/BELAKANG) -->
+        <button class="btn-switch-camera" id="btn-switch-camera" onclick="switchCamera()" title="Tukar Kamera">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 19H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2v3"/>
+            <path d="M21 15l3 3-3 3"/>
+            <path d="M15 18a6 6 0 0 0 6-3"/>
+            <path d="M18 10a6 6 0 0 0-6 3"/>
+          </svg>
+        </button>
         <button class="btn-end-call" onclick="endCall('ended')">✕</button>
       </div>
     </div>
@@ -1027,6 +1057,7 @@
     let isRecording = false;
     let currentCallType = 'voice'; 
     let callStartTime = null;
+    let currentFacingMode = 'user'; // 'user' (kamera depan) atau 'environment' (kamera belakang)
 
     const rtcConfig = {
       iceServers: [
@@ -1554,13 +1585,21 @@
 
     async function initLocalMedia(type) {
       try {
+        if (localStream) {
+          localStream.getTracks().forEach(track => track.stop());
+        }
+
         const constraints = { 
           audio: {
             echoCancellation: true,
             noiseSuppression: true,
             autoGainControl: true
           }, 
-          video: type === 'video' ? { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" } : false 
+          video: type === 'video' ? { 
+            width: { ideal: 640 }, 
+            height: { ideal: 480 }, 
+            facingMode: currentFacingMode 
+          } : false 
         };
         localStream = await navigator.mediaDevices.getUserMedia(constraints);
         
@@ -1568,11 +1607,30 @@
           const localVideo = document.getElementById('local-video');
           localVideo.srcObject = localStream;
           localVideo.style.display = 'block';
+          document.getElementById('btn-switch-camera').style.display = 'flex';
+        } else {
+          document.getElementById('btn-switch-camera').style.display = 'none';
+        }
+
+        if (peerConnection) {
+          const videoTrack = localStream.getVideoTracks()[0];
+          if (videoTrack) {
+            const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
+            if (sender) {
+              sender.replaceTrack(videoTrack);
+            }
+          }
         }
       } catch (err) {
         alert("Mohon izinkan akses Kamera/Mikrofon di HP Anda!");
         throw err;
       }
+    }
+
+    window.switchCamera = async function() {
+      if (currentCallType !== 'video') return;
+      currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+      await initLocalMedia('video');
     }
 
     function createPeerConnection(remoteUsername, type) {
@@ -1623,6 +1681,7 @@
       document.getElementById('call-sheet-modal').classList.remove('active');
       if (!activeContact) return;
       currentCallType = type;
+      currentFacingMode = 'user';
       const remoteUsername = activeContact.username;
 
       try {
@@ -1659,6 +1718,7 @@
     window.acceptCall = async function() {
       stopRingingSound();
       document.getElementById('incoming-call-modal').classList.remove('active');
+      currentFacingMode = 'user';
 
       try {
         await initLocalMedia(currentCallType);
@@ -1720,6 +1780,7 @@
       const localVideo = document.getElementById('local-video');
       if (localVideo) { localVideo.srcObject = null; localVideo.style.display = 'none'; }
       
+      document.getElementById('btn-switch-camera').style.display = 'none';
       targetUser = null;
       pendingCandidates = [];
       callStartTime = null;
