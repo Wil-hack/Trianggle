@@ -1098,16 +1098,27 @@
       }
     }
 
+    // FUNGSI NOTIFIKASI TINGKAT SISTEM (MUNCUL DI STATUS BAR & LOCKSCREEN)
     function showAndroidNotification(title, message, isCall = false) {
+      if (window.cordova && cordova.plugins && cordova.plugins.backgroundMode) {
+        cordova.plugins.backgroundMode.wakeUp();
+        cordova.plugins.backgroundMode.unlock();
+        if (isCall) {
+          cordova.plugins.backgroundMode.moveToForeground();
+        }
+      }
+
       if ("Notification" in window) {
         if (Notification.permission === "granted") {
           const notif = new Notification(title, {
             body: message,
             icon: 'logo.png',
-            tag: 'trihive-notification',
+            tag: isCall ? 'trihive-call-notification' : 'trihive-msg-notification',
             renotify: true,
+            priority: 'high',
+            importance: 'high',
             requireInteraction: isCall,
-            vibrate: [300, 100, 300, 100, 300]
+            vibrate: isCall ? [500, 200, 500, 200, 500] : [200, 100, 200]
           });
           notif.onclick = function() {
             window.focus();
@@ -1487,8 +1498,9 @@
               if (!isInitialLoad) {
                 playNotificationSound();
                 showAndroidNotification(
-                  `Pesan dari ${contactUsername}`,
-                  data.type === 'voice' ? '🎙️ Pesan Suara' : (data.type === 'call_log' ? '📞 Catatan Panggilan' : data.text)
+                  `Pesan Baru: ${contactUsername}`,
+                  data.type === 'voice' ? '🎙️ Pesan Suara' : (data.type === 'call_log' ? '📞 Catatan Panggilan' : data.text),
+                  false
                 );
               }
               unreadCounts[contactUsername] = (unreadCounts[contactUsername] || 0) + 1;
@@ -1518,12 +1530,6 @@
           targetUser = callData.caller;
           currentCallType = callData.callType || 'voice';
           playRingingSound();
-
-          if (window.cordova && cordova.plugins && cordova.plugins.backgroundMode) {
-            cordova.plugins.backgroundMode.wakeUp();
-            cordova.plugins.backgroundMode.unlock();
-            cordova.plugins.backgroundMode.moveToForeground();
-          }
 
           showAndroidNotification(
             currentCallType === 'video' ? `📹 Panggilan Video Masuk` : `📞 Panggilan Suara Masuk`,
