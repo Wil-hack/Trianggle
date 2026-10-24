@@ -13,8 +13,8 @@
       -webkit-user-select: none;
     }
     
-    /* MEMBEBASKAN SEMUA INPUT AGAR BISA DIKETIK DI HP ANDROID */
-    input, textarea, button, [contenteditable="true"] {
+    /* PASTI BISA DIKETIK: Bebaskan elemen input dari semua pembatasan */
+    input, textarea, select, button {
       -webkit-user-select: text !important;
       -moz-user-select: text !important;
       -ms-user-select: text !important;
@@ -106,6 +106,10 @@
       position: relative;
       cursor: grab;
       perspective: 900px;
+      z-index: 10;
+    }
+    #viewport.disable-touch {
+      pointer-events: none !important;
     }
     #viewport:active {
       cursor: grabbing;
@@ -216,15 +220,15 @@
       100% { transform: scale(1); }
     }
 
-    /* MODAL WINDOW GENERIC (STABIL KETIKA KEYBOARD HP MUNCUL) */
+    /* MODAL WINDOW GENERIC (ISOLASI DARI KANVAS) */
     .modal-backdrop {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(10, 11, 15, 0.92);
-      z-index: 999;
+      background: rgba(10, 11, 15, 0.95);
+      z-index: 9999 !important;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -234,7 +238,7 @@
     }
     .modal-backdrop.active {
       opacity: 1;
-      pointer-events: auto;
+      pointer-events: auto !important;
     }
 
     .card-modal {
@@ -248,7 +252,8 @@
       padding: 24px;
       text-align: center;
       position: relative;
-      z-index: 1000;
+      z-index: 10000 !important;
+      pointer-events: auto !important;
     }
     .card-modal h2 { font-size: 1.4rem; margin-bottom: 6px; }
     .card-modal p { font-size: 0.85rem; color: #94a3b8; margin-bottom: 18px; }
@@ -280,17 +285,19 @@
       position: relative;
       display: flex;
       align-items: center;
+      width: 100%;
     }
 
     .form-group input {
       width: 100%;
-      padding: 12px 14px;
+      padding: 12px 42px 12px 14px;
       background: #0a0c10;
       border: 1px solid rgba(255, 255, 255, 0.25);
       border-radius: 10px;
       color: #ffffff;
       font-size: 1rem;
       outline: none;
+      box-sizing: border-box;
     }
     .form-group input:focus {
       border-color: #3b82f6;
@@ -299,12 +306,20 @@
     .btn-toggle-pwd {
       position: absolute;
       right: 10px;
-      background: transparent;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.1);
       border: none;
-      color: #94a3b8;
-      font-size: 1.1rem;
+      border-radius: 6px;
+      color: #ffffff;
+      font-size: 1.2rem;
       cursor: pointer;
-      padding: 4px;
+      padding: 6px 8px;
+      z-index: 10001 !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
     }
 
     .btn-file-upload {
@@ -830,7 +845,7 @@
           <label>Password</label>
           <div class="input-wrapper">
             <input type="password" id="login-password" placeholder="Masukkan password...">
-            <button type="button" class="btn-toggle-pwd" onclick="togglePwdVisibility('login-password', this)">👁️</button>
+            <button type="button" class="btn-toggle-pwd" id="btn-toggle-login-pwd">👁️</button>
           </div>
         </div>
         <button class="btn-submit" onclick="submitLogin()">Masuk</button>
@@ -849,7 +864,7 @@
           <label>Password Akun</label>
           <div class="input-wrapper">
             <input type="password" id="reg-password" placeholder="Buat password aman...">
-            <button type="button" class="btn-toggle-pwd" onclick="togglePwdVisibility('reg-password', this)">👁️</button>
+            <button type="button" class="btn-toggle-pwd" id="btn-toggle-reg-pwd">👁️</button>
           </div>
         </div>
         <div class="form-group">
@@ -1114,13 +1129,49 @@
       }
     }, false);
 
-    // MENGATASI LEPAS FOKUS / TIDAK BISA DIKETIK DI HP
+    // BINDING TOMBOL MATA KHUSUS LAYAR TOUCH ANDROID
+    function bindTogglePwdBtn(btnId, pwdInputId) {
+      const btn = document.getElementById(btnId);
+      const input = document.getElementById(pwdInputId);
+      if (!btn || !input) return;
+
+      const toggleAction = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (input.type === 'password') {
+          input.type = 'text';
+          btn.innerText = '🙈';
+        } else {
+          input.type = 'password';
+          btn.innerText = '👁️';
+        }
+        input.focus();
+      };
+
+      btn.addEventListener('touchend', toggleAction);
+      btn.addEventListener('click', toggleAction);
+    }
+
+    // MANAJEMEN FOKUS INPUT DAN KANVAS
     window.addEventListener('DOMContentLoaded', () => {
       checkAutoLogin();
       
+      const viewport = document.getElementById('viewport');
+      if (document.querySelector('.modal-backdrop.active')) {
+        viewport.classList.add('disable-touch');
+      }
+
+      bindTogglePwdBtn('btn-toggle-login-pwd', 'login-password');
+      bindTogglePwdBtn('btn-toggle-reg-pwd', 'reg-password');
+
       document.querySelectorAll('input').forEach(input => {
         input.addEventListener('touchstart', (e) => {
           e.stopPropagation();
+        }, { passive: true });
+
+        input.addEventListener('touchend', (e) => {
+          e.stopPropagation();
+          input.focus();
         }, { passive: true });
 
         input.addEventListener('click', (e) => {
@@ -1129,18 +1180,6 @@
         });
       });
     });
-
-    window.togglePwdVisibility = function(inputId, btn) {
-      const pwdInput = document.getElementById(inputId);
-      if (pwdInput.type === 'password') {
-        pwdInput.type = 'text';
-        btn.innerText = '🙈';
-      } else {
-        pwdInput.type = 'password';
-        btn.innerText = '👁️';
-      }
-      pwdInput.focus();
-    }
 
     function checkAutoLogin() {
       const savedUser = localStorage.getItem('trihive_user');
@@ -1433,6 +1472,7 @@
 
     function setUserLoggedIn() {
       document.getElementById('login-modal').classList.remove('active');
+      document.getElementById('viewport').classList.remove('disable-touch');
       document.getElementById('user-pill').style.display = 'flex';
       document.getElementById('current-user-name').innerText = currentDisplayName;
       document.getElementById('current-user-avatar').src = currentAvatarUrl;
@@ -1566,6 +1606,7 @@
           document.getElementById('incoming-avatar').src = callData.callerAvatar;
           document.getElementById('incoming-call-type-text').innerText = currentCallType === 'video' ? "Panggilan Video Masuk..." : "Panggilan Suara Masuk...";
           document.getElementById('incoming-call-modal').classList.add('active');
+          document.getElementById('viewport').classList.add('disable-touch');
         } else if (callData && callData.status === 'connected') {
           stopRingingSound();
           callStartTime = Date.now();
@@ -1575,6 +1616,9 @@
           cleanupWebRTC();
           document.getElementById('incoming-call-modal').classList.remove('active');
           document.getElementById('call-modal').classList.remove('active');
+          if (!document.querySelector('.modal-backdrop.active')) {
+            document.getElementById('viewport').classList.remove('disable-touch');
+          }
         }
       });
 
@@ -1667,11 +1711,15 @@
     window.openCallOptionSheet = function() {
       if (!activeContact) return;
       document.getElementById('call-sheet-modal').classList.add('active');
+      document.getElementById('viewport').classList.add('disable-touch');
     }
 
     window.closeCallSheet = function(e) {
       if (e.target.id === 'call-sheet-modal' || !e) {
         document.getElementById('call-sheet-modal').classList.remove('active');
+        if (!document.querySelector('.modal-backdrop.active')) {
+          document.getElementById('viewport').classList.remove('disable-touch');
+        }
       }
     }
 
@@ -1709,6 +1757,7 @@
       document.getElementById('call-avatar').style.opacity = '1';
       document.getElementById('call-status-text').innerText = "Memanggil...";
       document.getElementById('call-modal').classList.add('active');
+      document.getElementById('viewport').classList.add('disable-touch');
     }
 
     window.acceptCall = async function() {
@@ -1742,6 +1791,7 @@
       document.getElementById('call-avatar').style.opacity = currentCallType === 'video' ? '0' : '1';
       document.getElementById('call-status-text').innerText = "Terhubung (Live)";
       document.getElementById('call-modal').classList.add('active');
+      document.getElementById('viewport').classList.add('disable-touch');
     }
 
     window.rejectCall = function() {
@@ -1754,6 +1804,9 @@
       remove(ref(db, `calls/${currentUser}`));
       remove(ref(db, `webrtc_signals/${currentUser}`));
       document.getElementById('incoming-call-modal').classList.remove('active');
+      if (!document.querySelector('.modal-backdrop.active')) {
+        document.getElementById('viewport').classList.remove('disable-touch');
+      }
     }
 
     function cleanupWebRTC() {
@@ -1824,6 +1877,9 @@
       remove(ref(db, `webrtc_signals/${currentUser}`));
       cleanupWebRTC();
       document.getElementById('call-modal').classList.remove('active');
+      if (!document.querySelector('.modal-backdrop.active')) {
+        document.getElementById('viewport').classList.remove('disable-touch');
+      }
     }
 
     window.toggleVoiceRecord = async function() {
@@ -1888,6 +1944,7 @@
       document.getElementById('edit-upload-preview').src = currentAvatarUrl;
       document.getElementById('edit-upload-preview').style.display = 'block';
       document.getElementById('edit-profile-modal').classList.add('active');
+      document.getElementById('viewport').classList.add('disable-touch');
     }
 
     window.saveProfileChanges = function() {
@@ -1924,6 +1981,7 @@
         return;
       }
       document.getElementById('add-contact-modal').classList.add('active');
+      document.getElementById('viewport').classList.add('disable-touch');
     }
 
     window.submitAddContact = function() {
@@ -1969,6 +2027,7 @@
       document.getElementById('user-pill').style.display = 'none';
       closeModals();
       document.getElementById('login-modal').classList.add('active');
+      document.getElementById('viewport').classList.add('disable-touch');
     }
 
     window.openProfile = function(person) {
@@ -1994,6 +2053,7 @@
       });
 
       document.getElementById('profile-modal').classList.add('active');
+      document.getElementById('viewport').classList.add('disable-touch');
     }
 
     window.openChat = function() {
@@ -2001,6 +2061,7 @@
       document.getElementById('chat-name').innerText = activeContact.name;
       document.getElementById('chat-avatar').src = activeContact.avatar;
       document.getElementById('chat-modal').classList.add('active');
+      document.getElementById('viewport').classList.add('disable-touch');
       
       unreadCounts[activeContact.username] = 0;
       buildGrid();
@@ -2162,6 +2223,9 @@
       document.querySelectorAll('.modal-backdrop').forEach(m => {
         if (m.id !== 'login-modal') m.classList.remove('active');
       });
+      if (!document.querySelector('.modal-backdrop.active')) {
+        document.getElementById('viewport').classList.remove('disable-touch');
+      }
     }
 
     buildGrid();
