@@ -16,13 +16,13 @@
     <preference name="Orientation" value="portrait" />
     <preference name="KeepRunning" value="true" />
 
-    <!-- Plugin Native Telepon, Audio Toggle & Notifikasi -->
+    <!-- Plugin Native Telepon, Audio Toggle & Background Service -->
     <plugin name="cordova-plugin-callkeep" spec="~3.1.0" />
     <plugin name="cordova-plugin-push-notifications" spec="~3.0.0" />
     <plugin name="cordova-plugin-background-mode" spec="~0.7.9" />
     <plugin name="cordova-plugin-audiotoggle" spec="~1.0.3" />
 
-    <!-- Izin Manifest Android Native -->
+    <!-- Izin Manifest Android Native (Lockscreen Call & Hardware Mic/Cam Access) -->
     <platform name="android">
         <allow-intent href="http://*/*" />
         <allow-intent href="https://*/*" />
