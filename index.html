@@ -13,19 +13,14 @@
       -webkit-user-select: none;
     }
     
-    /* PENTING: Membebaskan seluruh elemen input dari pembatasan touch/select agar bisa diketik di HP */
-    input[type="text"], 
-    input[type="password"],
-    textarea, 
-    [contenteditable="true"] {
+    /* MEMBEBASKAN SEMUA INPUT AGAR BISA DIKETIK DI HP ANDROID */
+    input, textarea, button, [contenteditable="true"] {
       -webkit-user-select: text !important;
       -moz-user-select: text !important;
       -ms-user-select: text !important;
       user-select: text !important;
       pointer-events: auto !important;
-      touch-action: auto !important;
-      opacity: 1 !important;
-      visibility: visible !important;
+      touch-action: manipulation !important;
     }
 
     body, html {
@@ -51,9 +46,7 @@
       left: 0;
       width: 100%;
       height: 60px;
-      background: rgba(11, 13, 18, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: rgba(11, 13, 18, 0.95);
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       justify-content: space-between;
@@ -223,23 +216,21 @@
       100% { transform: scale(1); }
     }
 
-    /* MODAL WINDOW GENERIC */
+    /* MODAL WINDOW GENERIC (STABIL KETIKA KEYBOARD HP MUNCUL) */
     .modal-backdrop {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(10, 11, 15, 0.85);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      z-index: 200;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 11, 15, 0.92);
+      z-index: 999;
       display: flex;
       justify-content: center;
       align-items: center;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.2s ease;
     }
     .modal-backdrop.active {
       opacity: 1;
@@ -247,19 +238,17 @@
     }
 
     .card-modal {
-      background: rgba(20, 22, 32, 0.98);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: #141722;
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 24px;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9);
       color: #e2e8f0;
       width: 90%;
       max-width: 380px;
       padding: 24px;
       text-align: center;
       position: relative;
-      z-index: 210;
+      z-index: 1000;
     }
     .card-modal h2 { font-size: 1.4rem; margin-bottom: 6px; }
     .card-modal p { font-size: 0.85rem; color: #94a3b8; margin-bottom: 18px; }
@@ -284,18 +273,40 @@
     }
     .tab-btn.active { background: #3b82f6; color: white; }
 
-    .form-group { margin-bottom: 14px; text-align: left; }
+    .form-group { margin-bottom: 14px; text-align: left; position: relative; }
     .form-group label { display: block; font-size: 0.75rem; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; }
+    
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
     .form-group input {
       width: 100%;
       padding: 12px 14px;
-      background: rgba(13, 14, 18, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: #0a0c10;
+      border: 1px solid rgba(255, 255, 255, 0.25);
       border-radius: 10px;
       color: #ffffff;
       font-size: 1rem;
       outline: none;
     }
+    .form-group input:focus {
+      border-color: #3b82f6;
+    }
+
+    .btn-toggle-pwd {
+      position: absolute;
+      right: 10px;
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 4px;
+    }
+
     .btn-file-upload {
       display: block;
       width: 100%;
@@ -342,9 +353,7 @@
     }
 
     .profile-card {
-      background: rgba(20, 22, 32, 0.95);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: #141722;
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 24px;
       width: 85%;
@@ -819,16 +828,10 @@
         </div>
         <div class="form-group">
           <label>Password</label>
-          <input 
-            type="password" 
-            id="login-password" 
-            placeholder="Masukkan password..." 
-            autocomplete="off" 
-            autocorrect="off" 
-            autocapitalize="off" 
-            spellcheck="false"
-            inputmode="text"
-          >
+          <div class="input-wrapper">
+            <input type="password" id="login-password" placeholder="Masukkan password...">
+            <button type="button" class="btn-toggle-pwd" onclick="togglePwdVisibility('login-password', this)">👁️</button>
+          </div>
         </div>
         <button class="btn-submit" onclick="submitLogin()">Masuk</button>
       </div>
@@ -844,16 +847,10 @@
         </div>
         <div class="form-group">
           <label>Password Akun</label>
-          <input 
-            type="password" 
-            id="reg-password" 
-            placeholder="Buat password aman..." 
-            autocomplete="off" 
-            autocorrect="off" 
-            autocapitalize="off" 
-            spellcheck="false"
-            inputmode="text"
-          >
+          <div class="input-wrapper">
+            <input type="password" id="reg-password" placeholder="Buat password aman...">
+            <button type="button" class="btn-toggle-pwd" onclick="togglePwdVisibility('reg-password', this)">👁️</button>
+          </div>
         </div>
         <div class="form-group">
           <label>Foto Profil (Upload HP)</label>
@@ -1117,26 +1114,33 @@
       }
     }, false);
 
-    // MENGATASI MASALAH INPUT TOUCH PADA HP ANDROID
+    // MENGATASI LEPAS FOKUS / TIDAK BISA DIKETIK DI HP
     window.addEventListener('DOMContentLoaded', () => {
       checkAutoLogin();
       
-      const inputs = document.querySelectorAll('input');
-      inputs.forEach(input => {
+      document.querySelectorAll('input').forEach(input => {
         input.addEventListener('touchstart', (e) => {
           e.stopPropagation();
         }, { passive: true });
-        
-        input.addEventListener('touchend', (e) => {
+
+        input.addEventListener('click', (e) => {
           e.stopPropagation();
           input.focus();
-        }, { passive: true });
-
-        input.addEventListener('mousedown', (e) => {
-          e.stopPropagation();
         });
       });
     });
+
+    window.togglePwdVisibility = function(inputId, btn) {
+      const pwdInput = document.getElementById(inputId);
+      if (pwdInput.type === 'password') {
+        pwdInput.type = 'text';
+        btn.innerText = '🙈';
+      } else {
+        pwdInput.type = 'password';
+        btn.innerText = '👁️';
+      }
+      pwdInput.focus();
+    }
 
     function checkAutoLogin() {
       const savedUser = localStorage.getItem('trihive_user');
@@ -1200,7 +1204,9 @@
       return x - Math.floor(x);
     }
 
+    let isGridBuilt = false;
     function buildGrid() {
+      if (isGridBuilt && contacts.length === 0) return;
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
       
@@ -1282,6 +1288,7 @@
         }
         grid.appendChild(row);
       }
+      isGridBuilt = true;
     }
 
     const viewport = document.getElementById('viewport');
