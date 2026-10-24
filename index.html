@@ -404,22 +404,22 @@
       gap: 12px;
     }
 
-    /* TOMBOL HEXAGON EMAS PANGGILAN DI HEADER */
-    .btn-hexagon-call {
+    /* TOMBOL BULAT EMAS PANGGILAN DI HEADER (SAMA SEPERTI TOMBOL KIRIM PESAN) */
+    .btn-round-call {
       background: linear-gradient(135deg, #dfb76c 0%, #b48c40 100%);
-      border: 1px solid #fef08a;
-      width: 44px;
-      height: 44px;
-      clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+      border: none;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
       color: #10141d;
       cursor: pointer;
       display: flex;
       justify-content: center;
       align-items: center;
-      box-shadow: 0 0 15px rgba(223, 183, 108, 0.4);
+      box-shadow: 0 4px 15px rgba(223, 183, 108, 0.35);
       transition: transform 0.15s ease;
     }
-    .btn-hexagon-call:active { transform: scale(0.9); }
+    .btn-round-call:active { transform: scale(0.92); }
 
     /* RUANG CHAT SCROLL NORMAL */
     .chat-body-full {
@@ -438,6 +438,7 @@
     .msg {
       max-width: 82%;
       padding: 12px 18px;
+      padding-bottom: 24px; /* Ruang untuk stempel waktu */
       font-size: 0.92rem;
       line-height: 1.45;
       position: relative;
@@ -462,13 +463,32 @@
       color: #ffffff;
       align-self: flex-end;
       border-radius: 20px 20px 6px 20px;
-      padding-bottom: 22px;
-      padding-right: 38px;
       border: 1.5px solid #dfb76c;
       box-shadow: 
         0 8px 20px rgba(0, 0, 0, 0.6),
         inset 0 1px 1px rgba(255, 255, 255, 0.25),
         0 0 12px rgba(30, 58, 138, 0.5);
+    }
+
+    /* STEMPEL WAKTU & TIK KONTROL DI DALAM PESAN */
+    .msg-footer-info {
+      position: absolute;
+      bottom: 4px;
+      right: 12px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.68rem;
+      color: #94a3b8;
+    }
+    .msg-out .msg-footer-info {
+      color: #cbd5e1;
+    }
+    .msg-status-ticks {
+      font-size: 0.72rem;
+      color: #dfb76c;
+      letter-spacing: -1.5px;
+      font-weight: 800;
     }
 
     /* GELEMBUNG HISTORI PANGGILAAN (CALL LOG BUBBLE) */
@@ -478,13 +498,14 @@
       background: rgba(32, 36, 48, 0.85);
       border: 1.5px solid #dfb76c;
       border-radius: 16px;
-      padding: 10px 16px;
+      padding: 10px 16px 24px;
       display: flex;
       align-items: center;
       gap: 10px;
       font-size: 0.85rem;
       color: #e2e8f0;
       cursor: pointer;
+      position: relative;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
       transition: transform 0.15s ease;
     }
@@ -495,16 +516,6 @@
     }
     .msg-call-log .call-icon {
       font-size: 1.1rem;
-    }
-    
-    .msg-status {
-      position: absolute;
-      bottom: 4px;
-      right: 12px;
-      font-size: 0.72rem;
-      color: #dfb76c;
-      letter-spacing: -1.5px;
-      font-weight: 800;
     }
 
     /* TOMBOL PLAY EMAS 3D TIMBUL */
@@ -886,12 +897,10 @@
           </div>
         </div>
         <div class="header-actions">
-          <!-- 1 TOMBOL HEXAGON EMAS PANGGILAN DI HEADER -->
-          <button class="btn-hexagon-call" onclick="openCallOptionSheet()" title="Panggil">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <!-- 1 TOMBOL BULAT EMAS PANGGILAN DI HEADER (PRESISI & RAPI) -->
+          <button class="btn-round-call" onclick="openCallOptionSheet()" title="Panggil">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10141d" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
               <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-              <line x1="12" y1="2" x2="12" y2="8"/>
-              <line x1="9" y1="5" x2="15" y2="5"/>
             </svg>
           </button>
           <button class="close-btn" style="position:static; font-size:1.4rem;" onclick="closeModals()">✕</button>
@@ -970,7 +979,7 @@
   </div>
 
   <div class="modal-backdrop" id="incoming-call-modal">
-    <div class="call-card">
+    <div class="card-modal">
       <img class="call-avatar" id="incoming-avatar" src="" alt="Avatar">
       <h3 id="incoming-name" style="color:white; margin-bottom: 4px;">Nama Kontak</h3>
       <p id="incoming-call-type-text" style="color: #3b82f6; font-size: 0.85rem;">Panggilan Masuk...</p>
@@ -1028,6 +1037,14 @@
         { urls: 'stun:stun3.l.google.com:19302' }
       ]
     };
+
+    function formatTime(timestamp) {
+      if (!timestamp) return "";
+      const date = new Date(timestamp);
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${hours}:${minutes}`;
+    }
 
     function showAndroidNotification(title, message, isCall = false) {
       if ("Notification" in window) {
@@ -1450,7 +1467,6 @@
           currentCallType = callData.callType || 'voice';
           playRingingSound();
 
-          // Pemicu Membangunkan Layar HP dari Kunci
           if (window.cordova && cordova.plugins && cordova.plugins.backgroundMode) {
             cordova.plugins.backgroundMode.wakeUp();
             cordova.plugins.backgroundMode.unlock();
@@ -1936,6 +1952,7 @@
         const data = snapshot.val();
         const msgKey = snapshot.key;
         const isMe = data.sender === currentUser;
+        const timeString = formatTime(data.timestamp);
 
         if (!isMe && data.unread !== false) {
           update(ref(db, `chats/${roomId}/${msgKey}`), { unread: false });
@@ -1958,9 +1975,12 @@
           msgDiv.onclick = () => window.openCallOptionSheet();
           msgDiv.innerHTML = `
             <span class="call-icon">${icon}</span>
-            <div>
+            <div style="flex:1;">
               <strong>${label} ${isMissed ? 'Tak Terjawab' : ''}</strong>
               <div style="font-size: 0.75rem; opacity: 0.8;">${isMissed ? 'Ketuk untuk menelepon balik' : detail}</div>
+            </div>
+            <div class="msg-footer-info">
+              <span>${timeString}</span>
             </div>
           `;
         } else {
@@ -1968,7 +1988,7 @@
 
           let statusTicks = '';
           if (isMe) {
-            statusTicks = `<span class="msg-status ${data.unread === false ? 'read' : ''}">✓✓</span>`;
+            statusTicks = `<span class="msg-status-ticks ${data.unread === false ? 'read' : ''}">✓✓</span>`;
           }
 
           if (data.type === 'voice') {
@@ -1985,10 +2005,19 @@
                   Pesan Suara
                 </span>
               </div>
-              ${statusTicks}
+              <div class="msg-footer-info">
+                <span>${timeString}</span>
+                ${statusTicks}
+              </div>
             `;
           } else {
-            msgDiv.innerHTML = `${data.text} ${statusTicks}`;
+            msgDiv.innerHTML = `
+              <div style="padding-bottom: 2px;">${data.text}</div>
+              <div class="msg-footer-info">
+                <span>${timeString}</span>
+                ${statusTicks}
+              </div>
+            `;
           }
         }
 
@@ -2002,7 +2031,7 @@
 
         const msgDiv = document.getElementById(`msg-${msgKey}`);
         if (msgDiv && isMe && data.type !== 'call_log') {
-          const statusElem = msgDiv.querySelector('.msg-status');
+          const statusElem = msgDiv.querySelector('.msg-status-ticks');
           if (statusElem && data.unread === false) {
             statusElem.classList.add('read');
           }
