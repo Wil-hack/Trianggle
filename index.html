@@ -12,6 +12,17 @@
       user-select: none;
       -webkit-user-select: none;
     }
+    
+    /* PENTING: Membebaskan seluruh elemen input dari pembatasan touch/select */
+    input, textarea, [contenteditable="true"] {
+      -webkit-user-select: text !important;
+      -moz-user-select: text !important;
+      -ms-user-select: text !important;
+      user-select: text !important;
+      pointer-events: auto !important;
+      touch-action: manipulation !important;
+    }
+
     body, html {
       width: 100%;
       height: 100%;
@@ -214,7 +225,7 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(10, 11, 15, 0.8);
+      background: rgba(10, 11, 15, 0.85);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       z-index: 200;
@@ -224,7 +235,6 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
-      touch-action: auto !important;
     }
     .modal-backdrop.active {
       opacity: 1;
@@ -232,7 +242,7 @@
     }
 
     .card-modal {
-      background: rgba(20, 22, 32, 0.95);
+      background: rgba(20, 22, 32, 0.98);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.12);
@@ -244,7 +254,6 @@
       padding: 24px;
       text-align: center;
       position: relative;
-      touch-action: manipulation !important;
       z-index: 210;
     }
     .card-modal h2 { font-size: 1.4rem; margin-bottom: 6px; }
@@ -274,15 +283,13 @@
     .form-group label { display: block; font-size: 0.75rem; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; }
     .form-group input {
       width: 100%;
-      padding: 11px 14px;
-      background: rgba(13, 14, 18, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 12px 14px;
+      background: rgba(13, 14, 18, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 10px;
-      color: white;
+      color: #ffffff;
+      font-size: 1rem;
       outline: none;
-      touch-action: manipulation !important;
-      -webkit-user-select: text !important;
-      user-select: text !important;
     }
     .btn-file-upload {
       display: block;
@@ -365,7 +372,7 @@
     }
     .btn-ngobrol:active { transform: scale(0.96); }
 
-    /* JENDELA CHAT LUAR DARK METALLIC */
+    /* JENDELA CHAT */
     .chat-backdrop {
       align-items: center;
       padding: 10px;
@@ -435,7 +442,6 @@
       flex-direction: column;
       gap: 14px;
       background: #14161d;
-      touch-action: pan-y !important;
     }
 
     .msg {
@@ -578,9 +584,6 @@
       color: white;
       outline: none;
       font-size: 0.92rem;
-      touch-action: manipulation !important;
-      -webkit-user-select: text !important;
-      user-select: text !important;
     }
     .chat-footer-full input:focus {
       border-color: #dfb76c;
@@ -807,11 +810,11 @@
       <div id="form-login">
         <div class="form-group">
           <label>Username Unik</label>
-          <input type="text" id="login-username" placeholder="Masukkan username unik..." onpointerdown="this.focus(); event.stopPropagation();">
+          <input type="text" id="login-username" placeholder="Masukkan username unik...">
         </div>
         <div class="form-group">
           <label>Password</label>
-          <input type="password" id="login-password" placeholder="Masukkan password..." onpointerdown="this.focus(); event.stopPropagation();">
+          <input type="password" id="login-password" placeholder="Masukkan password...">
         </div>
         <button class="btn-submit" onclick="submitLogin()">Masuk</button>
       </div>
@@ -819,15 +822,15 @@
       <div id="form-register" style="display: none;">
         <div class="form-group">
           <label>Username Unik (Huruf Kecil Semua)</label>
-          <input type="text" id="reg-username" placeholder="Contoh: wildan" onpointerdown="this.focus(); event.stopPropagation();">
+          <input type="text" id="reg-username" placeholder="Contoh: wildan">
         </div>
         <div class="form-group">
           <label>Nama Tampilan</label>
-          <input type="text" id="reg-fullname" placeholder="Contoh: Wildan Jaka" onpointerdown="this.focus(); event.stopPropagation();">
+          <input type="text" id="reg-fullname" placeholder="Contoh: Wildan Jaka">
         </div>
         <div class="form-group">
           <label>Password Akun</label>
-          <input type="password" id="reg-password" placeholder="Buat password aman..." onpointerdown="this.focus(); event.stopPropagation();">
+          <input type="password" id="reg-password" placeholder="Buat password aman...">
         </div>
         <div class="form-group">
           <label>Foto Profil (Upload HP)</label>
@@ -849,7 +852,7 @@
 
       <div class="form-group">
         <label>Nama Tampilan Baru</label>
-        <input type="text" id="edit-fullname" placeholder="Masukkan nama baru..." onpointerdown="this.focus(); event.stopPropagation();">
+        <input type="text" id="edit-fullname" placeholder="Masukkan nama baru...">
       </div>
 
       <div class="form-group">
@@ -873,7 +876,7 @@
 
       <div class="form-group">
         <label>Username Teman</label>
-        <input type="text" id="add-contact-username" placeholder="Masukkan username teman..." onpointerdown="this.focus(); event.stopPropagation();">
+        <input type="text" id="add-contact-username" placeholder="Masukkan username teman...">
       </div>
 
       <button class="btn-submit" onclick="submitAddContact()">+ Tambahkan Kontak</button>
@@ -914,7 +917,7 @@
       </div>
       <div class="chat-body-full" id="chat-body"></div>
       <div class="chat-footer-full">
-        <input type="text" id="chat-input" placeholder="Ketik pesan..." onkeypress="handleKey(event)" onpointerdown="this.focus(); event.stopPropagation();">
+        <input type="text" id="chat-input" placeholder="Ketik pesan..." onkeypress="handleKey(event)">
         <button class="btn-chat-action btn-mic" id="btn-mic" onclick="toggleVoiceRecord()" title="Kirim Pesan Suara">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
@@ -933,7 +936,7 @@
     </div>
   </div>
 
-  <!-- BOTTOM SHEET MODAL (PILIH TIPE PANGGILAN) -->
+  <!-- BOTTOM SHEET MODAL -->
   <div class="modal-backdrop bottom-sheet-backdrop" id="call-sheet-modal" onclick="closeCallSheet(event)">
     <div class="bottom-sheet-card">
       <div class="bottom-sheet-drag"></div>
@@ -1091,13 +1094,23 @@
       }
     }, false);
 
+    // MENGATASI MASALAH INPUT TOUCH PADA HP ANDROID
     window.addEventListener('DOMContentLoaded', () => {
       checkAutoLogin();
       
-      document.querySelectorAll('input').forEach(input => {
-        input.addEventListener('pointerdown', (e) => {
+      const inputs = document.querySelectorAll('input');
+      inputs.forEach(input => {
+        input.addEventListener('touchstart', (e) => {
+          e.stopPropagation();
+        }, { passive: true });
+        
+        input.addEventListener('touchend', (e) => {
           e.stopPropagation();
           input.focus();
+        }, { passive: true });
+
+        input.addEventListener('mousedown', (e) => {
+          e.stopPropagation();
         });
       });
     });
@@ -1258,7 +1271,7 @@
     updateTransform();
 
     function startPan(clientX, clientY, target) {
-      if (target.closest('.modal-backdrop') || target.closest('header')) return;
+      if (target.closest('.modal-backdrop') || target.closest('header') || target.tagName === 'INPUT') return;
       isPanning = true;
       startX = clientX - panX;
       startY = clientY - panY;
@@ -1278,7 +1291,7 @@
     window.addEventListener('mouseup', endPan);
 
     viewport.addEventListener('touchstart', (e) => {
-      if (e.target.closest('.modal-backdrop')) return;
+      if (e.target.closest('.modal-backdrop') || e.target.tagName === 'INPUT') return;
       if (e.touches.length === 1) startPan(e.touches[0].clientX, e.touches[0].clientY, e.target);
     }, { passive: true });
 
