@@ -1,37 +1,46 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="com.trihive.app" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>TriHive</name>
-    <description>Aplikasi Web Chat &amp; Voice/Video Call Mosaik Segitiga</description>
+    <description>Aplikasi Native Chat &amp; Voice/Video Call Mosaik Segitiga</description>
     <author email="admin@trihive.com" href="https://trihive.com">
-        Tim TriHive
+        Wildan Jaka Pratama - TriHive
     </author>
     
-    <!-- Halaman Utama Aplikasi -->
     <content src="index.html" />
 
-    <!-- Preferensi dan Pengaturan Tampilan -->
+    <!-- Preferensi Sistem Native -->
     <preference name="loglevel" value="DEBUG" />
     <preference name="DisallowOverscroll" value="true" />
     <preference name="BackgroundColor" value="0xff0b0d12" />
     <preference name="HideSplashScreenSpinner" value="true" />
     <preference name="Orientation" value="portrait" />
+    <preference name="KeepRunning" value="true" />
 
-    <!-- Konfigurasi Platform Android -->
+    <!-- Plugin Native Telepon, Audio Toggle & Notifikasi -->
+    <plugin name="cordova-plugin-callkeep" spec="~3.1.0" />
+    <plugin name="cordova-plugin-push-notifications" spec="~3.0.0" />
+    <plugin name="cordova-plugin-background-mode" spec="~0.7.9" />
+    <plugin name="cordova-plugin-audiotoggle" spec="~1.0.3" />
+
+    <!-- Izin Manifest Android Native -->
     <platform name="android">
         <allow-intent href="http://*/*" />
         <allow-intent href="https://*/*" />
         
-        <!-- Izin Khusus untuk WAKE_LOCK, Lockscreen, Full Screen Intent, & Foreground Service -->
         <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest" xmlns:android="http://schemas.android.com/apk/res/android">
             <uses-permission android:name="android.permission.WAKE_LOCK" />
             <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
             <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
             <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
             <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+            <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
+            <uses-permission android:name="android.permission.RECORD_AUDIO" />
+            <uses-permission android:name="android.permission.CAMERA" />
+            <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+            <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
         </edit-config>
     </platform>
 
-    <!-- Akses Aksesoris & Web URL Eksternal -->
     <access origin="*" />
     <allow-intent href="tel:*" />
     <allow-intent href="mailto:*" />
