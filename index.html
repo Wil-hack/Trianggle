@@ -886,7 +886,7 @@
           </div>
         </div>
         <div class="header-actions">
-          <!-- 1 TOMBOL HEXAGON EMAS PANGGILAAN -->
+          <!-- 1 TOMBOL HEXAGON EMAS PANGGILAN DI HEADER -->
           <button class="btn-hexagon-call" onclick="openCallOptionSheet()" title="Panggil">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
               <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
@@ -918,7 +918,7 @@
     </div>
   </div>
 
-  <!-- BOTTOM SHEET MODAL (PILIH TIPE PANGGILAAN) -->
+  <!-- BOTTOM SHEET MODAL (PILIH TIPE PANGGILAN) -->
   <div class="modal-backdrop bottom-sheet-backdrop" id="call-sheet-modal" onclick="closeCallSheet(event)">
     <div class="bottom-sheet-card">
       <div class="bottom-sheet-drag"></div>
@@ -1450,6 +1450,7 @@
           currentCallType = callData.callType || 'voice';
           playRingingSound();
 
+          // Pemicu Membangunkan Layar HP dari Kunci
           if (window.cordova && cordova.plugins && cordova.plugins.backgroundMode) {
             cordova.plugins.backgroundMode.wakeUp();
             cordova.plugins.backgroundMode.unlock();
