@@ -404,7 +404,7 @@
       gap: 12px;
     }
 
-    /* TOMBOL BULAT EMAS PANGGILAN DI HEADER (SAMA SEPERTI TOMBOL KIRIM PESAN) */
+    /* TOMBOL BULAT EMAS PANGGILAN DI HEADER */
     .btn-round-call {
       background: linear-gradient(135deg, #dfb76c 0%, #b48c40 100%);
       border: none;
@@ -434,50 +434,58 @@
       touch-action: pan-y !important;
     }
 
-    /* GELEMBUNG PESAN METALLIC + GOLD TRIM */
+    /* GELEMBUNG PESAN METALLIC */
     .msg {
-      max-width: 82%;
-      padding: 12px 18px;
-      padding-bottom: 24px; /* Ruang untuk stempel waktu */
+      max-width: 85%;
+      min-width: 90px;
+      padding: 10px 14px 22px 14px;
       font-size: 0.92rem;
-      line-height: 1.45;
+      line-height: 1.4;
       position: relative;
       word-break: break-word;
+      display: flex;
+      flex-direction: column;
     }
     
-    /* RECEIVER: METALLIC DARK GREY */
+    /* RECEIVER: DARK GREY */
     .msg-in {
       background: linear-gradient(145deg, #323846 0%, #202430 100%);
       color: #e2e8f0;
       align-self: flex-start;
-      border-radius: 20px 20px 20px 6px;
+      border-radius: 16px 16px 16px 4px;
       border: 1.5px solid #dfb76c;
-      box-shadow: 
-        0 8px 20px rgba(0, 0, 0, 0.6),
-        inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     }
 
-    /* SENDER: METALLIC ROYAL BLUE */
+    /* SENDER: BELUM TERBACA (ABU-ABU GELAP KEEMASAN) */
     .msg-out {
-      background: linear-gradient(145deg, #1e3a8a 0%, #1e293b 100%);
+      background: linear-gradient(145deg, #252a37 0%, #1a1d26 100%);
       color: #ffffff;
       align-self: flex-end;
-      border-radius: 20px 20px 6px 20px;
-      border: 1.5px solid #dfb76c;
-      box-shadow: 
-        0 8px 20px rgba(0, 0, 0, 0.6),
-        inset 0 1px 1px rgba(255, 255, 255, 0.25),
-        0 0 12px rgba(30, 58, 138, 0.5);
+      border-radius: 16px 16px 4px 16px;
+      border: 1.5px solid rgba(223, 183, 108, 0.4);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     }
 
-    /* STEMPEL WAKTU & TIK KONTROL DI DALAM PESAN */
+    /* SENDER: SUDAH TERBACA (BERUBAH JADI BIRU ELEGAN) */
+    .msg-out.read {
+      background: linear-gradient(145deg, #1d4ed8 0%, #1e3a8a 100%);
+      border: 1.5px solid #dfb76c;
+      box-shadow: 0 4px 15px rgba(29, 78, 216, 0.4);
+    }
+
+    .msg-text-content {
+      padding-right: 50px;
+    }
+
+    /* STEMPEL WAKTU & TIK KONTROL */
     .msg-footer-info {
       position: absolute;
       bottom: 4px;
-      right: 12px;
+      right: 10px;
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 3px;
       font-size: 0.68rem;
       color: #94a3b8;
     }
@@ -486,12 +494,15 @@
     }
     .msg-status-ticks {
       font-size: 0.72rem;
-      color: #dfb76c;
+      color: #94a3b8;
       letter-spacing: -1.5px;
       font-weight: 800;
     }
+    .msg-out.read .msg-status-ticks {
+      color: #dfb76c; /* Centang jadi emas terang saat dibaca */
+    }
 
-    /* GELEMBUNG HISTORI PANGGILAAN (CALL LOG BUBBLE) */
+    /* GELEMBUNG HISTORI PANGGILAAN */
     .msg-call-log {
       align-self: center;
       max-width: 90%;
@@ -897,7 +908,6 @@
           </div>
         </div>
         <div class="header-actions">
-          <!-- 1 TOMBOL BULAT EMAS PANGGILAN DI HEADER (PRESISI & RAPI) -->
           <button class="btn-round-call" onclick="openCallOptionSheet()" title="Panggil">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10141d" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
               <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
@@ -1953,6 +1963,7 @@
         const msgKey = snapshot.key;
         const isMe = data.sender === currentUser;
         const timeString = formatTime(data.timestamp);
+        const isRead = data.unread === false;
 
         if (!isMe && data.unread !== false) {
           update(ref(db, `chats/${roomId}/${msgKey}`), { unread: false });
@@ -1984,11 +1995,12 @@
             </div>
           `;
         } else {
-          msgDiv.className = `msg ${isMe ? 'msg-out' : 'msg-in'}`;
+          // Tambahkan class 'read' jika pesan sudah dibaca (warna papan jadi biru)
+          msgDiv.className = `msg ${isMe ? (isRead ? 'msg-out read' : 'msg-out') : 'msg-in'}`;
 
           let statusTicks = '';
           if (isMe) {
-            statusTicks = `<span class="msg-status-ticks ${data.unread === false ? 'read' : ''}">✓✓</span>`;
+            statusTicks = `<span class="msg-status-ticks">✓✓</span>`;
           }
 
           if (data.type === 'voice') {
@@ -2012,7 +2024,7 @@
             `;
           } else {
             msgDiv.innerHTML = `
-              <div style="padding-bottom: 2px;">${data.text}</div>
+              <div class="msg-text-content">${data.text}</div>
               <div class="msg-footer-info">
                 <span>${timeString}</span>
                 ${statusTicks}
@@ -2031,9 +2043,8 @@
 
         const msgDiv = document.getElementById(`msg-${msgKey}`);
         if (msgDiv && isMe && data.type !== 'call_log') {
-          const statusElem = msgDiv.querySelector('.msg-status-ticks');
-          if (statusElem && data.unread === false) {
-            statusElem.classList.add('read');
+          if (data.unread === false) {
+            msgDiv.classList.add('read');
           }
         }
       });
