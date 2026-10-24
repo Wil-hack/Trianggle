@@ -281,8 +281,8 @@
       color: white;
       outline: none;
       touch-action: manipulation !important;
-      -webkit-user-select: text;
-      user-select: text;
+      -webkit-user-select: text !important;
+      user-select: text !important;
     }
     .btn-file-upload {
       display: block;
@@ -579,8 +579,8 @@
       outline: none;
       font-size: 0.92rem;
       touch-action: manipulation !important;
-      -webkit-user-select: text;
-      user-select: text;
+      -webkit-user-select: text !important;
+      user-select: text !important;
     }
     .chat-footer-full input:focus {
       border-color: #dfb76c;
@@ -1093,6 +1093,18 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       checkAutoLogin();
+      
+      // Paksa fokus dan cegah benturan sentuh pada semua kotak input
+      document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('touchstart', (e) => {
+          e.stopPropagation();
+        }, { passive: true });
+        
+        input.addEventListener('click', (e) => {
+          e.stopPropagation();
+          input.focus();
+        });
+      });
     });
 
     function checkAutoLogin() {
