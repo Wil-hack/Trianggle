@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>TriHive - Web Chat & Voice Call</title>
+  <title>TriHive - Web Chat & Voice/Video Call</title>
   <style>
     * {
       box-sizing: border-box;
@@ -404,20 +404,22 @@
       gap: 12px;
     }
 
-    .btn-icon-call {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      color: white;
+    /* TOMBOL HEXAGON EMAS PANGGILAN DI HEADER */
+    .btn-hexagon-call {
+      background: linear-gradient(135deg, #dfb76c 0%, #b48c40 100%);
+      border: 1px solid #fef08a;
+      width: 44px;
+      height: 44px;
+      clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+      color: #10141d;
       cursor: pointer;
       display: flex;
       justify-content: center;
       align-items: center;
-      box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+      box-shadow: 0 0 15px rgba(223, 183, 108, 0.4);
+      transition: transform 0.15s ease;
     }
-    .btn-icon-call:active { transform: scale(0.92); }
+    .btn-hexagon-call:active { transform: scale(0.9); }
 
     /* RUANG CHAT SCROLL NORMAL */
     .chat-body-full {
@@ -467,6 +469,32 @@
         0 8px 20px rgba(0, 0, 0, 0.6),
         inset 0 1px 1px rgba(255, 255, 255, 0.25),
         0 0 12px rgba(30, 58, 138, 0.5);
+    }
+
+    /* GELEMBUNG HISTORI PANGGILAAN (CALL LOG BUBBLE) */
+    .msg-call-log {
+      align-self: center;
+      max-width: 90%;
+      background: rgba(32, 36, 48, 0.85);
+      border: 1.5px solid #dfb76c;
+      border-radius: 16px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      transition: transform 0.15s ease;
+    }
+    .msg-call-log:active { transform: scale(0.96); }
+    .msg-call-log.missed {
+      border-color: #ef4444;
+      color: #fca5a5;
+    }
+    .msg-call-log .call-icon {
+      font-size: 1.1rem;
     }
     
     .msg-status {
@@ -565,17 +593,112 @@
       box-shadow: none;
     }
 
-    .call-card {
-      background: rgba(20, 22, 32, 0.95);
-      backdrop-filter: blur(25px);
-      -webkit-backdrop-filter: blur(25px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 26px;
-      width: 85%;
-      max-width: 320px;
-      padding: 40px 24px;
-      text-align: center;
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+    /* BOTTOM SHEET CALL TYPE MODAL */
+    .bottom-sheet-backdrop {
+      align-items: flex-end !important;
+      padding: 0 !important;
+    }
+    .bottom-sheet-card {
+      width: 100%;
+      max-width: 500px;
+      background: #191c24;
+      border-top: 1.5px solid #2d3342;
+      border-radius: 24px 24px 0 0;
+      padding: 20px 24px 36px;
+      color: white;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
+      animation: slideUp 0.25s ease-out;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .bottom-sheet-drag {
+      width: 42px;
+      height: 4px;
+      background: #475569;
+      border-radius: 2px;
+      margin: 0 auto 16px;
+    }
+    .bottom-sheet-title {
+      font-size: 0.88rem;
+      color: #94a3b8;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .bottom-sheet-option {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: #202430;
+      border: 1px solid #2d3342;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .bottom-sheet-option:active {
+      background: #2a2e3d;
+      border-color: #dfb76c;
+    }
+    .bottom-sheet-option .opt-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(223, 183, 108, 0.15);
+      border: 1px solid #dfb76c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #dfb76c;
+    }
+
+    /* OVERLAY VIDEO & VOICE CALL */
+    .call-card-full {
+      width: 100vw;
+      height: 100vh;
+      max-width: none;
+      border-radius: 0;
+      background: #0b0d12;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 40px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    #remote-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+      display: none;
+    }
+    #local-video {
+      position: absolute;
+      top: 24px;
+      right: 20px;
+      width: 110px;
+      height: 155px;
+      object-fit: cover;
+      border-radius: 16px;
+      border: 2px solid #dfb76c;
+      z-index: 10;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+      display: none;
+    }
+    .call-ui-layer {
+      position: relative;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
     }
     .call-avatar {
       width: 104px;
@@ -590,6 +713,7 @@
       justify-content: center;
       gap: 20px;
       margin-top: 25px;
+      z-index: 10;
     }
     .btn-accept-call {
       width: 58px;
@@ -762,9 +886,12 @@
           </div>
         </div>
         <div class="header-actions">
-          <button class="btn-icon-call" onclick="startCall()" title="Panggil Suara">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <!-- 1 TOMBOL HEXAGON EMAS PANGGILAAN -->
+          <button class="btn-hexagon-call" onclick="openCallOptionSheet()" title="Panggil">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
               <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              <line x1="12" y1="2" x2="12" y2="8"/>
+              <line x1="9" y1="5" x2="15" y2="5"/>
             </svg>
           </button>
           <button class="close-btn" style="position:static; font-size:1.4rem;" onclick="closeModals()">✕</button>
@@ -791,14 +918,53 @@
     </div>
   </div>
 
-  <!-- CALL OVERLAYS -->
+  <!-- BOTTOM SHEET MODAL (PILIH TIPE PANGGILAAN) -->
+  <div class="modal-backdrop bottom-sheet-backdrop" id="call-sheet-modal" onclick="closeCallSheet(event)">
+    <div class="bottom-sheet-card">
+      <div class="bottom-sheet-drag"></div>
+      <div class="bottom-sheet-title">Pilih tipe panggilan</div>
+      
+      <div class="bottom-sheet-option" onclick="startCall('voice')">
+        <div class="opt-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+          </svg>
+        </div>
+        <div>
+          <div style="font-weight: 600; font-size: 0.95rem;">Panggilan suara</div>
+          <div style="font-size: 0.78rem; color: #94a3b8;">Bicara via jaringan audio live</div>
+        </div>
+      </div>
+
+      <div class="bottom-sheet-option" onclick="startCall('video')">
+        <div class="opt-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="23 7 16 12 23 17 23 7"/>
+            <rect x="1" y="5" width="15" height="14" rx="3" ry="3"/>
+          </svg>
+        </div>
+        <div>
+          <div style="font-weight: 600; font-size: 0.95rem;">Panggilan video</div>
+          <div style="font-size: 0.78rem; color: #94a3b8;">Tatap muka langsung dengan kamera HP</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALL OVERLAYS (VOICE & VIDEO) -->
   <div class="modal-backdrop" id="call-modal">
-    <div class="call-card">
-      <img class="call-avatar" id="call-avatar" src="" alt="Avatar">
-      <h3 id="call-name" style="color:white; margin-bottom: 4px;">Nama Kontak</h3>
-      <p id="call-status-text" style="color: #10b981; font-size: 0.85rem;">Memanggil...</p>
+    <div class="call-card-full">
+      <video id="remote-video" autoplay playsinline></video>
+      <video id="local-video" autoplay playsinline muted></video>
+
+      <div class="call-ui-layer">
+        <img class="call-avatar" id="call-avatar" src="" alt="Avatar">
+        <h3 id="call-name" style="color:white; margin-bottom: 4px;">Nama Kontak</h3>
+        <p id="call-status-text" style="color: #10b981; font-size: 0.85rem;">Memanggil...</p>
+      </div>
+
       <div class="call-actions">
-        <button class="btn-end-call" onclick="endCall()">✕</button>
+        <button class="btn-end-call" onclick="endCall('ended')">✕</button>
       </div>
     </div>
   </div>
@@ -807,7 +973,7 @@
     <div class="call-card">
       <img class="call-avatar" id="incoming-avatar" src="" alt="Avatar">
       <h3 id="incoming-name" style="color:white; margin-bottom: 4px;">Nama Kontak</h3>
-      <p style="color: #3b82f6; font-size: 0.85rem;">Panggilan Suara Masuk...</p>
+      <p id="incoming-call-type-text" style="color: #3b82f6; font-size: 0.85rem;">Panggilan Masuk...</p>
       <div class="call-actions">
         <button class="btn-accept-call" onclick="acceptCall()">📞</button>
         <button class="btn-end-call" onclick="rejectCall()">✕</button>
@@ -851,6 +1017,8 @@
     let mediaRecorder = null;
     let audioChunks = [];
     let isRecording = false;
+    let currentCallType = 'voice'; 
+    let callStartTime = null;
 
     const rtcConfig = {
       iceServers: [
@@ -861,29 +1029,42 @@
       ]
     };
 
+    function showAndroidNotification(title, message, isCall = false) {
+      if ("Notification" in window) {
+        if (Notification.permission === "granted") {
+          const notif = new Notification(title, {
+            body: message,
+            icon: 'logo.png',
+            requireInteraction: isCall,
+            vibrate: [200, 100, 200]
+          });
+          notif.onclick = function() {
+            window.focus();
+            if (window.cordova && cordova.plugins && cordova.plugins.backgroundMode) {
+              cordova.plugins.backgroundMode.moveToForeground();
+            }
+          };
+        } else if (Notification.permission !== "denied") {
+          Notification.requestPermission();
+        }
+      }
+    }
+
     document.addEventListener('deviceready', () => {
-      // Mengaktifkan Background Mode agar proses tidak mati saat di-minimize
       if (window.cordova && cordova.plugins && cordova.plugins.backgroundMode) {
         cordova.plugins.backgroundMode.enable();
+        cordova.plugins.backgroundMode.wakeUp();
+        cordova.plugins.backgroundMode.unlock();
         cordova.plugins.backgroundMode.setDefaults({
-          title: "TriHive Aktif",
-          text: "Aplikasi berjalan di latar belakang",
-          ticker: "TriHive siap menerima pesan",
+          title: "TriHive Siaga",
+          text: "Menerima Pesan & Panggilan Live",
           hidden: false,
-          resume: true,
           silent: false
         });
       }
 
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ audio: true })
-          .then((stream) => {
-            stream.getTracks().forEach(track => track.stop());
-            console.log("Izin Mikrofon Berhasil!");
-          })
-          .catch((err) => {
-            console.log("Izin Mikrofon Ditolak:", err);
-          });
+      if ("Notification" in window && Notification.permission !== "granted") {
+        Notification.requestPermission();
       }
     }, false);
 
@@ -1172,7 +1353,6 @@
         }
       });
 
-      // Keep-Alive Heartbeat setiap 15 detik
       setInterval(() => {
         if (currentUser) {
           set(ref(db, `status/${currentUser}/lastSeen`), Date.now());
@@ -1237,6 +1417,10 @@
             if (data.unread !== false) {
               if (!isInitialLoad) {
                 playNotificationSound();
+                showAndroidNotification(
+                  `Pesan dari ${contactUsername}`,
+                  data.type === 'voice' ? '🎙️ Pesan Suara' : (data.type === 'call_log' ? '📞 Catatan Panggilan' : data.text)
+                );
               }
               unreadCounts[contactUsername] = (unreadCounts[contactUsername] || 0) + 1;
               buildGrid();
@@ -1263,13 +1447,29 @@
         const callData = snapshot.val();
         if (callData && callData.status === 'calling') {
           targetUser = callData.caller;
+          currentCallType = callData.callType || 'voice';
           playRingingSound();
+
+          if (window.cordova && cordova.plugins && cordova.plugins.backgroundMode) {
+            cordova.plugins.backgroundMode.wakeUp();
+            cordova.plugins.backgroundMode.unlock();
+            cordova.plugins.backgroundMode.moveToForeground();
+          }
+
+          showAndroidNotification(
+            currentCallType === 'video' ? `📹 Panggilan Video Masuk` : `📞 Panggilan Suara Masuk`,
+            `${callData.callerName} memanggil Anda...`,
+            true
+          );
+
           document.getElementById('incoming-name').innerText = callData.callerName;
           document.getElementById('incoming-avatar').src = callData.callerAvatar;
+          document.getElementById('incoming-call-type-text').innerText = currentCallType === 'video' ? "Panggilan Video Masuk..." : "Panggilan Suara Masuk...";
           document.getElementById('incoming-call-modal').classList.add('active');
         } else if (callData && callData.status === 'connected') {
           stopRingingSound();
-          document.getElementById('call-status-text').innerText = "Terhubung (Suara Live)";
+          callStartTime = Date.now();
+          document.getElementById('call-status-text').innerText = "Terhubung (Live)";
         } else if (!callData) {
           stopRingingSound();
           cleanupWebRTC();
@@ -1284,8 +1484,9 @@
         if (answer && peerConnection && peerConnection.signalingState === "have-local-offer") {
           try {
             await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-            document.getElementById('call-status-text').innerText = "Terhubung (Suara Live)";
             stopRingingSound();
+            callStartTime = Date.now();
+            document.getElementById('call-status-text').innerText = "Terhubung (Live)";
             processPendingCandidates();
           } catch (e) { console.log("Answer error:", e); }
         }
@@ -1313,18 +1514,23 @@
       }
     }
 
-    async function initLocalAudio() {
+    async function initLocalMedia(type) {
       try {
-        if (!localStream) {
-          localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        const constraints = { audio: true, video: type === 'video' };
+        localStream = await navigator.mediaDevices.getUserMedia(constraints);
+        
+        if (type === 'video') {
+          const localVideo = document.getElementById('local-video');
+          localVideo.srcObject = localStream;
+          localVideo.style.display = 'block';
         }
       } catch (err) {
-        alert("Mohon izinkan akses Mikrofon di browser HP Anda!");
+        alert("Mohon izinkan akses Kamera/Mikrofon di HP Anda!");
         throw err;
       }
     }
 
-    function createPeerConnection(remoteUsername) {
+    function createPeerConnection(remoteUsername, type) {
       if (peerConnection) return;
       targetUser = remoteUsername;
       peerConnection = new RTCPeerConnection(rtcConfig);
@@ -1334,10 +1540,18 @@
       }
 
       peerConnection.ontrack = (event) => {
-        const remoteAudio = document.getElementById('remote-audio');
-        if (remoteAudio && event.streams[0]) {
-          remoteAudio.srcObject = event.streams[0];
-          remoteAudio.play().catch(e => console.log("Auto-play remote audio failed:", e));
+        if (type === 'video') {
+          const remoteVideo = document.getElementById('remote-video');
+          if (remoteVideo && event.streams[0]) {
+            remoteVideo.srcObject = event.streams[0];
+            remoteVideo.style.display = 'block';
+          }
+        } else {
+          const remoteAudio = document.getElementById('remote-audio');
+          if (remoteAudio && event.streams[0]) {
+            remoteAudio.srcObject = event.streams[0];
+            remoteAudio.play().catch(e => console.log(e));
+          }
         }
       };
 
@@ -1348,19 +1562,32 @@
       };
     }
 
-    window.startCall = async function() {
+    window.openCallOptionSheet = function() {
       if (!activeContact) return;
+      document.getElementById('call-sheet-modal').classList.add('active');
+    }
+
+    window.closeCallSheet = function(e) {
+      if (e.target.id === 'call-sheet-modal' || !e) {
+        document.getElementById('call-sheet-modal').classList.remove('active');
+      }
+    }
+
+    window.startCall = async function(type) {
+      document.getElementById('call-sheet-modal').classList.remove('active');
+      if (!activeContact) return;
+      currentCallType = type;
       const remoteUsername = activeContact.username;
 
       try {
-        await initLocalAudio();
+        await initLocalMedia(type);
       } catch (e) { return; }
 
       playRingingSound();
       remove(ref(db, `webrtc_signals/${remoteUsername}`));
       remove(ref(db, `webrtc_signals/${currentUser}`));
       
-      createPeerConnection(remoteUsername);
+      createPeerConnection(remoteUsername, type);
 
       const offer = await peerConnection.createOffer();
       await peerConnection.setLocalDescription(offer);
@@ -1369,6 +1596,7 @@
         caller: currentUser,
         callerName: currentDisplayName,
         callerAvatar: currentAvatarUrl,
+        callType: type,
         status: 'calling'
       });
 
@@ -1385,11 +1613,11 @@
       document.getElementById('incoming-call-modal').classList.remove('active');
 
       try {
-        await initLocalAudio();
+        await initLocalMedia(currentCallType);
       } catch (e) { return; }
 
       const callerUsername = targetUser;
-      createPeerConnection(callerUsername);
+      createPeerConnection(callerUsername, currentCallType);
 
       const offerSnap = await get(ref(db, `webrtc_signals/${currentUser}/offer`));
       if (offerSnap.exists()) {
@@ -1408,12 +1636,13 @@
 
       document.getElementById('call-name').innerText = document.getElementById('incoming-name').innerText;
       document.getElementById('call-avatar').src = document.getElementById('incoming-avatar').src;
-      document.getElementById('call-status-text').innerText = "Terhubung (Suara Live)";
+      document.getElementById('call-status-text').innerText = "Terhubung (Live)";
       document.getElementById('call-modal').classList.add('active');
     }
 
     window.rejectCall = function() {
       stopRingingSound();
+      logCallHistory('missed', 0);
       if (targetUser) {
         remove(ref(db, `calls/${targetUser}`));
         remove(ref(db, `webrtc_signals/${targetUser}`));
@@ -1434,12 +1663,51 @@
       }
       const remoteAudio = document.getElementById('remote-audio');
       if (remoteAudio) remoteAudio.srcObject = null;
+      const remoteVideo = document.getElementById('remote-video');
+      if (remoteVideo) { remoteVideo.srcObject = null; remoteVideo.style.display = 'none'; }
+      const localVideo = document.getElementById('local-video');
+      if (localVideo) { localVideo.srcObject = null; localVideo.style.display = 'none'; }
+      
       targetUser = null;
       pendingCandidates = [];
+      callStartTime = null;
     }
 
-    window.endCall = function() {
+    function logCallHistory(status, durationSec) {
+      if (!activeContact && !targetUser) return;
+      const otherUser = activeContact ? activeContact.username : targetUser;
+      const roomId = getRoomId(currentUser, otherUser);
+      const messagesRef = ref(db, `chats/${roomId}`);
+
+      let durationText = "";
+      if (status === 'connected' && durationSec > 0) {
+        const mins = Math.floor(durationSec / 60);
+        const secs = durationSec % 60;
+        durationText = mins > 0 ? `${mins} mnt ${secs} dtk` : `${secs} dtk`;
+      }
+
+      push(messagesRef, {
+        sender: currentUser,
+        type: 'call_log',
+        callType: currentCallType,
+        status: status,
+        duration: durationText,
+        unread: true,
+        timestamp: Date.now()
+      });
+    }
+
+    window.endCall = function(reason) {
       stopRingingSound();
+      
+      let durationSec = 0;
+      if (callStartTime) {
+        durationSec = Math.floor((Date.now() - callStartTime) / 1000);
+        logCallHistory('connected', durationSec);
+      } else {
+        logCallHistory('missed', 0);
+      }
+
       if (targetUser) {
         remove(ref(db, `calls/${targetUser}`));
         remove(ref(db, `webrtc_signals/${targetUser}`));
@@ -1679,35 +1947,48 @@
           chatBody.appendChild(msgDiv);
         }
 
-        msgDiv.className = `msg ${isMe ? 'msg-out' : 'msg-in'}`;
+        if (data.type === 'call_log') {
+          const isMissed = data.status === 'missed';
+          const icon = data.callType === 'video' ? '📹' : '📞';
+          const label = data.callType === 'video' ? 'Panggilan Video' : 'Panggilan Suara';
+          const detail = isMissed ? 'Tak Terjawab' : (data.duration || 'Selesai');
 
-        let statusTicks = '';
-        if (isMe) {
-          if (data.unread === false) {
-            statusTicks = '<span class="msg-status read">✓✓</span>';
-          } else {
-            statusTicks = '<span class="msg-status">✓✓</span>';
-          }
-        }
-
-        if (data.type === 'voice') {
+          msgDiv.className = `msg-call-log ${isMissed ? 'missed' : ''}`;
+          msgDiv.onclick = () => window.openCallOptionSheet();
           msgDiv.innerHTML = `
-            <div class="voice-msg-container">
-              <button class="btn-play-voice" onclick="playVoice(this, '${data.audio}')">▶</button>
-              <span class="voice-tag">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dfb76c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                  <line x1="12" y1="19" x2="12" y2="23"/>
-                  <line x1="8" y1="23" x2="16" y2="23"/>
-                </svg>
-                Pesan Suara
-              </span>
+            <span class="call-icon">${icon}</span>
+            <div>
+              <strong>${label} ${isMissed ? 'Tak Terjawab' : ''}</strong>
+              <div style="font-size: 0.75rem; opacity: 0.8;">${isMissed ? 'Ketuk untuk menelepon balik' : detail}</div>
             </div>
-            ${statusTicks}
           `;
         } else {
-          msgDiv.innerHTML = `${data.text} ${statusTicks}`;
+          msgDiv.className = `msg ${isMe ? 'msg-out' : 'msg-in'}`;
+
+          let statusTicks = '';
+          if (isMe) {
+            statusTicks = `<span class="msg-status ${data.unread === false ? 'read' : ''}">✓✓</span>`;
+          }
+
+          if (data.type === 'voice') {
+            msgDiv.innerHTML = `
+              <div class="voice-msg-container">
+                <button class="btn-play-voice" onclick="playVoice(this, '${data.audio}')">▶</button>
+                <span class="voice-tag">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dfb76c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" y1="19" x2="12" y2="23"/>
+                    <line x1="8" y1="23" x2="16" y2="23"/>
+                  </svg>
+                  Pesan Suara
+                </span>
+              </div>
+              ${statusTicks}
+            `;
+          } else {
+            msgDiv.innerHTML = `${data.text} ${statusTicks}`;
+          }
         }
 
         chatBody.scrollTop = chatBody.scrollHeight;
@@ -1719,7 +2000,7 @@
         const isMe = data.sender === currentUser;
 
         const msgDiv = document.getElementById(`msg-${msgKey}`);
-        if (msgDiv && isMe) {
+        if (msgDiv && isMe && data.type !== 'call_log') {
           const statusElem = msgDiv.querySelector('.msg-status');
           if (statusElem && data.unread === false) {
             statusElem.classList.add('read');
