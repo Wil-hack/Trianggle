@@ -3,791 +3,105 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>TriHive - Web Chat & Voice/Video Call</title>
+  <title>TriHive - Native Call & Chat</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    body, html {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background-color: #0b0d12;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      color: #e2e8f0;
-      overscroll-behavior-y: none;
-    }
-    .svg-defs {
-      position: absolute;
-      width: 0;
-      height: 0;
-      overflow: hidden;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    body, html { width: 100%; height: 100%; overflow: hidden; background-color: #0b0d12; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #e2e8f0; }
+    .svg-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 
-    /* HEADER UTAMA */
     header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 60px;
-      background: rgba(11, 13, 18, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 16px;
-      z-index: 100;
+      position: fixed; top: 0; left: 0; width: 100%; height: 60px;
+      background: rgba(11, 13, 18, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center; padding: 0 16px; z-index: 100;
     }
-    .brand-title {
-      font-weight: 700;
-      font-size: 1.15rem;
-      letter-spacing: 1.5px;
-      color: #f8fafc;
-    }
-    .header-controls {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .btn-add-contact {
-      background: rgba(59, 130, 246, 0.2);
-      border: 1px solid rgba(59, 130, 246, 0.4);
-      color: #3b82f6;
-      padding: 6px 12px;
-      border-radius: 18px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .user-pill {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 4px 10px;
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      cursor: pointer;
-    }
-    .user-pill img {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-    .user-pill span {
-      font-size: 0.85rem;
-    }
+    .brand-title { font-weight: 700; font-size: 1.15rem; letter-spacing: 1.5px; color: #f8fafc; }
+    .header-controls { display: flex; align-items: center; gap: 10px; }
+    .btn-add-contact { background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); color: #3b82f6; padding: 6px 12px; border-radius: 18px; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+    .user-pill { display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.05); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); cursor: pointer; }
+    .user-pill img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+    .user-pill span { font-size: 0.85rem; }
 
-    /* VIEWPORT CANVAS KANVAS GESER */
-    #viewport {
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-      position: relative;
-      cursor: grab;
-      perspective: 900px;
-    }
-    #viewport:active {
-      cursor: grabbing;
-    }
-    #canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      transform-origin: 0 0;
-      will-change: transform;
-    }
-    .honeycomb-grid {
-      position: relative;
-      padding: 150px;
-    }
-    .grid-row {
-      display: flex;
-      margin-top: -36px;
-    }
+    #viewport { width: 100vw; height: 100vh; overflow: hidden; position: relative; cursor: grab; perspective: 900px; }
+    #canvas { position: absolute; top: 0; left: 0; transform-origin: 0 0; will-change: transform; }
+    .honeycomb-grid { position: relative; padding: 150px; }
+    .grid-row { display: flex; margin-top: -36px; }
     .grid-row:nth-child(odd) { margin-left: 24px; }
     .grid-row:nth-child(even) { margin-left: 68px; }
 
-    .tile {
-      position: relative;
-      width: 100px;
-      height: 115px;
-      margin: 0 4px;
-      cursor: pointer;
-      will-change: transform;
-      transform: translateZ(0);
-      backface-visibility: hidden;
-      animation: oceanWave 6s ease-in-out infinite alternate;
-      animation-delay: calc(var(--col-index, 0) * 0.15s);
-    }
-
-    @keyframes oceanWave {
-      0% { transform: translateY(0px) rotateX(0deg) scale(1); }
-      50% { transform: translateY(-7px) rotateX(4deg) scale(1.01); }
-      100% { transform: translateY(3px) rotateX(-3deg) scale(0.99); }
-    }
-
-    .tile:active {
-      transform: scale(1.1) translateZ(15px) !important;
-      z-index: 30;
-    }
-
-    .tile-inner {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      filter: brightness(0.96);
-    }
+    .tile { position: relative; width: 100px; height: 115px; margin: 0 4px; cursor: pointer; animation: oceanWave 6s ease-in-out infinite alternate; animation-delay: calc(var(--col-index, 0) * 0.15s); }
+    @keyframes oceanWave { 0% { transform: translateY(0px); } 50% { transform: translateY(-7px); } 100% { transform: translateY(3px); } }
+    .tile-inner { width: 100%; height: 100%; position: relative; filter: brightness(0.96); }
     .tile-upright .tile-inner { clip-path: url(#tri-upright-clip); }
     .tile-inverted .tile-inner { clip-path: url(#tri-inverted-clip); }
-    
-    .tile-bg {
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, #181c28 0%, #0d0f17 50%, #22293e 100%);
-      background-size: 200% 200%;
-      animation: colorGlow 8s ease infinite alternate;
-    }
-    @keyframes colorGlow {
-      0% { background-position: 0% 20%; }
-      100% { background-position: 100% 80%; }
-    }
+    .tile-bg { width: 100%; height: 100%; background: linear-gradient(135deg, #181c28 0%, #0d0f17 100%); }
+    .tile-photo-wrapper { position: relative; width: 100%; height: 100%; }
+    .tile-photo { width: 100%; height: 100%; object-fit: cover; }
+    .unread-badge { position: absolute; top: 6px; right: 6px; background: #ef4444; color: white; font-size: 0.7rem; font-weight: 800; padding: 3px 7px; border-radius: 12px; border: 1.5px solid white; z-index: 10; display: none; }
 
-    .tile-photo-wrapper {
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
-    .tile-photo {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .tile-photo-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.1) 40%, rgba(11, 13, 18, 0.8) 100%);
-      pointer-events: none;
-    }
+    .modal-backdrop { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 11, 15, 0.8); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); z-index: 200; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+    .modal-backdrop.active { opacity: 1; pointer-events: auto; }
 
-    .unread-badge {
-      position: absolute;
-      top: 6px;
-      right: 6px;
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-      color: white;
-      font-size: 0.7rem;
-      font-weight: 800;
-      padding: 3px 7px;
-      border-radius: 12px;
-      border: 1.5px solid rgba(255, 255, 255, 0.8);
-      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.6);
-      z-index: 10;
-      display: none;
-      animation: badgePulse 2s infinite ease-in-out;
-    }
-    @keyframes badgePulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.12); }
-      100% { transform: scale(1); }
-    }
-
-    /* MODAL WINDOW GENERIC */
-    .modal-backdrop {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(10, 11, 15, 0.8);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      z-index: 200;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-    .modal-backdrop.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .card-modal {
-      background: rgba(20, 22, 32, 0.95);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 24px;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
-      color: #e2e8f0;
-      width: 90%;
-      max-width: 380px;
-      padding: 24px;
-      text-align: center;
-      position: relative;
-    }
-    .card-modal h2 { font-size: 1.4rem; margin-bottom: 6px; }
-    .card-modal p { font-size: 0.85rem; color: #94a3b8; margin-bottom: 18px; }
-    
-    .tab-group {
-      display: flex;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 4px;
-      border-radius: 10px;
-      margin-bottom: 16px;
-    }
-    .tab-btn {
-      flex: 1;
-      padding: 8px;
-      border: none;
-      background: transparent;
-      color: #94a3b8;
-      font-size: 0.85rem;
-      font-weight: 600;
-      border-radius: 8px;
-      cursor: pointer;
-    }
+    .card-modal { background: rgba(20, 22, 32, 0.95); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 24px; color: #e2e8f0; width: 90%; max-width: 380px; padding: 24px; text-align: center; position: relative; }
+    .tab-group { display: flex; background: rgba(255, 255, 255, 0.05); padding: 4px; border-radius: 10px; margin-bottom: 16px; }
+    .tab-btn { flex: 1; padding: 8px; border: none; background: transparent; color: #94a3b8; font-weight: 600; border-radius: 8px; cursor: pointer; }
     .tab-btn.active { background: #3b82f6; color: white; }
-
     .form-group { margin-bottom: 14px; text-align: left; }
     .form-group label { display: block; font-size: 0.75rem; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; }
-    .form-group input {
-      width: 100%;
-      padding: 11px 14px;
-      background: rgba(13, 14, 18, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      color: white;
-      outline: none;
-    }
-    .btn-file-upload {
-      display: block;
-      width: 100%;
-      padding: 11px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px dashed rgba(255, 255, 255, 0.25);
-      border-radius: 10px;
-      color: #3b82f6;
-      text-align: center;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      margin-bottom: 10px;
-    }
-    .upload-preview {
-      width: 65px;
-      height: 65px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin: 8px auto;
-      display: none;
-      border: 2px solid #3b82f6;
-    }
-    .btn-submit {
-      width: 100%;
-      padding: 12px;
-      background: #3b82f6;
-      border: none;
-      border-radius: 12px;
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    .close-btn {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: transparent;
-      border: none;
-      color: #94a3b8;
-      font-size: 1.3rem;
-      cursor: pointer;
-    }
+    .form-group input { width: 100%; padding: 11px 14px; background: rgba(13, 14, 18, 0.85); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; color: white; outline: none; }
+    .btn-file-upload { display: block; width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.06); border: 1px dashed rgba(255, 255, 255, 0.25); border-radius: 10px; color: #3b82f6; text-align: center; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+    .upload-preview { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; margin: 8px auto; display: none; border: 2px solid #3b82f6; }
+    .btn-submit { width: 100%; padding: 12px; background: #3b82f6; border: none; border-radius: 12px; color: white; font-weight: 600; cursor: pointer; margin-top: 10px; }
+    .close-btn { position: absolute; top: 16px; right: 16px; background: transparent; border: none; color: #94a3b8; font-size: 1.3rem; cursor: pointer; }
 
-    .profile-card {
-      background: rgba(20, 22, 32, 0.95);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 24px;
-      width: 85%;
-      max-width: 320px;
-      padding: 28px 24px;
-      text-align: center;
-      position: relative;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
-    }
-    .profile-card img {
-      width: 88px;
-      height: 88px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid #3b82f6;
-      margin-bottom: 12px;
-    }
-    .btn-ngobrol {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 14px;
-      font-weight: 700;
-      font-size: 0.95rem;
-      cursor: pointer;
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: white;
-      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
-      transition: transform 0.15s;
-    }
-    .btn-ngobrol:active { transform: scale(0.96); }
+    .chat-backdrop { align-items: center; padding: 10px; }
+    .chat-card-full { width: 96%; max-width: 440px; height: 85vh; max-height: 740px; background: #191c24; border: 1.5px solid #2d3342; border-radius: 28px; display: flex; flex-direction: column; overflow: hidden; }
+    .chat-header-full { padding: 16px 20px; background: #202430; border-bottom: 1px solid #2d3342; display: flex; align-items: center; justify-content: space-between; }
+    .chat-user-full { display: flex; align-items: center; gap: 12px; }
+    .chat-user-full img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #dfb76c; }
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+    .btn-round-call { background: linear-gradient(135deg, #dfb76c 0%, #b48c40 100%); border: none; width: 42px; height: 42px; border-radius: 50%; color: #10141d; cursor: pointer; display: flex; justify-content: center; align-items: center; }
 
-    /* JENDELA CHAT */
-    .chat-backdrop {
-      align-items: center;
-      padding: 10px;
-    }
-    .chat-card-full {
-      width: 96%;
-      max-width: 440px;
-      height: 85vh;
-      max-height: 740px;
-      background: #191c24;
-      border: 1.5px solid #2d3342;
-      border-radius: 28px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.9);
-    }
-
-    .chat-header-full {
-      padding: 16px 20px;
-      background: #202430;
-      border-bottom: 1px solid #2d3342;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .chat-user-full {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .chat-user-full img {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid #dfb76c;
-    }
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .btn-round-call {
-      background: linear-gradient(135deg, #dfb76c 0%, #b48c40 100%);
-      border: none;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      color: #10141d;
-      cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 4px 15px rgba(223, 183, 108, 0.35);
-      transition: transform 0.15s ease;
-    }
-    .btn-round-call:active { transform: scale(0.92); }
-
-    .chat-body-full {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      background: #14161d;
-      touch-action: pan-y !important;
-    }
-
-    .msg {
-      max-width: 85%;
-      min-width: 90px;
-      padding: 10px 14px 22px 14px;
-      font-size: 0.92rem;
-      line-height: 1.4;
-      position: relative;
-      word-break: break-word;
-      display: flex;
-      flex-direction: column;
-    }
+    .chat-body-full { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; background: #14161d; touch-action: pan-y !important; }
+    .msg { max-width: 85%; min-width: 90px; padding: 10px 14px 22px 14px; font-size: 0.92rem; line-height: 1.4; position: relative; word-break: break-word; display: flex; flex-direction: column; cursor: pointer; }
+    .msg-in { background: #202430; color: #e2e8f0; align-self: flex-start; border-radius: 16px 16px 16px 4px; border: 1.5px solid #dfb76c; }
+    .msg-out { background: #1a1d26; color: #ffffff; align-self: flex-end; border-radius: 16px 16px 4px 16px; border: 1.5px solid rgba(223, 183, 108, 0.4); }
+    .msg-out.read { background: #1d4ed8; border-color: #dfb76c; }
+    .msg-footer-info { position: absolute; bottom: 4px; right: 10px; display: flex; align-items: center; gap: 3px; font-size: 0.68rem; color: #94a3b8; }
     
-    .msg-in {
-      background: linear-gradient(145deg, #323846 0%, #202430 100%);
-      color: #e2e8f0;
-      align-self: flex-start;
-      border-radius: 16px 16px 16px 4px;
-      border: 1.5px solid #dfb76c;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    }
+    .chat-footer-full { padding: 14px 18px; padding-bottom: max(16px, env(safe-area-inset-bottom)); background: #191c24; border-top: 1px solid #2d3342; display: flex; gap: 12px; align-items: center; }
+    .chat-footer-full input { flex: 1; padding: 13px 20px; background: #202430; border: 1px solid #2d3342; border-radius: 26px; color: white; outline: none; font-size: 0.92rem; }
+    .btn-chat-action { background: linear-gradient(135deg, #dfb76c 0%, #b48c40 100%); border: none; width: 44px; height: 44px; border-radius: 50%; color: #10141d; cursor: pointer; display: flex; justify-content: center; align-items: center; flex-shrink: 0; }
+    .btn-mic { background: #202430; border: 1px solid #2d3342; color: #dfb76c; }
 
-    .msg-out {
-      background: linear-gradient(145deg, #252a37 0%, #1a1d26 100%);
-      color: #ffffff;
-      align-self: flex-end;
-      border-radius: 16px 16px 4px 16px;
-      border: 1.5px solid rgba(223, 183, 108, 0.4);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    }
-
-    .msg-out.read {
-      background: linear-gradient(145deg, #1d4ed8 0%, #1e3a8a 100%);
-      border: 1.5px solid #dfb76c;
-      box-shadow: 0 4px 15px rgba(29, 78, 216, 0.4);
-    }
-
-    .msg-text-content {
-      padding-right: 50px;
-    }
-
-    .msg-footer-info {
-      position: absolute;
-      bottom: 4px;
-      right: 10px;
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      font-size: 0.68rem;
-      color: #94a3b8;
-    }
-    .msg-out .msg-footer-info {
-      color: #cbd5e1;
-    }
-    .msg-status-ticks {
-      font-size: 0.72rem;
-      color: #94a3b8;
-      letter-spacing: -1.5px;
-      font-weight: 800;
-    }
-    .msg-out.read .msg-status-ticks {
-      color: #dfb76c;
-    }
-
-    .msg-call-log {
-      align-self: center;
-      max-width: 90%;
-      background: rgba(32, 36, 48, 0.85);
-      border: 1.5px solid #dfb76c;
-      border-radius: 16px;
-      padding: 10px 16px 24px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.85rem;
-      color: #e2e8f0;
-      cursor: pointer;
-      position: relative;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-      transition: transform 0.15s ease;
-    }
-    .msg-call-log:active { transform: scale(0.96); }
-    .msg-call-log.missed {
-      border-color: #ef4444;
-      color: #fca5a5;
-    }
-    .msg-call-log .call-icon {
-      font-size: 1.1rem;
-    }
-
-    .btn-play-voice {
-      background: linear-gradient(145deg, #dfb76c 0%, #9a7632 100%);
-      border: 1px solid #fef08a;
-      color: #1e293b;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 0.85rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      box-shadow: 
-        0 4px 10px rgba(0, 0, 0, 0.5),
-        inset 0 1px 2px rgba(255, 255, 255, 0.8);
-      transition: transform 0.15s ease;
-    }
-    .btn-play-voice:active {
-      transform: scale(0.92);
-      box-shadow: inset 0 2px 5px rgba(0,0,0,0.6);
-    }
-
-    .voice-msg-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .voice-tag {
-      font-size: 0.88rem;
-      font-weight: 700;
-      color: #dfb76c;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .chat-footer-full {
-      padding: 14px 18px;
-      padding-bottom: max(16px, env(safe-area-inset-bottom));
-      background: #191c24;
-      border-top: 1px solid #2d3342;
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-    .chat-footer-full input {
-      flex: 1;
-      min-width: 0;
-      padding: 13px 20px;
-      background: #202430;
-      border: 1px solid #2d3342;
-      border-radius: 26px;
-      color: white;
-      outline: none;
-      font-size: 0.92rem;
-    }
-    .chat-footer-full input:focus {
-      border-color: #dfb76c;
-    }
-
-    .btn-chat-action {
-      background: linear-gradient(135deg, #dfb76c 0%, #b48c40 100%);
-      border: none;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      color: #10141d;
-      cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-shrink: 0;
-      box-shadow: 0 4px 15px rgba(223, 183, 108, 0.35);
-    }
-    .btn-chat-action:active { transform: scale(0.92); }
+    /* LAYAR PANGGALAN NATIVE OVERLAY */
+    .call-card-full { width: 100vw; height: 100vh; background: #0b0d12; display: flex; flex-direction: column; justify-content: space-between; padding: 40px 20px; position: relative; overflow: hidden; }
+    #remote-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; display: none; }
+    #local-video { position: absolute; top: 24px; right: 20px; width: 110px; height: 155px; object-fit: cover; border-radius: 16px; border: 2px solid #dfb76c; z-index: 10; display: none; }
+    .call-ui-layer { position: relative; z-index: 5; display: flex; flex-direction: column; align-items: center; width: 100%; }
+    .call-avatar { width: 104px; height: 104px; border-radius: 50%; object-fit: cover; border: 4px solid #10b981; margin: 0 auto 20px; }
+    .call-actions { display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 25px; z-index: 10; }
     
-    .btn-mic {
-      background: #202430;
-      border: 1px solid #2d3342;
-      color: #dfb76c;
-      box-shadow: none;
-    }
+    .btn-call-opt { width: 54px; height: 54px; background: rgba(255, 255, 255, 0.15); border: 1.5px solid rgba(255, 255, 255, 0.3); border-radius: 50%; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 1.2rem; }
+    .btn-call-opt.active { background: #dfb76c; color: #10141d; }
+    .btn-end-call { width: 58px; height: 58px; background: #ef4444; border: none; border-radius: 50%; color: white; font-size: 1.25rem; cursor: pointer; }
+    .btn-accept-call { width: 58px; height: 58px; background: #10b981; border: none; border-radius: 50%; color: white; font-size: 1.25rem; cursor: pointer; }
 
-    .bottom-sheet-backdrop {
-      align-items: flex-end !important;
-      padding: 0 !important;
-    }
-    .bottom-sheet-card {
-      width: 100%;
-      max-width: 500px;
-      background: #191c24;
-      border-top: 1.5px solid #2d3342;
-      border-radius: 24px 24px 0 0;
-      padding: 20px 24px 36px;
-      color: white;
-      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
-      animation: slideUp 0.25s ease-out;
-    }
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
-    }
-    .bottom-sheet-drag {
-      width: 42px;
-      height: 4px;
-      background: #475569;
-      border-radius: 2px;
-      margin: 0 auto 16px;
-    }
-    .bottom-sheet-title {
-      font-size: 0.88rem;
-      color: #94a3b8;
-      margin-bottom: 16px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .bottom-sheet-option {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 14px 16px;
-      border-radius: 16px;
-      background: #202430;
-      border: 1px solid #2d3342;
-      margin-bottom: 10px;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-    .bottom-sheet-option:active {
-      background: #2a2e3d;
-      border-color: #dfb76c;
-    }
-    .bottom-sheet-option .opt-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: rgba(223, 183, 108, 0.15);
-      border: 1px solid #dfb76c;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #dfb76c;
-    }
-
-    /* OVERLAY VIDEO & VOICE CALL */
-    .call-card-full {
-      width: 100vw;
-      height: 100vh;
-      max-width: none;
-      border-radius: 0;
-      background: #0b0d12;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 40px 20px;
-      position: relative;
-      overflow: hidden;
-    }
-    #remote-video {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 1;
-      display: none;
-    }
-    #local-video {
-      position: absolute;
-      top: 24px;
-      right: 20px;
-      width: 110px;
-      height: 155px;
-      object-fit: cover;
-      border-radius: 16px;
-      border: 2px solid #dfb76c;
-      z-index: 10;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.8);
-      display: none;
-    }
-    .call-ui-layer {
-      position: relative;
-      z-index: 5;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-    }
-    .call-avatar {
-      width: 104px;
-      height: 104px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 4px solid #10b981;
-      margin: 0 auto 20px;
-    }
-    .call-actions {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 20px;
-      margin-top: 25px;
-      z-index: 10;
-    }
-    .btn-switch-camera {
-      width: 58px;
-      height: 58px;
-      background: rgba(255, 255, 255, 0.15);
-      border: 1.5px solid rgba(255, 255, 255, 0.3);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-radius: 50%;
-      color: white;
-      cursor: pointer;
-      display: none;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4);
-      transition: transform 0.15s ease, background 0.2s ease;
-    }
-    .btn-switch-camera:active {
-      transform: scale(0.92);
-      background: rgba(255, 255, 255, 0.3);
-    }
-    .btn-accept-call {
-      width: 58px;
-      height: 58px;
-      background: #10b981;
-      border: none;
-      border-radius: 50%;
-      color: white;
-      font-size: 1.25rem;
-      cursor: pointer;
-      box-shadow: 0 8px 22px rgba(16, 185, 129, 0.5);
-    }
-    .btn-end-call {
-      width: 58px;
-      height: 58px;
-      background: #ef4444;
-      border: none;
-      border-radius: 50%;
-      color: white;
-      font-size: 1.25rem;
-      cursor: pointer;
-      box-shadow: 0 8px 22px rgba(239, 68, 68, 0.5);
-    }
+    .bottom-sheet-backdrop { align-items: flex-end !important; padding: 0 !important; }
+    .bottom-sheet-card { width: 100%; max-width: 500px; background: #191c24; border-top: 1.5px solid #2d3342; border-radius: 24px 24px 0 0; padding: 20px 24px 36px; color: white; }
+    .bottom-sheet-option { display: flex; align-items: center; gap: 16px; padding: 14px 16px; border-radius: 16px; background: #202430; border: 1px solid #2d3342; margin-bottom: 10px; cursor: pointer; }
   </style>
 </head>
 <body>
 
   <svg class="svg-defs">
     <defs>
-      <clipPath id="tri-upright-clip" clipPathUnits="objectBoundingBox">
-        <polygon points="0.5 0, 1 1, 0 1" />
-      </clipPath>
-      <clipPath id="tri-inverted-clip" clipPathUnits="objectBoundingBox">
-        <polygon points="0 0, 1 0, 0.5 1" />
-      </clipPath>
+      <clipPath id="tri-upright-clip" clipPathUnits="objectBoundingBox"><polygon points="0.5 0, 1 1, 0 1" /></clipPath>
+      <clipPath id="tri-inverted-clip" clipPathUnits="objectBoundingBox"><polygon points="0 0, 1 0, 0.5 1" /></clipPath>
     </defs>
   </svg>
 
   <header>
-    <div class="brand">
-      <span class="brand-title">TriHive</span>
-    </div>
+    <div class="brand"><span class="brand-title">TriHive</span></div>
     <div class="header-controls">
       <button class="btn-add-contact" onclick="openAddContactModal()">+ Kontak</button>
       <div class="user-pill" id="user-pill" style="display: none;" onclick="openEditProfileModal()">
@@ -805,13 +119,14 @@
 
   <audio id="notif-audio" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
   <audio id="ring-audio" src="https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3" loop preload="auto"></audio>
+  <audio id="ringback-audio" src="https://assets.mixkit.co/active_storage/sfx/1358/1358-preview.mp3" loop preload="auto"></audio>
   <audio id="remote-audio" autoplay playsinline></audio>
 
-  <!-- LOGIN / REGISTER MODAL -->
+  <!-- LOGIN MODAL -->
   <div class="modal-backdrop active" id="login-modal">
     <div class="card-modal">
       <h2>Masuk Ke TriHive</h2>
-      <p>Aplikasi Chat & Telepon Mosaik Segitiga</p>
+      <p style="color:#94a3b8; font-size:0.85rem; margin-bottom:18px;">Aplikasi Chat & Telepon Mosaik Segitiga</p>
       
       <div class="tab-group">
         <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Masuk</button>
@@ -819,37 +134,22 @@
       </div>
 
       <div id="form-login">
-        <div class="form-group">
-          <label>Username Unik</label>
-          <input type="text" id="login-username" placeholder="Masukkan username unik...">
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="login-password" placeholder="Masukkan password...">
-        </div>
+        <div class="form-group"><label>Username</label><input type="text" id="login-username" placeholder="Username..."></div>
+        <div class="form-group"><label>Password</label><input type="password" id="login-password" placeholder="Password..."></div>
         <button class="btn-submit" onclick="submitLogin()">Masuk</button>
       </div>
 
       <div id="form-register" style="display: none;">
+        <div class="form-group"><label>Username Unik</label><input type="text" id="reg-username" placeholder="Username baru..."></div>
+        <div class="form-group"><label>Nama Tampilan</label><input type="text" id="reg-fullname" placeholder="Nama lengkap..."></div>
+        <div class="form-group"><label>Password Akun</label><input type="password" id="reg-password" placeholder="Password..."></div>
         <div class="form-group">
-          <label>Username Unik (Huruf Kecil Semua)</label>
-          <input type="text" id="reg-username" placeholder="Contoh: wildan">
-        </div>
-        <div class="form-group">
-          <label>Nama Tampilan</label>
-          <input type="text" id="reg-fullname" placeholder="Contoh: Wildan Jaka">
-        </div>
-        <div class="form-group">
-          <label>Password Akun</label>
-          <input type="password" id="reg-password" placeholder="Buat password aman...">
-        </div>
-        <div class="form-group">
-          <label>Foto Profil (Upload HP)</label>
-          <label for="file-input" class="btn-file-upload">📁 Pilih Foto dari HP</label>
+          <label>Foto Profil</label>
+          <label for="file-input" class="btn-file-upload">📁 Pilih Foto</label>
           <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="handleFileUpload(event, 'upload-preview')">
           <img id="upload-preview" class="upload-preview" alt="Preview">
         </div>
-        <button class="btn-submit" onclick="submitRegister()">Daftar Akun Baru</button>
+        <button class="btn-submit" onclick="submitRegister()">Daftar</button>
       </div>
     </div>
   </div>
@@ -859,20 +159,14 @@
     <div class="card-modal">
       <button class="close-btn" onclick="closeModals()">✕</button>
       <h2>Ubah Profil</h2>
-      <p>ID Username: <strong id="edit-username-id" style="color:#3b82f6;">-</strong> (Permanen)</p>
-
-      <div class="form-group">
-        <label>Nama Tampilan Baru</label>
-        <input type="text" id="edit-fullname" placeholder="Masukkan nama baru...">
-      </div>
-
+      <p style="margin-bottom: 12px;">ID: <strong id="edit-username-id" style="color:#3b82f6;">-</strong></p>
+      <div class="form-group"><label>Nama Tampilan</label><input type="text" id="edit-fullname"></div>
       <div class="form-group">
         <label>Ganti Foto Profil</label>
-        <label for="file-edit-input" class="btn-file-upload">📁 Pilih Foto Baru dari HP</label>
+        <label for="file-edit-input" class="btn-file-upload">📁 Pilih Foto Baru</label>
         <input type="file" id="file-edit-input" accept="image/*" style="display: none;" onchange="handleFileUpload(event, 'edit-upload-preview')">
         <img id="edit-upload-preview" class="upload-preview" alt="Preview">
       </div>
-
       <button class="btn-submit" onclick="saveProfileChanges()">Simpan Perubahan</button>
       <button class="btn-submit" style="background:#ef4444; margin-top:8px;" onclick="logout()">Keluar Akun</button>
     </div>
@@ -882,31 +176,25 @@
   <div class="modal-backdrop" id="add-contact-modal">
     <div class="card-modal">
       <button class="close-btn" onclick="closeModals()">✕</button>
-      <h2>Tambah Kontak Baru</h2>
-      <p>Masukkan username teman yang terdaftar di TriHive</p>
-
-      <div class="form-group">
-        <label>Username Teman</label>
-        <input type="text" id="add-contact-username" placeholder="Masukkan username teman...">
-      </div>
-
+      <h2>Tambah Kontak</h2>
+      <div class="form-group"><label>Username Teman</label><input type="text" id="add-contact-username" placeholder="Username teman..."></div>
       <button class="btn-submit" onclick="submitAddContact()">+ Tambahkan Kontak</button>
     </div>
   </div>
 
   <!-- PROFILE PREVIEW MODAL -->
   <div class="modal-backdrop" id="profile-modal">
-    <div class="profile-card">
+    <div class="card-modal">
       <button class="close-btn" onclick="closeModals()">✕</button>
-      <img id="preview-avatar" src="" alt="Avatar">
-      <h3 id="preview-name" style="margin-bottom: 2px; font-size:1.2rem;">Nama Kontak</h3>
+      <img id="preview-avatar" style="width:88px; height:88px; border-radius:50%; object-fit:cover; border:3px solid #3b82f6; margin-bottom:12px;" src="" alt="Avatar">
+      <h3 id="preview-name" style="margin-bottom: 2px;">Nama</h3>
       <p id="preview-username-id" style="color: #94a3b8; font-size: 0.75rem; margin-bottom: 6px;">@username</p>
       <p id="preview-status" style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 20px;">● Offline</p>
-      <button class="btn-ngobrol" onclick="openChat()">Ngobrol</button>
+      <button class="btn-submit" onclick="openChat()">Ngobrol</button>
     </div>
   </div>
 
-  <!-- CHAT MODAL -->
+  <!-- CHAT WINDOW -->
   <div class="modal-backdrop chat-backdrop" id="chat-modal">
     <div class="chat-card-full">
       <div class="chat-header-full">
@@ -918,69 +206,36 @@
           </div>
         </div>
         <div class="header-actions">
-          <button class="btn-round-call" onclick="openCallOptionSheet()" title="Panggil">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10141d" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-            </svg>
-          </button>
+          <button class="btn-round-call" onclick="openCallOptionSheet()">📞</button>
           <button class="close-btn" style="position:static; font-size:1.4rem;" onclick="closeModals()">✕</button>
         </div>
       </div>
       <div class="chat-body-full" id="chat-body"></div>
       <div class="chat-footer-full">
-        <input type="text" id="chat-input" placeholder="Ketik pesan..." onkeypress="handleKey(event)">
-        <button class="btn-chat-action btn-mic" id="btn-mic" onclick="toggleVoiceRecord()" title="Kirim Pesan Suara">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-            <line x1="12" y1="19" x2="12" y2="23"/>
-            <line x1="8" y1="23" x2="16" y2="23"/>
-          </svg>
-        </button>
-        <button class="btn-chat-action" onclick="sendMsg()" title="Kirim">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10141d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="22" y1="2" x2="11" y2="13"/>
-            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-          </svg>
-        </button>
+        <input type="text" id="chat-input" placeholder="Ketik pesan..." onkeypress="handleKey(event)" oninput="handleTypingNotification()">
+        <button class="btn-chat-action btn-mic" id="btn-mic" onclick="toggleVoiceRecord()">🎙️</button>
+        <button class="btn-chat-action" onclick="sendMsg()">➤</button>
       </div>
     </div>
   </div>
 
-  <!-- BOTTOM SHEET MODAL -->
+  <!-- BOTTOM SHEET CALL SELECTION -->
   <div class="modal-backdrop bottom-sheet-backdrop" id="call-sheet-modal" onclick="closeCallSheet(event)">
     <div class="bottom-sheet-card">
-      <div class="bottom-sheet-drag"></div>
-      <div class="bottom-sheet-title">Pilih tipe panggilan</div>
-      
+      <div style="width:42px; height:4px; background:#475569; border-radius:2px; margin:0 auto 16px;"></div>
+      <div style="font-size:0.88rem; color:#94a3b8; margin-bottom:16px;">Pilihan Panggilan</div>
       <div class="bottom-sheet-option" onclick="startCall('voice')">
-        <div class="opt-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-          </svg>
-        </div>
-        <div>
-          <div style="font-weight: 600; font-size: 0.95rem;">Panggilan suara</div>
-          <div style="font-size: 0.78rem; color: #94a3b8;">Bicara via jaringan audio live</div>
-        </div>
+        <div style="font-size:1.2rem;">📞</div>
+        <div><div style="font-weight:600;">Panggilan Suara</div><div style="font-size:0.78rem; color:#94a3b8;">Bicara via jaringan audio live</div></div>
       </div>
-
       <div class="bottom-sheet-option" onclick="startCall('video')">
-        <div class="opt-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="23 7 16 12 23 17 23 7"/>
-            <rect x="1" y="5" width="15" height="14" rx="3" ry="3"/>
-          </svg>
-        </div>
-        <div>
-          <div style="font-weight: 600; font-size: 0.95rem;">Panggilan video</div>
-          <div style="font-size: 0.78rem; color: #94a3b8;">Tatap muka langsung dengan kamera HP</div>
-        </div>
+        <div style="font-size:1.2rem;">📹</div>
+        <div><div style="font-weight:600;">Panggilan Video</div><div style="font-size:0.78rem; color:#94a3b8;">Tatap muka via kamera HP</div></div>
       </div>
     </div>
   </div>
 
-  <!-- CALL OVERLAYS (VOICE & VIDEO) -->
+  <!-- CALL OVERLAY -->
   <div class="modal-backdrop" id="call-modal">
     <div class="call-card-full">
       <video id="remote-video" autoplay playsinline></video>
@@ -993,20 +248,22 @@
       </div>
 
       <div class="call-actions">
+        <!-- TOMBOL MUTE MIC -->
+        <button class="btn-call-opt" id="btn-toggle-mic" onclick="toggleMuteMic()" title="Mute Mic">🎙️</button>
+        
+        <!-- TOMBOL LOUDSPEAKER SWITCH -->
+        <button class="btn-call-opt" id="btn-toggle-speaker" onclick="toggleSpeakerSwitch()" title="Loudspeaker">🔊</button>
+        
         <!-- TOMBOL FLIP CAMERA -->
-        <button class="btn-switch-camera" id="btn-switch-camera" onclick="switchCamera()" title="Tukar Kamera">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M11 19H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2v3"/>
-            <path d="M21 15l3 3-3 3"/>
-            <path d="M15 18a6 6 0 0 0 6-3"/>
-            <path d="M18 10a6 6 0 0 0-6 3"/>
-          </svg>
-        </button>
+        <button class="btn-call-opt" id="btn-switch-camera" onclick="switchCamera()" title="Tukar Kamera" style="display:none;">🔄</button>
+        
+        <!-- TOMBOL TUTUP TELEPON -->
         <button class="btn-end-call" onclick="endCall('ended')">✕</button>
       </div>
     </div>
   </div>
 
+  <!-- INCOMING CALL MODAL -->
   <div class="modal-backdrop" id="incoming-call-modal">
     <div class="card-modal">
       <img class="call-avatar" id="incoming-avatar" src="" alt="Avatar">
@@ -1019,7 +276,6 @@
     </div>
   </div>
 
-  <!-- Firebase SDKs -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, push, onChildAdded, onChildChanged, set, get, update, remove, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -1046,7 +302,6 @@
     let unreadCounts = {};
     let activeListeners = {};
     let activeStatusListener = null;
-    let activeProfileStatusListener = null;
 
     let peerConnection = null;
     let localStream = null;
@@ -1059,98 +314,146 @@
     let callStartTime = null;
     let currentFacingMode = 'user';
 
+    let isMicMuted = false;
+    let isSpeakerOn = false;
+    let typingTimeout = null;
+
     const rtcConfig = {
       iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-        { urls: 'stun:stun2.l.google.com:19302' },
-        { urls: 'stun:stun3.l.google.com:19302' }
+        { urls: 'stun:stun1.l.google.com:19302' }
       ]
     };
 
     function formatTime(timestamp) {
       if (!timestamp) return "";
       const date = new Date(timestamp);
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      return `${hours}:${minutes}`;
+      return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
     }
 
-    function enableBackgroundCallService() {
-      if (window.cordova && cordova.plugins && cordova.plugins.backgroundMode) {
-        cordova.plugins.backgroundMode.enable();
-        cordova.plugins.backgroundMode.overrideBackButton();
-        cordova.plugins.backgroundMode.setDefaults({
-          title: "TriHive Panggilan Aktif",
-          text: "Panggilan suara & video aktif di latar belakang",
-          icon: 'icon',
-          color: '10141d',
-          resume: true,
-          hidden: false,
-          bigText: true
-        });
-      }
-    }
+    // KOMPRESI FOTO OTOMATIS
+    window.handleFileUpload = function(e, previewId) {
+      const file = e.target.files[0];
+      if (file) {
+        const img = new Image();
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          img.src = evt.target.result;
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 300;
+            const scaleSize = MAX_WIDTH / img.width;
+            canvas.width = MAX_WIDTH;
+            canvas.height = img.height * scaleSize;
 
-    function disableBackgroundCallService() {
-      if (window.cordova && cordova.plugins && cordova.plugins.backgroundMode) {
-        cordova.plugins.backgroundMode.disable();
-      }
-    }
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            tempUploadAvatar = canvas.toDataURL('image/jpeg', 0.7);
 
-    // FUNGSI NOTIFIKASI TINGKAT SISTEM (MUNCUL DI STATUS BAR & LOCKSCREEN)
-    function showAndroidNotification(title, message, isCall = false) {
-      if (window.cordova && cordova.plugins && cordova.plugins.backgroundMode) {
-        cordova.plugins.backgroundMode.wakeUp();
-        cordova.plugins.backgroundMode.unlock();
-        if (isCall) {
-          cordova.plugins.backgroundMode.moveToForeground();
-        }
-      }
-
-      if ("Notification" in window) {
-        if (Notification.permission === "granted") {
-          const notif = new Notification(title, {
-            body: message,
-            icon: 'logo.png',
-            tag: isCall ? 'trihive-call-notification' : 'trihive-msg-notification',
-            renotify: true,
-            priority: 'high',
-            importance: 'high',
-            requireInteraction: isCall,
-            vibrate: isCall ? [500, 200, 500, 200, 500] : [200, 100, 200]
-          });
-          notif.onclick = function() {
-            window.focus();
-            if (window.cordova && cordova.plugins && cordova.plugins.backgroundMode) {
-              cordova.plugins.backgroundMode.moveToForeground();
-            }
+            const preview = document.getElementById(previewId);
+            preview.src = tempUploadAvatar;
+            preview.style.display = 'block';
           };
-        } else if (Notification.permission !== "denied") {
-          Notification.requestPermission().then(permission => {
-            if (permission === "granted") {
-              showAndroidNotification(title, message, isCall);
-            }
-          });
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // SWITCH LOUDSPEAKER & EARPIECE
+    window.toggleSpeakerSwitch = function() {
+      isSpeakerOn = !isSpeakerOn;
+      const btn = document.getElementById('btn-toggle-speaker');
+
+      if (window.cordova && window.cordova.plugins && window.cordova.plugins.AudioToggle) {
+        if (isSpeakerOn) {
+          cordova.plugins.AudioToggle.setAudioMode(cordova.plugins.AudioToggle.SPEAKER);
+          btn.classList.add('active');
+        } else {
+          cordova.plugins.AudioToggle.setAudioMode(cordova.plugins.AudioToggle.EARPIECE);
+          btn.classList.remove('active');
         }
+      } else {
+        btn.classList.toggle('active', isSpeakerOn);
+      }
+    }
+
+    // MUTE / UNMUTE MIC
+    window.toggleMuteMic = function() {
+      if (localStream) {
+        const audioTrack = localStream.getAudioTracks()[0];
+        if (audioTrack) {
+          isMicMuted = !isMicMuted;
+          audioTrack.enabled = !isMicMuted;
+          const btn = document.getElementById('btn-toggle-mic');
+          btn.classList.toggle('active', isMicMuted);
+        }
+      }
+    }
+
+    // TYPING INDICATOR
+    window.handleTypingNotification = function() {
+      if (!activeContact) return;
+      const typingRef = ref(db, `typing/${activeContact.username}/${currentUser}`);
+      set(typingRef, true);
+
+      clearTimeout(typingTimeout);
+      typingTimeout = setTimeout(() => {
+        set(typingRef, false);
+      }, 2000);
+    }
+
+    function playRingbackSound() {
+      const audio = document.getElementById('ringback-audio');
+      if (audio) { audio.currentTime = 0; audio.play().catch(e => {}); }
+    }
+
+    function stopRingbackSound() {
+      const audio = document.getElementById('ringback-audio');
+      if (audio) { audio.pause(); audio.currentTime = 0; }
+    }
+
+    function playRingingSound() {
+      const audio = document.getElementById('ring-audio');
+      if (audio) { audio.currentTime = 0; audio.play().catch(e => {}); }
+    }
+
+    function stopRingingSound() {
+      const audio = document.getElementById('ring-audio');
+      if (audio) { audio.pause(); audio.currentTime = 0; }
+    }
+
+    // FITUR HAPUS PESAN
+    window.deleteMessage = function(msgKey) {
+      if (!activeContact) return;
+      if (confirm("Hapus pesan ini untuk semua orang?")) {
+        const roomId = getRoomId(currentUser, activeContact.username);
+        remove(ref(db, `chats/${roomId}/${msgKey}`));
       }
     }
 
     document.addEventListener('deviceready', () => {
+      if (window.cordova && window.cordova.plugins && window.cordova.plugins.callkeep) {
+        const callKeep = window.cordova.plugins.callkeep;
+        callKeep.setup({
+          ios: { appName: 'TriHive' },
+          android: {
+            alertTitle: 'Izin Panggilan Native',
+            alertDescription: 'TriHive memerlukan izin untuk menampilkan panggilan di atas layar kunci.',
+            cancelButton: 'Batal', okButton: 'Izinkan'
+          }
+        });
+        callKeep.addEventListener('answerCall', () => acceptCall());
+        callKeep.addEventListener('endCall', () => rejectCall());
+      }
+
       if (window.cordova && cordova.plugins && cordova.plugins.backgroundMode) {
         cordova.plugins.backgroundMode.enable();
         cordova.plugins.backgroundMode.wakeUp();
         cordova.plugins.backgroundMode.unlock();
       }
-
-      if ("Notification" in window && Notification.permission !== "granted") {
-        Notification.requestPermission();
-      }
     }, false);
 
-    window.addEventListener('DOMContentLoaded', () => {
-      checkAutoLogin();
-    });
+    window.addEventListener('DOMContentLoaded', () => { checkAutoLogin(); });
 
     function checkAutoLogin() {
       const savedUser = localStorage.getItem('trihive_user');
@@ -1161,51 +464,9 @@
         currentUser = savedUser;
         currentDisplayName = savedName || savedUser;
         currentAvatarUrl = savedAvatar || currentAvatarUrl;
-
         setUserLoggedIn();
         loadUserContacts();
         listenIncomingCalls();
-      }
-    }
-
-    function unlockAudio() {
-      const notifAudio = document.getElementById('notif-audio');
-      const ringAudio = document.getElementById('ring-audio');
-      if (notifAudio) {
-        notifAudio.play().then(() => {
-          notifAudio.pause();
-          notifAudio.currentTime = 0;
-        }).catch(() => {});
-      }
-      if (ringAudio) {
-        ringAudio.play().then(() => {
-          ringAudio.pause();
-          ringAudio.currentTime = 0;
-        }).catch(() => {});
-      }
-    }
-
-    function playNotificationSound() {
-      const audio = document.getElementById('notif-audio');
-      if (audio) {
-        audio.currentTime = 0;
-        audio.play().catch(e => console.log("Audio notify blocked:", e));
-      }
-    }
-
-    function playRingingSound() {
-      const audio = document.getElementById('ring-audio');
-      if (audio) {
-        audio.currentTime = 0;
-        audio.play().catch(e => console.log("Ring audio blocked:", e));
-      }
-    }
-
-    function stopRingingSound() {
-      const audio = document.getElementById('ring-audio');
-      if (audio) {
-        audio.pause();
-        audio.currentTime = 0;
       }
     }
 
@@ -1229,7 +490,6 @@
 
           if (!isUpright && contactIdx < contacts.length) {
             const person = contacts[contactIdx];
-            
             const photoWrapper = document.createElement('div');
             photoWrapper.className = 'tile-photo-wrapper';
 
@@ -1237,11 +497,7 @@
             img.src = person.avatar || currentAvatarUrl;
             img.className = 'tile-photo';
 
-            const overlay = document.createElement('div');
-            overlay.className = 'tile-photo-overlay';
-
             photoWrapper.appendChild(img);
-            photoWrapper.appendChild(overlay);
             inner.appendChild(photoWrapper);
 
             const badge = document.createElement('div');
@@ -1249,15 +505,10 @@
             badge.id = `badge-${person.username}`;
             
             const count = unreadCounts[person.username] || 0;
-            if (count > 0) {
-              badge.innerText = count;
-              badge.style.display = 'block';
-            }
+            if (count > 0) { badge.innerText = count; badge.style.display = 'block'; }
             tile.appendChild(badge);
 
-            tile.onclick = () => {
-              openProfile(person);
-            };
+            tile.onclick = () => openProfile(person);
             contactIdx++;
           } else {
             const bg = document.createElement('div');
@@ -1276,54 +527,25 @@
     const canvas = document.getElementById('canvas');
     let isPanning = false, startX = 0, startY = 0, panX = -100, panY = -100;
 
-    function updateTransform() {
-      canvas.style.transform = `translate3d(${panX}px, ${panY}px, 0)`;
-    }
+    function updateTransform() { canvas.style.transform = `translate3d(${panX}px, ${panY}px, 0)`; }
     updateTransform();
 
     function startPan(clientX, clientY, target) {
       if (target.closest('.modal-backdrop') || target.closest('header')) return;
-      isPanning = true;
-      startX = clientX - panX;
-      startY = clientY - panY;
+      isPanning = true; startX = clientX - panX; startY = clientY - panY;
     }
-
     function movePan(clientX, clientY) {
       if (!isPanning) return;
-      panX = clientX - startX;
-      panY = clientY - startY;
-      updateTransform();
+      panX = clientX - startX; panY = clientY - startY; updateTransform();
     }
-
     function endPan() { isPanning = false; }
 
     viewport.addEventListener('mousedown', (e) => startPan(e.clientX, e.clientY, e.target));
     window.addEventListener('mousemove', (e) => movePan(e.clientX, e.clientY));
     window.addEventListener('mouseup', endPan);
-
-    viewport.addEventListener('touchstart', (e) => {
-      if (e.touches.length === 1) startPan(e.touches[0].clientX, e.touches[0].clientY, e.target);
-    }, { passive: true });
-
-    window.addEventListener('touchmove', (e) => {
-      if (isPanning && e.touches.length === 1) movePan(e.touches[0].clientX, e.touches[0].clientY);
-    }, { passive: true });
-
+    viewport.addEventListener('touchstart', (e) => { if (e.touches.length === 1) startPan(e.touches[0].clientX, e.touches[0].clientY, e.target); }, { passive: true });
+    window.addEventListener('touchmove', (e) => { if (isPanning && e.touches.length === 1) movePan(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
     window.addEventListener('touchend', endPan);
-
-    window.handleFileUpload = function(e, previewId) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          tempUploadAvatar = evt.target.result;
-          const preview = document.getElementById(previewId);
-          preview.src = tempUploadAvatar;
-          preview.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-      }
-    }
 
     window.switchTab = function(tab) {
       document.getElementById('tab-login').classList.toggle('active', tab === 'login');
@@ -1333,23 +555,14 @@
     }
 
     window.submitLogin = function() {
-      unlockAudio();
       const inputUsername = document.getElementById('login-username').value.trim().toLowerCase();
       const inputPassword = document.getElementById('login-password').value.trim();
 
-      if (!inputUsername || !inputPassword) {
-        alert("Username dan Password wajib diisi!");
-        return;
-      }
+      if (!inputUsername || !inputPassword) return alert("Isi semua bidang!");
 
       get(ref(db, `users/${inputUsername}`)).then((userSnapshot) => {
-        if (userSnapshot.exists()) {
+        if (userSnapshot.exists() && userSnapshot.val().password === inputPassword) {
           const userData = userSnapshot.val();
-          if (userData.password !== inputPassword) {
-            alert("Password salah!");
-            return;
-          }
-
           currentUser = inputUsername;
           currentDisplayName = userData.displayName || inputUsername;
           currentAvatarUrl = userData.avatar || currentAvatarUrl;
@@ -1361,39 +574,22 @@
           setUserLoggedIn();
           loadUserContacts();
           listenIncomingCalls();
-        } else {
-          alert("Username tidak ditemukan! Silakan daftar akun baru.");
-        }
-      }).catch((err) => {
-        alert("Gagal terhubung ke database: " + err.message);
+        } else { alert("Login gagal!"); }
       });
     }
 
     window.submitRegister = function() {
-      unlockAudio();
       const regUsername = document.getElementById('reg-username').value.trim().toLowerCase();
       const regFullname = document.getElementById('reg-fullname').value.trim() || regUsername;
       const regPassword = document.getElementById('reg-password').value.trim();
 
-      if (!regUsername || !regPassword) {
-        alert("Username dan Password wajib diisi!");
-        return;
-      }
+      if (!regUsername || !regPassword) return alert("Isi semua bidang!");
 
       get(ref(db, `users/${regUsername}`)).then((userSnapshot) => {
-        if (userSnapshot.exists()) {
-          alert("Username ini sudah dipakai orang lain! Pilih username lain.");
-          return;
-        }
+        if (userSnapshot.exists()) return alert("Username sudah dipakai!");
 
         const avatar = tempUploadAvatar || currentAvatarUrl;
-
-        set(ref(db, `users/${regUsername}`), {
-          username: regUsername,
-          displayName: regFullname,
-          password: regPassword,
-          avatar: avatar
-        }).then(() => {
+        set(ref(db, `users/${regUsername}`), { username: regUsername, displayName: regFullname, password: regPassword, avatar: avatar }).then(() => {
           currentUser = regUsername;
           currentDisplayName = regFullname;
           currentAvatarUrl = avatar;
@@ -1406,8 +602,6 @@
           loadUserContacts();
           listenIncomingCalls();
         });
-      }).catch((err) => {
-        alert("Gagal mendaftarkan akun: " + err.message);
       });
     }
 
@@ -1418,38 +612,8 @@
       document.getElementById('current-user-avatar').src = currentAvatarUrl;
 
       const userStatusRef = ref(db, `status/${currentUser}`);
-      const connectedRef = ref(db, '.info/connected');
-
-      onValue(connectedRef, (snap) => {
-        if (snap.val() === true) {
-          onDisconnect(userStatusRef).set({
-            isOnline: false,
-            lastSeen: Date.now()
-          });
-          set(userStatusRef, {
-            isOnline: true,
-            lastSeen: Date.now()
-          });
-        }
-      });
-
-      setInterval(() => {
-        if (currentUser) {
-          set(ref(db, `status/${currentUser}/lastSeen`), Date.now());
-        }
-      }, 15000);
-
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible' && currentUser) {
-          set(userStatusRef, { isOnline: true, lastSeen: Date.now() });
-        }
-      });
-
-      document.addEventListener('resume', () => {
-        if (currentUser) {
-          set(userStatusRef, { isOnline: true, lastSeen: Date.now() });
-        }
-      }, false);
+      set(userStatusRef, { isOnline: true, lastSeen: Date.now() });
+      onDisconnect(userStatusRef).set({ isOnline: false, lastSeen: Date.now() });
     }
 
     function loadUserContacts() {
@@ -1460,11 +624,7 @@
           if (cSnap.exists()) {
             const cData = cSnap.val();
             if (!contacts.find(c => c.username === contactUsername)) {
-              contacts.push({
-                username: cData.username,
-                name: cData.displayName || cData.username,
-                avatar: cData.avatar
-              });
+              contacts.push({ username: cData.username, name: cData.displayName || cData.username, avatar: cData.avatar });
               buildGrid();
               listenIncomingMessages(contactUsername);
             }
@@ -1480,43 +640,17 @@
       const roomId = getRoomId(currentUser, contactUsername);
       const messagesRef = ref(db, `chats/${roomId}`);
 
-      let isInitialLoad = true;
-      get(messagesRef).then(() => {
-        isInitialLoad = false;
-      });
-
       onChildAdded(messagesRef, (snapshot) => {
         const data = snapshot.val();
-        
         if (data.sender === contactUsername) {
           const isChatOpen = activeContact && activeContact.username === contactUsername && document.getElementById('chat-modal').classList.contains('active');
-
           if (isChatOpen) {
             update(ref(db, `chats/${roomId}/${snapshot.key}`), { unread: false });
           } else {
             if (data.unread !== false) {
-              if (!isInitialLoad) {
-                playNotificationSound();
-                showAndroidNotification(
-                  `Pesan Baru: ${contactUsername}`,
-                  data.type === 'voice' ? '🎙️ Pesan Suara' : (data.type === 'call_log' ? '📞 Catatan Panggilan' : data.text),
-                  false
-                );
-              }
               unreadCounts[contactUsername] = (unreadCounts[contactUsername] || 0) + 1;
               buildGrid();
             }
-          }
-        }
-      });
-
-      onChildChanged(messagesRef, (snapshot) => {
-        const data = snapshot.val();
-        if (data.sender === contactUsername && data.unread === false) {
-          if (unreadCounts[contactUsername] > 0) {
-            unreadCounts[contactUsername]--;
-            if (unreadCounts[contactUsername] < 0) unreadCounts[contactUsername] = 0;
-            buildGrid();
           }
         }
       });
@@ -1531,22 +665,18 @@
           currentCallType = callData.callType || 'voice';
           playRingingSound();
 
-          showAndroidNotification(
-            currentCallType === 'video' ? `📹 Panggilan Video Masuk` : `📞 Panggilan Suara Masuk`,
-            `${callData.callerName} memanggil Anda... Ketuk untuk mengangkat.`,
-            true
-          );
-
           document.getElementById('incoming-name').innerText = callData.callerName;
           document.getElementById('incoming-avatar').src = callData.callerAvatar;
           document.getElementById('incoming-call-type-text').innerText = currentCallType === 'video' ? "Panggilan Video Masuk..." : "Panggilan Suara Masuk...";
           document.getElementById('incoming-call-modal').classList.add('active');
         } else if (callData && callData.status === 'connected') {
           stopRingingSound();
+          stopRingbackSound();
           callStartTime = Date.now();
           document.getElementById('call-status-text').innerText = "Terhubung (Live)";
         } else if (!callData) {
           stopRingingSound();
+          stopRingbackSound();
           cleanupWebRTC();
           document.getElementById('incoming-call-modal').classList.remove('active');
           document.getElementById('call-modal').classList.remove('active');
@@ -1559,11 +689,11 @@
         if (answer && peerConnection && peerConnection.signalingState === "have-local-offer") {
           try {
             await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-            stopRingingSound();
+            stopRingbackSound();
             callStartTime = Date.now();
             document.getElementById('call-status-text').innerText = "Terhubung (Live)";
             processPendingCandidates();
-          } catch (e) { console.log("Answer error:", e); }
+          } catch (e) {}
         }
       });
 
@@ -1573,9 +703,7 @@
         if (candidate) {
           if (peerConnection && peerConnection.remoteDescription) {
             try { await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)); } catch(e){}
-          } else {
-            pendingCandidates.push(candidate);
-          }
+          } else { pendingCandidates.push(candidate); }
         }
       });
     }
@@ -1590,103 +718,17 @@
     }
 
     async function initLocalMedia(type) {
-      try {
-        if (localStream) {
-          localStream.getTracks().forEach(track => track.stop());
-        }
-
-        const constraints = { 
-          audio: {
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true
-          }, 
-          video: type === 'video' ? { 
-            width: { ideal: 640 }, 
-            height: { ideal: 480 }, 
-            facingMode: currentFacingMode 
-          } : false 
-        };
-        localStream = await navigator.mediaDevices.getUserMedia(constraints);
-        
-        if (type === 'video') {
-          const localVideo = document.getElementById('local-video');
-          localVideo.srcObject = localStream;
-          localVideo.style.display = 'block';
-          document.getElementById('btn-switch-camera').style.display = 'flex';
-        } else {
-          document.getElementById('btn-switch-camera').style.display = 'none';
-        }
-
-        if (peerConnection) {
-          const videoTrack = localStream.getVideoTracks()[0];
-          if (videoTrack) {
-            const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
-            if (sender) {
-              sender.replaceTrack(videoTrack);
-            }
-          }
-          const audioTrack = localStream.getAudioTracks()[0];
-          if (audioTrack) {
-            const audioSender = peerConnection.getSenders().find(s => s.track && s.track.kind === 'audio');
-            if (audioSender) {
-              audioSender.replaceTrack(audioTrack);
-            }
-          }
-        }
-      } catch (err) {
-        alert("Mohon izinkan akses Kamera/Mikrofon di HP Anda!");
-        throw err;
-      }
-    }
-
-    window.switchCamera = async function() {
-      if (currentCallType !== 'video') return;
-      currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
-      await initLocalMedia('video');
-    }
-
-    function createPeerConnection(remoteUsername, type) {
-      if (peerConnection) return;
-      targetUser = remoteUsername;
-      peerConnection = new RTCPeerConnection(rtcConfig);
-
-      if (localStream) {
-        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-      }
-
-      peerConnection.ontrack = (event) => {
-        if (type === 'video') {
-          const remoteVideo = document.getElementById('remote-video');
-          if (remoteVideo && event.streams[0]) {
-            remoteVideo.srcObject = event.streams[0];
-            remoteVideo.style.display = 'block';
-            document.getElementById('call-avatar').style.display = 'none';
-          }
-        }
-        
-        const remoteAudio = document.getElementById('remote-audio');
-        if (remoteAudio && event.streams[0]) {
-          remoteAudio.srcObject = event.streams[0];
-          remoteAudio.play().catch(e => console.log("Audio play error:", e));
-        }
+      if (localStream) localStream.getTracks().forEach(track => track.stop());
+      const constraints = { 
+        audio: { echoCancellation: true, noiseSuppression: true }, 
+        video: type === 'video' ? { facingMode: currentFacingMode } : false 
       };
-
-      peerConnection.onicecandidate = (event) => {
-        if (event.candidate && targetUser) {
-          push(ref(db, `webrtc_signals/${targetUser}/candidates`), event.candidate.toJSON());
-        }
-      };
-    }
-
-    window.openCallOptionSheet = function() {
-      if (!activeContact) return;
-      document.getElementById('call-sheet-modal').classList.add('active');
-    }
-
-    window.closeCallSheet = function(e) {
-      if (e.target.id === 'call-sheet-modal' || !e) {
-        document.getElementById('call-sheet-modal').classList.remove('active');
+      localStream = await navigator.mediaDevices.getUserMedia(constraints);
+      if (type === 'video') {
+        const localVideo = document.getElementById('local-video');
+        localVideo.srcObject = localStream;
+        localVideo.style.display = 'block';
+        document.getElementById('btn-switch-camera').style.display = 'flex';
       }
     }
 
@@ -1694,31 +736,19 @@
       document.getElementById('call-sheet-modal').classList.remove('active');
       if (!activeContact) return;
       currentCallType = type;
-      currentFacingMode = 'user';
       const remoteUsername = activeContact.username;
 
-      try {
-        await initLocalMedia(type);
-      } catch (e) { return; }
+      try { await initLocalMedia(type); } catch (e) { return; }
 
-      enableBackgroundCallService();
-      playRingingSound();
+      playRingbackSound();
       remove(ref(db, `webrtc_signals/${remoteUsername}`));
       remove(ref(db, `webrtc_signals/${currentUser}`));
       
       createPeerConnection(remoteUsername, type);
-
       const offer = await peerConnection.createOffer();
       await peerConnection.setLocalDescription(offer);
 
-      set(ref(db, `calls/${remoteUsername}`), {
-        caller: currentUser,
-        callerName: currentDisplayName,
-        callerAvatar: currentAvatarUrl,
-        callType: type,
-        status: 'calling'
-      });
-
+      set(ref(db, `calls/${remoteUsername}`), { caller: currentUser, callerName: currentDisplayName, callerAvatar: currentAvatarUrl, callType: type, status: 'calling' });
       set(ref(db, `webrtc_signals/${remoteUsername}/offer`), { type: offer.type, sdp: offer.sdp });
 
       document.getElementById('call-name').innerText = activeContact.name;
@@ -1731,21 +761,14 @@
     window.acceptCall = async function() {
       stopRingingSound();
       document.getElementById('incoming-call-modal').classList.remove('active');
-      currentFacingMode = 'user';
 
-      try {
-        await initLocalMedia(currentCallType);
-      } catch (e) { return; }
-
-      enableBackgroundCallService();
+      try { await initLocalMedia(currentCallType); } catch (e) { return; }
       const callerUsername = targetUser;
       createPeerConnection(callerUsername, currentCallType);
 
       const offerSnap = await get(ref(db, `webrtc_signals/${currentUser}/offer`));
       if (offerSnap.exists()) {
-        const offerData = offerSnap.val();
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(offerData));
-
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(offerSnap.val()));
         const answer = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answer);
 
@@ -1758,239 +781,55 @@
 
       document.getElementById('call-name').innerText = document.getElementById('incoming-name').innerText;
       document.getElementById('call-avatar').src = document.getElementById('incoming-avatar').src;
-      document.getElementById('call-avatar').style.display = currentCallType === 'video' ? 'none' : 'block';
       document.getElementById('call-status-text').innerText = "Terhubung (Live)";
       document.getElementById('call-modal').classList.add('active');
     }
 
     window.rejectCall = function() {
       stopRingingSound();
-      disableBackgroundCallService();
-      logCallHistory('missed', 0);
-      if (targetUser) {
-        remove(ref(db, `calls/${targetUser}`));
-        remove(ref(db, `webrtc_signals/${targetUser}`));
-      }
+      stopRingbackSound();
+      if (targetUser) { remove(ref(db, `calls/${targetUser}`)); remove(ref(db, `webrtc_signals/${targetUser}`)); }
       remove(ref(db, `calls/${currentUser}`));
       remove(ref(db, `webrtc_signals/${currentUser}`));
       document.getElementById('incoming-call-modal').classList.remove('active');
     }
 
+    function createPeerConnection(remoteUsername, type) {
+      if (peerConnection) return;
+      targetUser = remoteUsername;
+      peerConnection = new RTCPeerConnection(rtcConfig);
+
+      if (localStream) localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+      peerConnection.ontrack = (event) => {
+        if (type === 'video') {
+          const remoteVideo = document.getElementById('remote-video');
+          if (remoteVideo && event.streams[0]) { remoteVideo.srcObject = event.streams[0]; remoteVideo.style.display = 'block'; document.getElementById('call-avatar').style.display = 'none'; }
+        }
+        const remoteAudio = document.getElementById('remote-audio');
+        if (remoteAudio && event.streams[0]) { remoteAudio.srcObject = event.streams[0]; remoteAudio.play().catch(e => {}); }
+      };
+
+      peerConnection.onicecandidate = (event) => {
+        if (event.candidate && targetUser) push(ref(db, `webrtc_signals/${targetUser}/candidates`), event.candidate.toJSON());
+      };
+    }
+
     function cleanupWebRTC() {
-      disableBackgroundCallService();
-      if (peerConnection) {
-        peerConnection.close();
-        peerConnection = null;
-      }
-      if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
-        localStream = null;
-      }
-      const remoteAudio = document.getElementById('remote-audio');
-      if (remoteAudio) remoteAudio.srcObject = null;
-      const remoteVideo = document.getElementById('remote-video');
-      if (remoteVideo) { remoteVideo.srcObject = null; remoteVideo.style.display = 'none'; }
-      const localVideo = document.getElementById('local-video');
-      if (localVideo) { localVideo.srcObject = null; localVideo.style.display = 'none'; }
-      
-      document.getElementById('btn-switch-camera').style.display = 'none';
-      targetUser = null;
-      pendingCandidates = [];
-      callStartTime = null;
+      if (peerConnection) { peerConnection.close(); peerConnection = null; }
+      if (localStream) { localStream.getTracks().forEach(track => track.stop()); localStream = null; }
+      targetUser = null; pendingCandidates = []; callStartTime = null; isMicMuted = false; isSpeakerOn = false;
     }
 
-    function logCallHistory(status, durationSec) {
-      if (!activeContact && !targetUser) return;
-      const otherUser = activeContact ? activeContact.username : targetUser;
-      const roomId = getRoomId(currentUser, otherUser);
-      const messagesRef = ref(db, `chats/${roomId}`);
-
-      let durationText = "";
-      if (status === 'connected' && durationSec > 0) {
-        const mins = Math.floor(durationSec / 60);
-        const secs = durationSec % 60;
-        durationText = mins > 0 ? `${mins} mnt ${secs} dtk` : `${secs} dtk`;
-      }
-
-      push(messagesRef, {
-        sender: currentUser,
-        type: 'call_log',
-        callType: currentCallType,
-        status: status,
-        duration: durationText,
-        unread: true,
-        timestamp: Date.now()
-      });
-    }
-
-    window.endCall = function(reason) {
+    window.endCall = function() {
       stopRingingSound();
-      
-      let durationSec = 0;
-      if (callStartTime) {
-        durationSec = Math.floor((Date.now() - callStartTime) / 1000);
-        logCallHistory('connected', durationSec);
-      } else {
-        logCallHistory('missed', 0);
-      }
-
-      if (targetUser) {
-        remove(ref(db, `calls/${targetUser}`));
-        remove(ref(db, `webrtc_signals/${targetUser}`));
-      }
-      if (activeContact) {
-        remove(ref(db, `calls/${activeContact.username}`));
-        remove(ref(db, `webrtc_signals/${activeContact.username}`));
-      }
+      stopRingbackSound();
+      if (targetUser) { remove(ref(db, `calls/${targetUser}`)); remove(ref(db, `webrtc_signals/${targetUser}`)); }
+      if (activeContact) { remove(ref(db, `calls/${activeContact.username}`)); remove(ref(db, `webrtc_signals/${activeContact.username}`)); }
       remove(ref(db, `calls/${currentUser}`));
       remove(ref(db, `webrtc_signals/${currentUser}`));
       cleanupWebRTC();
       document.getElementById('call-modal').classList.remove('active');
-    }
-
-    window.toggleVoiceRecord = async function() {
-      const micBtn = document.getElementById('btn-mic');
-      if (!isRecording) {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          mediaRecorder = new MediaRecorder(stream);
-          audioChunks = [];
-
-          mediaRecorder.ondataavailable = event => {
-            if (event.data.size > 0) {
-              audioChunks.push(event.data);
-            }
-          };
-
-          mediaRecorder.onstop = () => {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-            const reader = new FileReader();
-            reader.readAsDataURL(audioBlob);
-            reader.onloadend = function() {
-              const base64Audio = reader.result;
-              sendVoiceMessage(base64Audio);
-            };
-            stream.getTracks().forEach(track => track.stop());
-          };
-
-          mediaRecorder.start();
-          isRecording = true;
-          micBtn.classList.add('recording');
-          micBtn.title = "Ketuk untuk Berhenti & Kirim";
-        } catch (e) {
-          alert("Gagal mengakses mikrofon: " + e.message);
-        }
-      } else {
-        if (mediaRecorder && mediaRecorder.state !== "inactive") {
-          mediaRecorder.stop();
-        }
-        isRecording = false;
-        micBtn.classList.remove('recording');
-        micBtn.title = "Kirim Pesan Suara";
-      }
-    }
-
-    function sendVoiceMessage(audioBase64) {
-      if (!activeContact) return;
-      const roomId = getRoomId(currentUser, activeContact.username);
-      const messagesRef = ref(db, `chats/${roomId}`);
-
-      push(messagesRef, {
-        sender: currentUser,
-        type: 'voice',
-        audio: audioBase64,
-        unread: true,
-        timestamp: Date.now()
-      });
-    }
-
-    window.openEditProfileModal = function() {
-      document.getElementById('edit-username-id').innerText = `@${currentUser}`;
-      document.getElementById('edit-fullname').value = currentDisplayName;
-      document.getElementById('edit-upload-preview').src = currentAvatarUrl;
-      document.getElementById('edit-upload-preview').style.display = 'block';
-      document.getElementById('edit-profile-modal').classList.add('active');
-    }
-
-    window.saveProfileChanges = function() {
-      const newName = document.getElementById('edit-fullname').value.trim();
-      const newAvatar = tempUploadAvatar || currentAvatarUrl;
-
-      if (!newName) {
-        alert("Nama tidak boleh kosong!");
-        return;
-      }
-
-      update(ref(db, `users/${currentUser}`), {
-        displayName: newName,
-        avatar: newAvatar
-      }).then(() => {
-        currentDisplayName = newName;
-        currentAvatarUrl = newAvatar;
-
-        localStorage.setItem('trihive_name', currentDisplayName);
-        localStorage.setItem('trihive_avatar', currentAvatarUrl);
-
-        document.getElementById('current-user-name').innerText = currentDisplayName;
-        document.getElementById('current-user-avatar').src = currentAvatarUrl;
-        tempUploadAvatar = "";
-
-        alert("Profil berhasil diperbarui!");
-        closeModals();
-      });
-    }
-
-    window.openAddContactModal = function() {
-      if (!currentUser) {
-        alert("Silakan login terlebih dahulu!");
-        return;
-      }
-      document.getElementById('add-contact-modal').classList.add('active');
-    }
-
-    window.submitAddContact = function() {
-      const contactUsername = document.getElementById('add-contact-username').value.trim().toLowerCase();
-      if (!contactUsername) {
-        alert("Masukkan username teman!");
-        return;
-      }
-
-      if (contactUsername === currentUser) {
-        alert("Anda tidak bisa menambahkan username sendiri!");
-        return;
-      }
-
-      get(ref(db, `users/${contactUsername}`)).then((targetSnap) => {
-        if (!targetSnap.exists()) {
-          alert("Username tidak ditemukan di server!");
-          return;
-        }
-
-        set(ref(db, `user_contacts/${currentUser}/${contactUsername}`), true);
-        set(ref(db, `user_contacts/${contactUsername}/${currentUser}`), true);
-
-        document.getElementById('add-contact-username').value = '';
-        alert("Kontak berhasil ditambahkan!");
-        closeModals();
-      });
-    }
-
-    window.logout = function() {
-      if (currentUser) {
-        set(ref(db, `status/${currentUser}`), { isOnline: false, lastSeen: Date.now() });
-      }
-      localStorage.removeItem('trihive_user');
-      localStorage.removeItem('trihive_name');
-      localStorage.removeItem('trihive_avatar');
-
-      currentUser = null;
-      contacts = [];
-      unreadCounts = {};
-      activeListeners = {};
-      buildGrid();
-      document.getElementById('user-pill').style.display = 'none';
-      closeModals();
-      document.getElementById('login-modal').classList.add('active');
     }
 
     window.openProfile = function(person) {
@@ -2000,19 +839,10 @@
       document.getElementById('preview-avatar').src = person.avatar;
 
       const statusElem = document.getElementById('preview-status');
-      
-      if (activeProfileStatusListener) activeProfileStatusListener();
-
-      const contactStatusRef = ref(db, `status/${person.username}`);
-      activeProfileStatusListener = onValue(contactStatusRef, (snapshot) => {
+      onValue(ref(db, `status/${person.username}`), (snapshot) => {
         const data = snapshot.val();
-        if (data && data.isOnline) {
-          statusElem.innerText = "● Online";
-          statusElem.style.color = "#10b981";
-        } else {
-          statusElem.innerText = "● Offline";
-          statusElem.style.color = "#94a3b8";
-        }
+        statusElem.innerText = (data && data.isOnline) ? "● Online" : "● Offline";
+        statusElem.style.color = (data && data.isOnline) ? "#10b981" : "#94a3b8";
       });
 
       document.getElementById('profile-modal').classList.add('active');
@@ -2023,32 +853,28 @@
       document.getElementById('chat-name').innerText = activeContact.name;
       document.getElementById('chat-avatar').src = activeContact.avatar;
       document.getElementById('chat-modal').classList.add('active');
-      
       unreadCounts[activeContact.username] = 0;
       buildGrid();
 
       const statusElem = document.getElementById('chat-status');
-      const contactStatusRef = ref(db, `status/${activeContact.username}`);
-
-      if (activeStatusListener) activeStatusListener();
-
-      activeStatusListener = onValue(contactStatusRef, (snapshot) => {
+      onValue(ref(db, `status/${activeContact.username}`), (snapshot) => {
         const data = snapshot.val();
-        if (data && data.isOnline) {
-          statusElem.innerText = "Online";
-          statusElem.style.color = "#10b981";
-        } else {
-          statusElem.innerText = "Offline";
-          statusElem.style.color = "#94a3b8";
+        statusElem.innerText = (data && data.isOnline) ? "Online" : "Offline";
+        statusElem.style.color = (data && data.isOnline) ? "#10b981" : "#94a3b8";
+      });
+
+      // LISTEN TYPING STATUS
+      onValue(ref(db, `typing/${currentUser}/${activeContact.username}`), (snapshot) => {
+        if (snapshot.val() === true) {
+          statusElem.innerText = "sedang mengetik...";
+          statusElem.style.color = "#dfb76c";
         }
       });
 
       loadMessages();
     }
 
-    function getRoomId(userA, userB) {
-      return [userA, userB].sort().join('_');
-    }
+    function getRoomId(userA, userB) { return [userA, userB].sort().join('_'); }
 
     function loadMessages() {
       const chatBody = document.getElementById('chat-body');
@@ -2062,11 +888,6 @@
         const msgKey = snapshot.key;
         const isMe = data.sender === currentUser;
         const timeString = formatTime(data.timestamp);
-        const isRead = data.unread === false;
-
-        if (!isMe && data.unread !== false) {
-          update(ref(db, `chats/${roomId}/${msgKey}`), { unread: false });
-        }
 
         let msgDiv = document.getElementById(`msg-${msgKey}`);
         if (!msgDiv) {
@@ -2075,86 +896,21 @@
           chatBody.appendChild(msgDiv);
         }
 
-        if (data.type === 'call_log') {
-          const isMissed = data.status === 'missed';
-          const icon = data.callType === 'video' ? '📹' : '📞';
-          const label = data.callType === 'video' ? 'Panggilan Video' : 'Panggilan Suara';
-          const detail = isMissed ? 'Tak Terjawab' : (data.duration || 'Selesai');
+        msgDiv.className = `msg ${isMe ? 'msg-out' : 'msg-in'}`;
+        msgDiv.onclick = () => window.deleteMessage(msgKey);
 
-          msgDiv.className = `msg-call-log ${isMissed ? 'missed' : ''}`;
-          msgDiv.onclick = () => window.openCallOptionSheet();
-          msgDiv.innerHTML = `
-            <span class="call-icon">${icon}</span>
-            <div style="flex:1;">
-              <strong>${label} ${isMissed ? 'Tak Terjawab' : ''}</strong>
-              <div style="font-size: 0.75rem; opacity: 0.8;">${isMissed ? 'Ketuk untuk menelepon balik' : detail}</div>
-            </div>
-            <div class="msg-footer-info">
-              <span>${timeString}</span>
-            </div>
-          `;
-        } else {
-          msgDiv.className = `msg ${isMe ? (isRead ? 'msg-out read' : 'msg-out') : 'msg-in'}`;
-
-          let statusTicks = '';
-          if (isMe) {
-            statusTicks = `<span class="msg-status-ticks">✓✓</span>`;
-          }
-
-          if (data.type === 'voice') {
-            msgDiv.innerHTML = `
-              <div class="voice-msg-container">
-                <button class="btn-play-voice" onclick="playVoice(this, '${data.audio}')">▶</button>
-                <span class="voice-tag">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dfb76c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                    <line x1="12" y1="19" x2="12" y2="23"/>
-                    <line x1="8" y1="23" x2="16" y2="23"/>
-                  </svg>
-                  Pesan Suara
-                </span>
-              </div>
-              <div class="msg-footer-info">
-                <span>${timeString}</span>
-                ${statusTicks}
-              </div>
-            `;
-          } else {
-            msgDiv.innerHTML = `
-              <div class="msg-text-content">${data.text}</div>
-              <div class="msg-footer-info">
-                <span>${timeString}</span>
-                ${statusTicks}
-              </div>
-            `;
-          }
-        }
+        msgDiv.innerHTML = `
+          <div>${data.text || 'Pesan Suara'}</div>
+          <div class="msg-footer-info"><span>${timeString}</span></div>
+        `;
 
         chatBody.scrollTop = chatBody.scrollHeight;
       });
 
-      onChildChanged(messagesRef, (snapshot) => {
-        const data = snapshot.val();
-        const msgKey = snapshot.key;
-        const isMe = data.sender === currentUser;
-
-        const msgDiv = document.getElementById(`msg-${msgKey}`);
-        if (msgDiv && isMe && data.type !== 'call_log') {
-          if (data.unread === false) {
-            msgDiv.classList.add('read');
-          }
-        }
+      onChildRemoved(messagesRef, (snapshot) => {
+        const msgDiv = document.getElementById(`msg-${snapshot.key}`);
+        if (msgDiv) msgDiv.remove();
       });
-    }
-
-    window.playVoice = function(btn, base64Audio) {
-      const audio = new Audio(base64Audio);
-      btn.innerText = "⏸";
-      audio.play();
-      audio.onended = () => {
-        btn.innerText = "▶";
-      };
     }
 
     window.sendMsg = function() {
@@ -2163,28 +919,20 @@
       if (!text || !activeContact) return;
 
       const roomId = getRoomId(currentUser, activeContact.username);
-      const messagesRef = ref(db, `chats/${roomId}`);
-
-      push(messagesRef, {
-        sender: currentUser,
-        type: 'text',
-        text: text,
-        unread: true,
-        timestamp: Date.now()
-      });
-
+      push(ref(db, `chats/${roomId}`), { sender: currentUser, type: 'text', text: text, unread: true, timestamp: Date.now() });
       input.value = '';
     }
 
-    window.handleKey = function(e) {
-      if (e.key === 'Enter') window.sendMsg();
+    window.handleKey = function(e) { if (e.key === 'Enter') window.sendMsg(); }
+    window.openCallOptionSheet = function() { document.getElementById('call-sheet-modal').classList.add('active'); }
+    window.closeCallSheet = function(e) { if (e.target.id === 'call-sheet-modal' || !e) document.getElementById('call-sheet-modal').classList.remove('active'); }
+    window.openAddContactModal = function() { document.getElementById('add-contact-modal').classList.add('active'); }
+    window.openEditProfileModal = function() {
+      document.getElementById('edit-username-id').innerText = `@${currentUser}`;
+      document.getElementById('edit-fullname').value = currentDisplayName;
+      document.getElementById('edit-profile-modal').classList.add('active');
     }
-
-    window.closeModals = function() {
-      document.querySelectorAll('.modal-backdrop').forEach(m => {
-        if (m.id !== 'login-modal') m.classList.remove('active');
-      });
-    }
+    window.closeModals = function() { document.querySelectorAll('.modal-backdrop').forEach(m => { if (m.id !== 'login-modal') m.classList.remove('active'); }); }
 
     buildGrid();
   </script>
