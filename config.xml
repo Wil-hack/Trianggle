@@ -21,7 +21,7 @@
         <allow-intent href="http://*/*" />
         <allow-intent href="https://*/*" />
         
-        <!-- Izin Khusus untuk WAKE_LOCK, Lockscreen, & Foreground Service (Panggilan & Suara) -->
+        <!-- Izin Khusus untuk WAKE_LOCK, Lockscreen, Full Screen Intent, & Foreground Service -->
         <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest" xmlns:android="http://schemas.android.com/apk/res/android">
             <uses-permission android:name="android.permission.WAKE_LOCK" />
             <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
