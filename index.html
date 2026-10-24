@@ -110,7 +110,7 @@
     }
     .honeycomb-grid {
       position: relative;
-      padding: 100px;
+      padding: 80px;
     }
     .grid-row {
       display: flex;
@@ -207,7 +207,7 @@
       100% { transform: scale(1); }
     }
 
-    /* MODAL WINDOW GENERIC */
+    /* MODAL WINDOW GENERIC (PERBAIKAN INPUT TOUCH) */
     .modal-backdrop {
       position: fixed;
       top: 0;
@@ -224,6 +224,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
+      touch-action: auto !important;
     }
     .modal-backdrop.active {
       opacity: 1;
@@ -243,6 +244,8 @@
       padding: 24px;
       text-align: center;
       position: relative;
+      touch-action: manipulation !important;
+      z-index: 210;
     }
     .card-modal h2 { font-size: 1.4rem; margin-bottom: 6px; }
     .card-modal p { font-size: 0.85rem; color: #94a3b8; margin-bottom: 18px; }
@@ -277,6 +280,9 @@
       border-radius: 10px;
       color: white;
       outline: none;
+      touch-action: manipulation !important;
+      -webkit-user-select: text;
+      user-select: text;
     }
     .btn-file-upload {
       display: block;
@@ -404,7 +410,6 @@
       gap: 12px;
     }
 
-    /* TOMBOL BULAT EMAS PANGGILAN DI HEADER */
     .btn-round-call {
       background: linear-gradient(135deg, #dfb76c 0%, #b48c40 100%);
       border: none;
@@ -421,7 +426,6 @@
     }
     .btn-round-call:active { transform: scale(0.92); }
 
-    /* RUANG CHAT SCROLL NORMAL */
     .chat-body-full {
       flex: 1;
       padding: 20px;
@@ -434,7 +438,6 @@
       touch-action: pan-y !important;
     }
 
-    /* GELEMBUNG PESAN METALLIC */
     .msg {
       max-width: 85%;
       min-width: 90px;
@@ -556,7 +559,6 @@
       gap: 6px;
     }
 
-    /* INPUT CHAT FOOTER */
     .chat-footer-full {
       padding: 14px 18px;
       padding-bottom: max(16px, env(safe-area-inset-bottom));
@@ -576,6 +578,9 @@
       color: white;
       outline: none;
       font-size: 0.92rem;
+      touch-action: manipulation !important;
+      -webkit-user-select: text;
+      user-select: text;
     }
     .chat-footer-full input:focus {
       border-color: #dfb76c;
@@ -604,7 +609,6 @@
       box-shadow: none;
     }
 
-    /* BOTTOM SHEET CALL TYPE MODAL */
     .bottom-sheet-backdrop {
       align-items: flex-end !important;
       padding: 0 !important;
@@ -1148,7 +1152,6 @@
       }
     }
 
-    // Fungsi pengacak deterministik (seeded random) agar posisi acak tapi stabil
     function seededRandom(seed) {
       const x = Math.sin(seed++) * 10000;
       return x - Math.floor(x);
@@ -1161,7 +1164,6 @@
       const totalRows = 6;
       const totalCols = 8;
       
-      // Kumpulkan slot segitiga terbalik (hanya segitiga terbalik yang bisa diisi foto kontak)
       let availableSlots = [];
       for (let r = 0; r < totalRows; r++) {
         for (let c = 0; c < totalCols; c++) {
@@ -1172,11 +1174,9 @@
         }
       }
 
-      // Acak posisi slot berdasarkan username agar unik tiap akun tapi konsisten
       let seed = currentUser ? currentUser.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) : 123;
       availableSlots.sort(() => seededRandom(seed++) - 0.5);
 
-      // Petakan kontak ke slot acak
       let slotMap = {};
       contacts.forEach((person, idx) => {
         if (idx < availableSlots.length) {
@@ -1185,7 +1185,6 @@
         }
       });
 
-      // Render grid mosaik
       for (let r = 0; r < totalRows; r++) {
         const row = document.createElement('div');
         row.className = 'grid-row';
@@ -1272,6 +1271,7 @@
     window.addEventListener('mouseup', endPan);
 
     viewport.addEventListener('touchstart', (e) => {
+      if (e.target.closest('.modal-backdrop')) return;
       if (e.touches.length === 1) startPan(e.touches[0].clientX, e.touches[0].clientY, e.target);
     }, { passive: true });
 
