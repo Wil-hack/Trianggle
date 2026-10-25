@@ -401,15 +401,15 @@
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       z-index: 10;
     }
 
     .btn-round-call {
       background: linear-gradient(135deg, #dfb76c 0%, #b48c40 100%);
       border: none;
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       color: #10141d;
       cursor: pointer;
@@ -602,6 +602,28 @@
       animation: pulseMic 1s infinite alternate;
     }
     @keyframes pulseMic { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
+
+    /* BOTTOM SHEET MENU */
+    .bottom-sheet-option {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      border-radius: 18px;
+      background: #202430;
+      border: 1.5px solid #2d3342;
+      margin-bottom: 12px;
+      cursor: pointer;
+      width: 100%;
+      pointer-events: auto !important;
+      z-index: 300;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .bottom-sheet-option:active {
+      background: #2a2e3d;
+      border-color: #dfb76c;
+      transform: scale(0.98);
+    }
 
     /* OVERLAY VIDEO & VOICE CALL */
     .call-card-full {
@@ -871,8 +893,19 @@
           </div>
         </div>
         <div class="header-actions">
+          <!-- TOMBOL HAPUS SELURUH PESAN (CLEAR CHAT) -->
+          <button class="btn-round-call" onclick="clearAllMessages()" title="Hapus Semua Pesan" style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #ef4444;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+          </button>
+
+          <!-- TOMBOL PANGGILAN -->
           <button class="btn-round-call" onclick="openCallOptionSheet()" title="Panggil">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10141d" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10141d" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
               <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
             </svg>
           </button>
@@ -900,23 +933,23 @@
     </div>
   </div>
 
-  <!-- BOTTOM SHEET MODAL -->
+  <!-- BOTTOM SHEET MODAL (PILIH TIPE PANGGILAN FULL AREA) -->
   <div class="modal-backdrop bottom-sheet-backdrop" id="call-sheet-modal" onclick="closeCallSheet(event)">
-    <div class="bottom-sheet-card" style="background:#191c24; border-top:1.5px solid #2d3342; border-radius:24px 24px 0 0; padding:20px 24px 36px; color:white; width:100%; max-width:500px; margin:auto 0 0 0;">
+    <div class="bottom-sheet-card" style="background:#191c24; border-top:1.5px solid #2d3342; border-radius:24px 24px 0 0; padding:20px 24px 36px; color:white; width:100%; max-width:500px; margin:auto 0 0 0; pointer-events: auto;">
       <div class="bottom-sheet-drag" style="width:42px; height:4px; background:#475569; border-radius:2px; margin:0 auto 16px;"></div>
       <div class="bottom-sheet-title" style="font-size:0.88rem; color:#94a3b8; margin-bottom:16px; text-transform:uppercase;">Pilih tipe panggilan</div>
       
-      <div class="bottom-sheet-option" onclick="startCall('voice')" style="display:flex; align-items:center; gap:16px; padding:14px 16px; border-radius:16px; background:#202430; border:1px solid #2d3342; margin-bottom:10px; cursor:pointer;">
-        <div class="opt-icon" style="width:40px; height:40px; border-radius:50%; background:rgba(223, 183, 108, 0.15); border:1px solid #dfb76c; display:flex; align-items:center; justify-content:center; color:#dfb76c;">📞</div>
-        <div>
+      <div class="bottom-sheet-option" onclick="startCall('voice')">
+        <div class="opt-icon" style="width:40px; height:40px; border-radius:50%; background:rgba(223, 183, 108, 0.15); border:1px solid #dfb76c; display:flex; align-items:center; justify-content:center; color:#dfb76c; flex-shrink:0;">📞</div>
+        <div style="flex:1;">
           <div style="font-weight: 600; font-size: 0.95rem;">Panggilan suara</div>
           <div style="font-size: 0.78rem; color: #94a3b8;">Bicara via jaringan audio live</div>
         </div>
       </div>
 
-      <div class="bottom-sheet-option" onclick="startCall('video')" style="display:flex; align-items:center; gap:16px; padding:14px 16px; border-radius:16px; background:#202430; border:1px solid #2d3342; margin-bottom:10px; cursor:pointer;">
-        <div class="opt-icon" style="width:40px; height:40px; border-radius:50%; background:rgba(223, 183, 108, 0.15); border:1px solid #dfb76c; display:flex; align-items:center; justify-content:center; color:#dfb76c;">📹</div>
-        <div>
+      <div class="bottom-sheet-option" onclick="startCall('video')">
+        <div class="opt-icon" style="width:40px; height:40px; border-radius:50%; background:rgba(223, 183, 108, 0.15); border:1px solid #dfb76c; display:flex; align-items:center; justify-content:center; color:#dfb76c; flex-shrink:0;">📹</div>
+        <div style="flex:1;">
           <div style="font-weight: 600; font-size: 0.95rem;">Panggilan video</div>
           <div style="font-size: 0.78rem; color: #94a3b8;">Tatap muka langsung dengan kamera HP</div>
         </div>
@@ -937,7 +970,6 @@
       </div>
 
       <div class="call-actions">
-        <!-- TOMBOL MUTE MIC -->
         <button class="btn-call-opt" id="btn-toggle-mic" onclick="toggleMuteMic()" title="Mute Mic">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
@@ -947,7 +979,6 @@
           </svg>
         </button>
         
-        <!-- TOMBOL LOUDSPEAKER -->
         <button class="btn-call-opt" id="btn-toggle-speaker" onclick="toggleSpeakerSwitch()" title="Loudspeaker">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
@@ -955,7 +986,6 @@
           </svg>
         </button>
 
-        <!-- TOMBOL FLIP CAMERA -->
         <button class="btn-call-opt" id="btn-switch-camera" onclick="switchCamera()" title="Tukar Kamera" style="display:none;">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M20 10c0-4.4-3.6-8-8-8s-8 3.6-8 8c0 2.1.8 4 2.2 5.5"/>
@@ -965,7 +995,6 @@
           </svg>
         </button>
 
-        <!-- TOMBOL MATIKAN TELEPON -->
         <button class="btn-end-call" onclick="endCall('ended')">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"/>
@@ -1099,12 +1128,25 @@
       }
     }
 
-    // FUNGSI HAPUS PESAN DENGAN LONG PRESS AMAN (800ms)
     window.deleteMessage = function(msgKey) {
       if (!activeContact) return;
       if (confirm("Hapus pesan ini untuk semua orang?")) {
         const roomId = getRoomId(currentUser, activeContact.username);
         remove(ref(db, `chats/${roomId}/${msgKey}`));
+      }
+    }
+
+    window.clearAllMessages = function() {
+      if (!activeContact) return;
+      if (confirm(`Hapus seluruh riwayat pesan dengan @${activeContact.username}?`)) {
+        const roomId = getRoomId(currentUser, activeContact.username);
+        const messagesRef = ref(db, `chats/${roomId}`);
+        remove(messagesRef).then(() => {
+          const chatBody = document.getElementById('chat-body');
+          if (chatBody) chatBody.innerHTML = '';
+        }).catch((err) => {
+          alert("Gagal menghapus pesan: " + err.message);
+        });
       }
     }
 
@@ -1222,26 +1264,17 @@
 
     function playNotificationSound() {
       const audio = document.getElementById('notif-audio');
-      if (audio) {
-        audio.currentTime = 0;
-        audio.play().catch(e => {});
-      }
+      if (audio) { audio.currentTime = 0; audio.play().catch(e => {}); }
     }
 
     function playRingingSound() {
       const audio = document.getElementById('ring-audio');
-      if (audio) {
-        audio.currentTime = 0;
-        audio.play().catch(e => {});
-      }
+      if (audio) { audio.currentTime = 0; audio.play().catch(e => {}); }
     }
 
     function stopRingingSound() {
       const audio = document.getElementById('ring-audio');
-      if (audio) {
-        audio.pause();
-        audio.currentTime = 0;
-      }
+      if (audio) { audio.pause(); audio.currentTime = 0; }
     }
 
     function buildGrid() {
@@ -1290,9 +1323,7 @@
             }
             tile.appendChild(badge);
 
-            tile.onclick = () => {
-              openProfile(person);
-            };
+            tile.onclick = () => { openProfile(person); };
             contactIdx++;
           } else {
             const bg = document.createElement('div');
@@ -1470,14 +1501,8 @@
 
       onValue(connectedRef, (snap) => {
         if (snap.val() === true) {
-          onDisconnect(userStatusRef).set({
-            isOnline: false,
-            lastSeen: Date.now()
-          });
-          set(userStatusRef, {
-            isOnline: true,
-            lastSeen: Date.now()
-          });
+          onDisconnect(userStatusRef).set({ isOnline: false, lastSeen: Date.now() });
+          set(userStatusRef, { isOnline: true, lastSeen: Date.now() });
         }
       });
 
@@ -1517,13 +1542,10 @@
       const messagesRef = ref(db, `chats/${roomId}`);
 
       let isInitialLoad = true;
-      get(messagesRef).then(() => {
-        isInitialLoad = false;
-      });
+      get(messagesRef).then(() => { isInitialLoad = false; });
 
       onChildAdded(messagesRef, (snapshot) => {
         const data = snapshot.val();
-        
         if (data.sender === contactUsername) {
           const isChatOpen = activeContact && activeContact.username === contactUsername && document.getElementById('chat-modal').classList.contains('active');
 
@@ -1639,16 +1661,8 @@
         }
 
         const constraints = { 
-          audio: {
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true
-          }, 
-          video: type === 'video' ? { 
-            width: { ideal: 640 }, 
-            height: { ideal: 480 }, 
-            facingMode: currentFacingMode 
-          } : false 
+          audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }, 
+          video: type === 'video' ? { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: currentFacingMode } : false 
         };
         localStream = await navigator.mediaDevices.getUserMedia(constraints);
         
@@ -1890,9 +1904,7 @@
           audioChunks = [];
 
           mediaRecorder.ondataavailable = event => {
-            if (event.data.size > 0) {
-              audioChunks.push(event.data);
-            }
+            if (event.data.size > 0) { audioChunks.push(event.data); }
           };
 
           mediaRecorder.onstop = () => {
@@ -2113,7 +2125,7 @@
           chatBody.appendChild(msgDiv);
         }
 
-        // AMAN: LONG PRESS 800ms BARU MUNCUL KONFIRMASI HAPUS (TIDAK SENSITIF)
+        // AMAN: LONG PRESS 800ms UNTUK HAPUS SATUAN
         let pressTimer;
         msgDiv.onpointerdown = (e) => {
           pressTimer = setTimeout(() => {
@@ -2137,9 +2149,7 @@
               <strong>${label} ${isMissed ? 'Tak Terjawab' : ''}</strong>
               <div style="font-size: 0.75rem; opacity: 0.8;">${detail}</div>
             </div>
-            <div class="msg-footer-info">
-              <span>${timeString}</span>
-            </div>
+            <div class="msg-footer-info"><span>${timeString}</span></div>
           `;
         } else {
           msgDiv.className = `msg ${isMe ? (isRead ? 'msg-out read' : 'msg-out') : 'msg-in'}`;
@@ -2163,18 +2173,12 @@
                   Pesan Suara
                 </span>
               </div>
-              <div class="msg-footer-info">
-                <span>${timeString}</span>
-                ${statusTicks}
-              </div>
+              <div class="msg-footer-info"><span>${timeString}</span>${statusTicks}</div>
             `;
           } else {
             msgDiv.innerHTML = `
               <div class="msg-text-content">${data.text}</div>
-              <div class="msg-footer-info">
-                <span>${timeString}</span>
-                ${statusTicks}
-              </div>
+              <div class="msg-footer-info"><span>${timeString}</span>${statusTicks}</div>
             `;
           }
         }
@@ -2205,9 +2209,7 @@
       const audio = new Audio(base64Audio);
       btn.innerText = "⏸";
       audio.play();
-      audio.onended = () => {
-        btn.innerText = "▶";
-      };
+      audio.onended = () => { btn.innerText = "▶"; };
     }
 
     window.sendMsg = function() {
