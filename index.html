@@ -227,7 +227,7 @@
     }
     .modal-backdrop.active {
       opacity: 1;
-      pointer-events: auto;
+      pointer-events: auto !important;
     }
 
     .card-modal {
@@ -243,6 +243,8 @@
       padding: 24px;
       text-align: center;
       position: relative;
+      pointer-events: auto !important;
+      z-index: 210;
     }
     .card-modal h2 { font-size: 1.4rem; margin-bottom: 6px; }
     .card-modal p { font-size: 0.85rem; color: #94a3b8; margin-bottom: 18px; }
@@ -253,6 +255,7 @@
       padding: 4px;
       border-radius: 10px;
       margin-bottom: 16px;
+      pointer-events: auto !important;
     }
     .tab-btn {
       flex: 1;
@@ -264,19 +267,27 @@
       font-weight: 600;
       border-radius: 8px;
       cursor: pointer;
+      pointer-events: auto !important;
     }
     .tab-btn.active { background: #3b82f6; color: white; }
 
-    .form-group { margin-bottom: 14px; text-align: left; }
+    .form-group { margin-bottom: 14px; text-align: left; pointer-events: auto !important; }
     .form-group label { display: block; font-size: 0.75rem; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; }
     .form-group input {
       width: 100%;
-      padding: 11px 14px;
-      background: rgba(13, 14, 18, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
+      padding: 12px 14px;
+      background: rgba(13, 14, 18, 0.95);
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
       color: white;
       outline: none;
+      font-size: 0.95rem;
+      pointer-events: auto !important;
+      position: relative;
+      z-index: 220;
+    }
+    .form-group input:focus {
+      border-color: #3b82f6;
     }
     .btn-file-upload {
       display: block;
@@ -291,6 +302,7 @@
       font-weight: 600;
       cursor: pointer;
       margin-bottom: 10px;
+      pointer-events: auto !important;
     }
     .upload-preview {
       width: 65px;
@@ -311,6 +323,9 @@
       font-weight: 600;
       cursor: pointer;
       margin-top: 10px;
+      pointer-events: auto !important;
+      z-index: 220;
+      position: relative;
     }
     .close-btn {
       position: absolute;
@@ -321,6 +336,7 @@
       color: #94a3b8;
       font-size: 1.3rem;
       cursor: pointer;
+      pointer-events: auto !important;
     }
 
     .profile-card {
@@ -335,6 +351,7 @@
       text-align: center;
       position: relative;
       box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+      pointer-events: auto !important;
     }
     .profile-card img {
       width: 88px;
@@ -356,6 +373,7 @@
       color: white;
       box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
       transition: transform 0.15s;
+      pointer-events: auto !important;
     }
     .btn-ngobrol:active { transform: scale(0.96); }
 
@@ -376,6 +394,7 @@
       flex-direction: column;
       overflow: hidden;
       box-shadow: 0 30px 60px rgba(0, 0, 0, 0.9);
+      pointer-events: auto !important;
     }
 
     .chat-header-full {
@@ -638,6 +657,7 @@
       padding: 40px 20px;
       position: relative;
       overflow: hidden;
+      pointer-events: auto !important;
     }
     #remote-video {
       position: absolute;
@@ -893,7 +913,6 @@
           </div>
         </div>
         <div class="header-actions">
-          <!-- TOMBOL HAPUS SELURUH PESAN (CLEAR CHAT) -->
           <button class="btn-round-call" onclick="clearAllMessages()" title="Hapus Semua Pesan" style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #ef4444;">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="3 6 5 6 21 6"></polyline>
@@ -903,7 +922,6 @@
             </svg>
           </button>
 
-          <!-- TOMBOL PANGGILAN -->
           <button class="btn-round-call" onclick="openCallOptionSheet()" title="Panggil">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10141d" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
               <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
@@ -933,7 +951,7 @@
     </div>
   </div>
 
-  <!-- BOTTOM SHEET MODAL (PILIH TIPE PANGGILAN FULL AREA) -->
+  <!-- BOTTOM SHEET MODAL -->
   <div class="modal-backdrop bottom-sheet-backdrop" id="call-sheet-modal" onclick="closeCallSheet(event)">
     <div class="bottom-sheet-card" style="background:#191c24; border-top:1.5px solid #2d3342; border-radius:24px 24px 0 0; padding:20px 24px 36px; color:white; width:100%; max-width:500px; margin:auto 0 0 0; pointer-events: auto;">
       <div class="bottom-sheet-drag" style="width:42px; height:4px; background:#475569; border-radius:2px; margin:0 auto 16px;"></div>
@@ -2125,7 +2143,6 @@
           chatBody.appendChild(msgDiv);
         }
 
-        // AMAN: LONG PRESS 800ms UNTUK HAPUS SATUAN
         let pressTimer;
         msgDiv.onpointerdown = (e) => {
           pressTimer = setTimeout(() => {
