@@ -212,7 +212,7 @@
       100% { transform: scale(1); }
     }
 
-    /* FIX MODAL BACKDROP & INPUT INTERACTION */
+    /* FIX MODAL BACKDROP & INPUT CLICKABILITY */
     .modal-backdrop {
       position: fixed;
       top: 0;
@@ -228,7 +228,7 @@
       align-items: center;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.2s ease;
     }
     .modal-backdrop.active {
       opacity: 1;
@@ -340,6 +340,7 @@
       font-size: 1.3rem;
       cursor: pointer;
       pointer-events: auto !important;
+      z-index: 10002;
     }
 
     .profile-card {
@@ -808,6 +809,7 @@
   <!-- LOGIN / REGISTER MODAL -->
   <div class="modal-backdrop active" id="login-modal">
     <div class="card-modal">
+      <button class="close-btn" onclick="closeModals()">✕</button>
       <h2>Masuk Ke TriHive</h2>
       <p>Aplikasi Chat & Telepon Mosaik Segitiga</p>
       
@@ -2007,7 +2009,7 @@
 
     window.openAddContactModal = function() {
       if (!currentUser) {
-        alert("Silakan login terlebih dahulu!");
+        document.getElementById('login-modal').classList.add('active');
         return;
       }
       document.getElementById('add-contact-modal').classList.add('active');
@@ -2258,7 +2260,7 @@
 
     window.closeModals = function() {
       document.querySelectorAll('.modal-backdrop').forEach(m => {
-        if (m.id !== 'login-modal') m.classList.remove('active');
+        m.classList.remove('active');
       });
     }
 
