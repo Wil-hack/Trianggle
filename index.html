@@ -962,12 +962,34 @@
     function buildGrid() {
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
-      let contactIdx = 0;
-      // Acak urutan kontak setiap kali grid dibuat, tanpa mengubah data aslinya.
+      // Acak urutan kontak, lalu tempatkan foto teman dalam satu kelompok
+      // supaya segitiga foto profil berdekatan. Lokasi kelompok diacak tiap grid dibuat.
       const randomizedContacts = [...contacts];
       for (let i = randomizedContacts.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [randomizedContacts[i], randomizedContacts[j]] = [randomizedContacts[j], randomizedContacts[i]];
+      }
+
+      const contactAt = new Map();
+      if (randomizedContacts.length > 0) {
+        const anchorR = 1 + Math.floor(Math.random() * 6);
+        const anchorC = 1 + Math.floor(Math.random() * 8);
+        const availableSlots = [];
+        for (let rr = 0; rr < 8; rr++) {
+          for (let cc = 0; cc < 10; cc++) {
+            if ((rr + cc) % 2 === 1) {
+              availableSlots.push({
+                r: rr,
+                c: cc,
+                distance: Math.pow(rr - anchorR, 2) + Math.pow(cc - anchorC, 2)
+              });
+            }
+          }
+        }
+        availableSlots.sort((a, b) => a.distance - b.distance);
+        randomizedContacts.forEach((person, i) => {
+          if (availableSlots[i]) contactAt.set(`${availableSlots[i].r}-${availableSlots[i].c}`, person);
+        });
       }
 
       for (let r = 0; r < 8; r++) {
@@ -983,8 +1005,8 @@
           const inner = document.createElement('div');
           inner.className = 'tile-inner';
 
-          if (contactIdx < randomizedContacts.length && !isUpright) {
-            const person = randomizedContacts[contactIdx];
+          const person = contactAt.get(`${r}-${c}`);
+          if (person && !isUpright) {
             
             const photoWrapper = document.createElement('div');
             photoWrapper.className = 'tile-photo-wrapper';
@@ -1014,7 +1036,6 @@
             tile.onclick = () => {
               openProfile(person);
             };
-            contactIdx++;
           } else {
             const bg = document.createElement('div');
             bg.className = 'tile-bg';
