@@ -645,6 +645,7 @@
     </div>
     <div class="header-controls">
       <button class="btn-add-contact" onclick="openAddContactModal()">+ Kontak</button>
+      <button class="btn-add-contact" id="enable-notifications-btn" onclick="enablePushNotifications()" style="font-size:0.8rem;">🔔 Aktifkan notif</button>
       <div class="user-pill" id="user-pill" style="display: none;" onclick="openEditProfileModal()">
         <img id="current-user-avatar" src="" alt="Avatar">
         <span id="current-user-name">Pengguna</span>
@@ -830,6 +831,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, push, onChildAdded, onChildChanged, set, get, update, remove, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getMessaging, getToken, isSupported } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBfAvdE0PZMvytkSaofbFAgk0749E-b_pI",
@@ -843,6 +845,52 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    const VAPID_PUBLIC_KEY = "BBqfPddFnX-9yjuEpZ8u0DArJ_shiQ2tK6wTux8yVOQLvIbiCt3XNN6xBs-7RnD8_pTHQExSLV7mL0MVg5uOPFA";
+
+    window.enablePushNotifications = async function () {
+      if (!currentUser) {
+        alert("Silakan login dulu sebelum mengaktifkan notifikasi.");
+        return;
+      }
+      if (!("Notification" in window) || !("serviceWorker" in navigator)) {
+        alert("Browser ini belum mendukung notifikasi web. Coba buka TriHive melalui Chrome.");
+        return;
+      }
+      try {
+        const supported = await isSupported();
+        if (!supported) {
+          alert("Firebase Messaging tidak didukung di browser ini.");
+          return;
+        }
+        const permission = await Notification.requestPermission();
+        if (permission !== "granted") {
+          alert("Izin notifikasi belum diizinkan. Aktifkan izin TriHive dari pengaturan situs di Chrome.");
+          return;
+        }
+        const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+        const messaging = getMessaging(app);
+        const token = await getToken(messaging, {
+          vapidKey: VAPID_PUBLIC_KEY,
+          serviceWorkerRegistration: registration
+        });
+        if (!token) {
+          alert("Token notifikasi belum berhasil dibuat. Coba muat ulang halaman.");
+          return;
+        }
+        await set(ref(db, `push_tokens/${currentUser}/${Date.now()}`), {
+          token,
+          platform: "web",
+          updatedAt: Date.now()
+        });
+        localStorage.setItem(`trihive_push_enabled_${currentUser}`, "true");
+        const btn = document.getElementById("enable-notifications-btn");
+        if (btn) btn.textContent = "🔔 Notif aktif";
+        alert("Notifikasi TriHive berhasil diaktifkan di browser ini.");
+      } catch (err) {
+        console.error("Gagal mengaktifkan notifikasi:", err);
+        alert("Gagal mengaktifkan notifikasi: " + (err.message || err));
+      }
+    };
 
     let contacts = [];
     let activeContact = null;
