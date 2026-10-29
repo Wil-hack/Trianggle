@@ -289,10 +289,16 @@
       display: flex; flex-direction: column; gap: 14px; background: #14161d; touch-action: pan-y !important;
     }
 
-    /* GELEMBUNG PESAN & WARNA STATUS BACA */
+    /* GELEMBUNG PESAN & TATA LETAK WAKTU YANG LEBIH RAPI */
     .msg {
-      max-width: 82%; padding: 10px 14px 22px 14px; font-size: 0.92rem; line-height: 1.45;
-      position: relative; word-break: break-word; cursor: pointer;
+      max-width: 82%; 
+      padding: 10px 14px 26px 14px; /* Ruang bawah dilebarkan agar jam tidak menumpuk teks pendek */
+      font-size: 0.92rem; 
+      line-height: 1.45;
+      position: relative; 
+      word-break: break-word; 
+      cursor: pointer;
+      display: inline-block;
     }
     .msg-in {
       background: linear-gradient(145deg, #323846 0%, #202430 100%);
@@ -310,8 +316,9 @@
       border: 1.5px solid #2d3342; margin-left: 30px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }
 
+    /* TIMESTAMP WAKTU DIKEMAS RAPI DI SUDUT BAWAH */
     .msg-time {
-      position: absolute; bottom: 4px; right: 12px; font-size: 0.68rem; color: #94a3b8; font-weight: 600;
+      position: absolute; bottom: 5px; right: 12px; font-size: 0.65rem; color: #94a3b8; font-weight: 600; letter-spacing: 0.3px;
     }
     .msg-in .msg-time { left: 12px; right: auto; }
 
@@ -363,7 +370,6 @@
     #remote-video { width: 100%; height: 100%; object-fit: cover; }
     #local-video { position: absolute; bottom: 12px; right: 12px; width: 90px; height: 120px; object-fit: cover; border-radius: 8px; border: 2px solid white; background: #222; }
     
-    /* TOMBOL GANTI KAMERA (FLIP) */
     .btn-flip-camera {
       position: absolute; top: 12px; left: 12px; width: 40px; height: 40px;
       background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.3);
@@ -532,7 +538,6 @@
   <div class="modal-backdrop" id="call-modal">
     <div class="call-card">
       <div class="video-container" id="video-box">
-        <!-- Tombol Ganti Kamera Depan/Belakang -->
         <button class="btn-flip-camera" id="btn-flip" onclick="switchCamera()" title="Ganti Kamera">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 4v5h-.58l-1.42-1.42A8 8 0 1 0 20 12h-2a6 6 0 1 1-1.78-4.22L15 9h5V4z"/></svg>
         </button>
@@ -612,7 +617,7 @@
     let localStream = null;
     let targetUser = null;
     let isVideoCall = false;
-    let useFrontCamera = true; // Status kamera depan/belakang
+    let useFrontCamera = true;
     let mediaRecorder = null;
     let audioChunks = [];
     let isRecording = false;
@@ -905,7 +910,6 @@
       } catch (err) { alert("Gagal akses kamera/mikrofon."); throw err; }
     }
 
-    // Fungsi Ganti / Balik Kamera Depan & Belakang
     window.switchCamera = async function() {
       useFrontCamera = !useFrontCamera;
       if (isVideoCall) {
@@ -913,9 +917,7 @@
         if (peerConnection) {
           const videoTrack = localStream.getVideoTracks()[0];
           const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
-          if (sender) {
-            sender.replaceTrack(videoTrack);
-          }
+          if (sender) { sender.replaceTrack(videoTrack); }
         }
       }
     };
