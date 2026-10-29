@@ -1,33 +1,29 @@
-  <!-- Firebase SDKs & Safe Messaging Init -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, onChildAdded, onChildChanged, set, get, update, remove, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-    import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js";
+// Import Firebase scripts untuk Service Worker
+importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js');
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBfAvdE0PZMvytkSaofbFAgk0749E-b_pI",
-      authDomain: "trihive-857cd.firebaseapp.com",
-      databaseURL: "https://trihive-857cd-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "trihive-857cd",
-      storageBucket: "trihive-857cd.firebasestorage.app",
-      messagingSenderId: "434709340496",
-      appId: "1:434709340496:web:3e1206dc10679ddc680c55"
-    };
+// Inisialisasi Firebase di Service Worker menggunakan konfigurasi project Anda
+firebase.initializeApp({
+  apiKey: "AIzaSyBfAvdE0PZMvytkSaofbFAgk0749E-b_pI",
+  authDomain: "trihive-857cd.firebaseapp.com",
+  databaseURL: "https://trihive-857cd-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "trihive-857cd",
+  storageBucket: "trihive-857cd.firebasestorage.app",
+  messagingSenderId: "434709340496",
+  appId: "1:434709340496:web:3e1206dc10679ddc680c55"
+});
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+const messaging = firebase.messaging();
 
-    // Pendaftaran Service Worker yang disesuaikan dengan jalur relatif/subfolder
-    try {
-      const messaging = getMessaging(app);
-      if ('serviceWorker' in navigator) {
-        // Menggunakan jalur absolut atau menyesuaikan root project Anda
-        navigator.serviceWorker.register('./firebase-messaging-sw.js').then((registration) => {
-          console.log('Service Worker berhasil:', registration.scope);
-        }).catch((err) => {
-          console.log('Pendaftaran Service Worker dilewati:', err.message);
-        });
-      }
-    } catch (e) {
-      console.log('Messaging error:', e);
-    }
+// Menangani background notification saat aplikasi ditutup atau di latar belakang
+messaging.onBackgroundMessage((payload) => {
+  console.log('[firebase-messaging-sw.js] Pesan background diterima: ', payload);
+  
+  const notificationTitle = payload.notification ? payload.notification.title : 'TriHive';
+  const notificationOptions = {
+    body: payload.notification ? payload.notification.body : 'Anda memiliki pesan baru.',
+    icon: '/favicon.ico' // Sesuaikan ikon jika ada
+  };
+
+  self.registration.showNotification(notificationTitle, notificationOptions);
+});
