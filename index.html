@@ -1036,11 +1036,13 @@
       }
     }
 
+    /* BUILD GRID: RATA KIRI (DIPRIORITASKAN DARI KOLOM KIRI KE KANAN) */
     function buildGrid() {
       const grid = document.getElementById('grid');
       if (!grid) return;
       grid.innerHTML = '';
 
+      // Generator pseudo-random berbasis seed untuk variasi baris yang stabil
       function pseudoRandom(seed) {
         let hash = 0;
         for (let i = 0; i < seed.length; i++) {
@@ -1054,39 +1056,40 @@
 
       const rng = pseudoRandom(currentUser || 'trihive_default_seed');
 
-      const randomizedContacts = [...contacts].sort((a, b) => a.username.localeCompare(b.username));
-      for (let i = randomizedContacts.length - 1; i > 0; i--) {
-        const j = Math.floor(rng() * (i + 1));
-        [randomizedContacts[i], randomizedContacts[j]] = [randomizedContacts[j], randomizedContacts[i]];
-      }
+      // Urutkan kontak secara alfabetis dulu agar stabil
+      const sortedContacts = [...contacts].sort((a, b) => a.username.localeCompare(b.username));
 
       const contactAt = new Map();
-      if (randomizedContacts.length > 0) {
-        const anchorR = 1 + Math.floor(rng() * 6);
-        const anchorC = 1 + Math.floor(rng() * 8);
+      if (sortedContacts.length > 0) {
         const availableSlots = [];
 
+        // Kumpulkan slot inverted (tempat foto)
         for (let rr = 0; rr < 8; rr++) {
           for (let cc = 0; cc < 10; cc++) {
             if ((rr + cc) % 2 === 1) {
-              availableSlots.push({
-                r: rr,
-                c: cc,
-                distance: Math.pow(rr - anchorR, 2) + Math.pow(cc - anchorC, 2)
-              });
+              availableSlots.push({ r: rr, c: cc });
             }
           }
         }
 
-        availableSlots.sort((a, b) => a.distance - b.distance);
+        // URUTKAN SLOT: Kolom paling kiri (c terkecil) diutamakan lebih dulu!
+        // Jika kolom sama, diurutkan selang-seling berdasarkan baris (r)
+        availableSlots.sort((a, b) => {
+          if (a.c !== b.c) {
+            return a.c - b.c; // Prioritas kolom terluar kiri ke kanan
+          }
+          return a.r - b.r;
+        });
 
-        randomizedContacts.forEach((person, i) => {
+        // Petakan kontak ke slot yang sudah diurutkan dari kiri
+        sortedContacts.forEach((person, i) => {
           if (availableSlots[i]) {
             contactAt.set(`${availableSlots[i].r}-${availableSlots[i].c}`, person);
           }
         });
       }
 
+      // Render grid 8x10
       for (let r = 0; r < 8; r++) {
         const row = document.createElement('div');
         row.className = 'grid-row';
