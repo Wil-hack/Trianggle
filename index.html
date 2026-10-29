@@ -104,6 +104,7 @@
       color: #3b82f6;
     }
 
+    /* Diperbaiki agar area "Wildan Jaka" responsif dan dapat diklik normal */
     .user-pill {
       display: flex;
       align-items: center;
@@ -113,6 +114,9 @@
       border-radius: 20px;
       border: 1px solid rgba(255, 255, 255, 0.12);
       cursor: pointer;
+      position: relative;
+      z-index: 110;
+      pointer-events: auto;
     }
 
     .user-pill img {
@@ -120,6 +124,7 @@
       height: 28px;
       border-radius: 50%;
       object-fit: cover;
+      pointer-events: none;
     }
 
     .user-pill span {
@@ -129,6 +134,7 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       font-weight: 500;
+      pointer-events: none;
     }
 
     /* VIEWPORT KANVAS */
@@ -437,7 +443,7 @@
       color: white;
     }
 
-    /* CHAT */
+    /* CHAT - Desain Diperhalus & Elegan */
     .chat-backdrop {
       align-items: center;
       padding: 10px;
@@ -448,18 +454,18 @@
       max-width: 440px;
       height: 85vh;
       max-height: 740px;
-      background: #191c24;
-      border: 1.5px solid #2d3342;
-      border-radius: 28px;
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 24px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
 
     .chat-header-full {
-      padding: 14px 18px;
-      background: #202430;
-      border-bottom: 1px solid #2d3342;
+      padding: 12px 16px;
+      background: #111827;
+      border-bottom: 1px solid #1f2937;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -468,53 +474,101 @@
     .chat-user-full {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .chat-user-full img {
-      width: 42px;
-      height: 42px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid #dfb76c;
+      border: 2px solid #3b82f6;
     }
 
     .header-actions {
       display: flex;
       align-items: center;
       gap: 8px;
+      position: relative;
     }
 
-    .btn-icon-call, .btn-icon-video {
-      background: #10b981;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      width: 38px;
-      height: 38px;
+    /* Tombol Telepon Terpadu & Dropdown Menu Panggilan */
+    .call-dropdown-container {
+      position: relative;
+    }
+
+    .btn-unified-call {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
-      color: white;
+      color: #94a3b8;
       cursor: pointer;
       display: flex;
       justify-content: center;
       align-items: center;
+      transition: all 0.2s;
     }
 
-    .btn-icon-video { background: #3b82f6; }
+    .btn-unified-call:hover {
+      background: rgba(59, 130, 246, 0.25);
+      color: #3b82f6;
+    }
+
+    .call-menu-popup {
+      position: absolute;
+      right: 0;
+      top: 44px;
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 12px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 100;
+      min-width: 160px;
+      display: none;
+    }
+
+    .call-menu-popup.active {
+      display: flex;
+    }
+
+    .call-menu-popup button {
+      background: transparent;
+      border: none;
+      color: #e5e7eb;
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 0.85srem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .call-menu-popup button:hover {
+      background: #374151;
+      color: #3b82f6;
+    }
 
     .chat-body-full {
       flex: 1;
-      padding: 18px;
+      padding: 16px;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       display: flex;
       flex-direction: column;
       gap: 12px;
-      background: #14161d;
+      background: #0b0d12;
     }
 
     .msg {
       max-width: 82%;
       min-width: 78px;
-      padding: 8px 12px 22px 12px;
+      padding: 10px 14px 24px 14px;
       font-size: 0.92rem;
       line-height: 1.4;
       position: relative;
@@ -522,46 +576,47 @@
       cursor: pointer;
     }
 
+    /* Gelembung Chat Masuk & Keluar Diperhalus Model Kapsul Modern */
     .msg-in {
-      background: #202430;
-      color: #e2e8f0;
+      background: #1f2937;
+      color: #f3f4f6;
       align-self: flex-start;
-      border-radius: 20px 20px 20px 6px;
-      border: 1.5px solid #2d3342;
+      border-radius: 16px 16px 16px 4px;
       margin-right: 30px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
 
     .msg-out.unread {
-      background: #1d4ed8;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
       color: #ffffff;
       align-self: flex-end;
-      border-radius: 20px 20px 6px 20px;
-      border: 1.8px solid #dfb76c;
+      border-radius: 16px 16px 4px 16px;
       margin-left: 30px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
 
     .msg-out.read {
-      background: #151b2b;
+      background: #1a2234;
       color: #94a3b8;
       align-self: flex-end;
-      border-radius: 20px 20px 6px 20px;
-      border: 1.5px solid #2d3342;
+      border-radius: 16px 16px 4px 16px;
+      border: 1px solid #2d3342;
       margin-left: 30px;
     }
 
     .msg-time {
       position: absolute;
-      bottom: 4px;
-      right: 10px;
-      font-size: 0.62rem;
-      color: #94a3b8;
+      bottom: 6px;
+      right: 12px;
+      font-size: 0.65rem;
+      opacity: 0.7;
     }
 
-    .msg-in .msg-time { left: 10px; right: auto; }
+    .msg-in .msg-time { left: 12px; right: auto; }
 
     .msg-quote {
       background: rgba(0, 0, 0, 0.25);
-      border-left: 3px solid #dfb76c;
+      border-left: 3px solid #f59e0b;
       padding: 4px 8px;
       border-radius: 4px;
       font-size: 0.78rem;
@@ -571,7 +626,7 @@
 
     #reply-preview-container {
       display: none;
-      background: #202430;
+      background: #1f2937;
       padding: 8px 14px;
       border-top: 1px solid #2d3342;
       align-items: center;
@@ -580,7 +635,7 @@
     }
 
     #reply-preview-text {
-      color: #dfb76c;
+      color: #f59e0b;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -595,11 +650,11 @@
     }
 
     .btn-play-voice {
-      background: #dfb76c;
+      background: #f59e0b;
       border: none;
-      color: #1e293b;
-      width: 34px;
-      height: 34px;
+      color: #111827;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       cursor: pointer;
     }
@@ -613,18 +668,18 @@
     .voice-tag {
       font-size: 0.85rem;
       font-weight: 700;
-      color: #dfb76c;
+      color: #f59e0b;
     }
 
     .chat-footer-full {
-      background: #191c24;
-      border-top: 1px solid #2d3342;
+      background: #111827;
+      border-top: 1px solid #1f2937;
       display: flex;
       flex-direction: column;
     }
 
     .chat-input-row {
-      padding: 12px 16px;
+      padding: 10px 16px;
       display: flex;
       gap: 10px;
       align-items: center;
@@ -633,33 +688,42 @@
     .chat-footer-full input {
       flex: 1;
       min-width: 0;
-      padding: 12px 18px;
-      background: #202430;
-      border: 1px solid #2d3342;
-      border-radius: 26px;
+      padding: 11px 16px;
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 24px;
       color: white;
       outline: none;
       font-size: 0.92rem;
     }
 
+    .chat-footer-full input::placeholder {
+      color: #6b7280;
+    }
+
     .btn-chat-action {
-      background: #dfb76c;
+      background: #f59e0b;
       border: none;
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      color: #10141d;
+      color: #111827;
       cursor: pointer;
       display: flex;
       justify-content: center;
       align-items: center;
       flex-shrink: 0;
+      transition: transform 0.2s;
+    }
+
+    .btn-chat-action:hover {
+      transform: scale(1.05);
     }
 
     .btn-mic, .btn-gallery {
-      background: #202430;
-      border: 1px solid #2d3342;
-      color: #dfb76c;
+      background: #1f2937;
+      border: 1px solid #374151;
+      color: #f59e0b;
     }
 
     /* PANGGILAN */
@@ -857,6 +921,7 @@
     <div class="header-controls">
       <button class="btn-icon-header" onclick="openAddContactModal()" title="Tambah Kontak">➕</button>
       <button class="btn-icon-header" id="enable-notifications-btn" onclick="enablePushNotifications()" title="Notifikasi">🔔</button>
+      <!-- Area Profil "Wildan Jaka" yang kini diaktifkan agar bisa diklik kembali -->
       <div class="user-pill" id="user-pill" style="display: none;" onclick="openEditProfileModal()">
         <img id="current-user-avatar" src="" alt="Avatar">
         <span id="current-user-name">Pengguna</span>
@@ -975,10 +1040,18 @@
             <span id="chat-status" style="color:#94a3b8; font-size:0.75rem;">Offline</span>
           </div>
         </div>
+        <!-- Tombol Panggilan Terpadu (Voice & Video Call digabung jadi 1 ikon telepon dengan Menu Popup) -->
         <div class="header-actions">
-          <button class="btn-icon-video" onclick="startCall(true)" title="Video Call">📹</button>
-          <button class="btn-icon-call" onclick="startCall(false)" title="Voice Call">📞</button>
-          <button class="close-btn" style="position:static; font-size:1.4rem;" onclick="closeModals()">✕</button>
+          <div class="call-dropdown-container">
+            <button class="btn-unified-call" onclick="toggleCallMenu()" title="Panggil">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            </button>
+            <div id="callMenuPopup" class="call-menu-popup">
+              <button onclick="startCall(false); toggleCallMenu();">📞 Panggilan Suara</button>
+              <button onclick="startCall(true); toggleCallMenu();">📹 Panggilan Video</button>
+            </div>
+          </div>
+          <button class="close-btn" style="position:static; font-size:1.3rem;" onclick="closeModals()">✕</button>
         </div>
       </div>
       <div class="chat-body-full" id="chat-body"></div>
@@ -1033,7 +1106,7 @@
 
   <div id="app-toast"></div>
 
-  <!-- SCRIPT UTAMA FIREBASE CDN -->
+  <!-- SCRIPT UTAMA FIREBASE CDN & LOGIKA APLIKASI -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import {
@@ -1132,7 +1205,6 @@
       if (a) { a.pause(); a.currentTime = 0; }
     }
 
-    // HELPER STATUS ONLINE (Grace Period 10 Menit agar tetap online saat di-minimize)
     function isUserOnline(d) {
       if (!d) return false;
       if (d.isOnline === true) return true;
@@ -1147,10 +1219,6 @@
     let unreadCounts = {};
     let activeContact = null;
     let replyingTo = null;
-    let isRecording = false;
-    let mediaRecorder = null;
-    let audioChunks = [];
-    let typingTimeout = null;
     let activeStatusListener = null;
     let activeProfileStatusListener = null;
     let activeListeners = {};
@@ -1161,7 +1229,6 @@
     let currentFacingMode = 'user';
     let isIncomingListening = false;
     let targetUser = null;
-    let callTimeoutTimer = null;
     let pendingIceCandidates = [];
 
     const rtcConfig = {
@@ -1173,7 +1240,6 @@
       ]
     };
 
-    // KOORDINAT CLUSTER ORGANIK DI TENGAH (Saling berdampingan & menempel)
     const ORGANIC_CLUSTER_SLOTS = [
       { r: 5, c: 5 }, { r: 5, c: 6 }, { r: 6, c: 5 }, { r: 4, c: 6 },
       { r: 6, c: 6 }, { r: 5, c: 4 }, { r: 4, c: 5 }, { r: 6, c: 4 },
@@ -1272,7 +1338,6 @@
       }
     }
 
-    // DRAGGING POINTER
     function initCanvasPanning() {
       const viewport = document.getElementById('viewport');
       const canvas = document.getElementById('canvas');
@@ -1384,7 +1449,6 @@
       if (!currentUser) return;
       const statusRef = ref(db, `status/${currentUser}`);
 
-      // Heartbeat berkala agar status selalu Online
       const sendHeartbeat = () => {
         if (currentUser) {
           set(statusRef, { isOnline: true, lastSeen: Date.now() });
@@ -1397,7 +1461,6 @@
       document.addEventListener('visibilitychange', sendHeartbeat);
       window.addEventListener('focus', sendHeartbeat);
 
-      // Support plugin background mode Cordova
       document.addEventListener('deviceready', () => {
         const cdv = window.cordova;
         if (cdv && cdv.plugins && cdv.plugins.backgroundMode) {
@@ -1679,7 +1742,23 @@
       targetUser = null;
     }
 
-    // CHAT
+    // Fungsi untuk membuka menu dropdown pilihan panggilan suara/video di header chat
+    window.toggleCallMenu = function() {
+      const popup = document.getElementById('callMenuPopup');
+      if (popup) {
+        popup.classList.toggle('active');
+      }
+    };
+
+    // Menutup popup panggilan jika pengguna klik di luar area tombol
+    window.addEventListener('click', function(e) {
+      const container = document.querySelector('.call-dropdown-container');
+      const popup = document.getElementById('callMenuPopup');
+      if (container && popup && !container.contains(e.target)) {
+        popup.classList.remove('active');
+      }
+    });
+
     let activeChatAdded = null;
     let currentChatRoom = null;
 
@@ -1703,7 +1782,7 @@
         if (statusElem) {
           if (d && d.isTyping) {
             statusElem.innerText = "Sedang mengetik...";
-            statusElem.style.color = "#dfb76c";
+            statusElem.style.color = "#f59e0b";
           } else if (isUserOnline(d)) {
             statusElem.innerText = "Online";
             statusElem.style.color = "#10b981";
@@ -1809,6 +1888,30 @@
       document.getElementById('profile-modal')?.classList.add('active');
     };
 
+    // Fungsi membuka modal Ubah Profil saat "Wildan Jaka" diklik di header
+    window.openEditProfileModal = function() {
+      if (!currentUser) return;
+      document.getElementById('edit-username-id').innerText = `@${currentUser}`;
+      document.getElementById('edit-fullname').value = currentDisplayName;
+      document.getElementById('edit-upload-preview').src = currentAvatarUrl;
+      document.getElementById('edit-upload-preview').style.display = currentAvatarUrl ? 'block' : 'none';
+      document.body.classList.add('modal-open');
+      document.getElementById('edit-profile-modal')?.classList.add('active');
+    };
+
+    window.saveProfileChanges = function() {
+      const newName = document.getElementById('edit-fullname').value.trim();
+      if (!newName || !currentUser) return showToast("Nama tidak boleh kosong!");
+      
+      update(ref(db, `users/${currentUser}`), { displayName: newName, avatar: currentAvatarUrl }).then(() => {
+        currentDisplayName = newName;
+        localStorage.setItem('trihive_name', currentDisplayName);
+        document.getElementById('current-user-name').innerText = currentDisplayName;
+        window.closeModals();
+        showToast("Profil berhasil diperbarui!");
+      });
+    };
+
     window.openAddContactModal = function() {
       document.body.classList.add('modal-open');
       document.getElementById('add-contact-modal')?.classList.add('active');
@@ -1845,7 +1948,15 @@
 
     window.handleKey = function(e) { if (e.key === 'Enter') window.sendMsg(); };
 
-    // Inisialisasi awal
+    // Registrasi Service Worker agar aplikasi tetap berjalan secara Offline
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('ServiceWorker Berhasil Terdaftar!', reg.scope))
+          .catch(err => console.log('ServiceWorker Gagal:', err));
+      });
+    }
+
     buildGrid();
     initCanvasPanning();
 
@@ -1855,7 +1966,6 @@
       setupIncomingCallsListener();
     }
 
-    // ===== REGISTRASI PUSH NOTIFICATION (FCM) =====
     let pushUser = null;
     function registerPush() {
       if (!window.FirebasePlugin) { showToast("Plugin push belum terpasang di APK ini."); return; }
