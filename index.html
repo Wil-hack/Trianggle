@@ -11,6 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="icon" href="logo.png">
   <link rel="manifest" href="manifest.json">
+  <script src="cordova.js"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -1078,6 +1079,18 @@
     }
 
     window.enablePushNotifications = async function() {
+      if (window.FirebasePlugin) {
+        FirebasePlugin.grantPermission((ok) => {
+          if (ok) {
+            showToast("Notifikasi diizinkan.");
+            document.getElementById('enable-notifications-btn').style.color = '#10b981';
+            registerPush();
+          } else {
+            showToast("Izin notifikasi ditolak. Aktifkan di Pengaturan HP.");
+          }
+        }, () => showToast("Gagal meminta izin notifikasi."));
+        return;
+      }
       if (!('Notification' in window)) {
         showToast("Browser tidak mendukung notifikasi.");
         return;
@@ -1841,6 +1854,34 @@
       loadUserContacts();
       setupIncomingCallsListener();
     }
+
+    // ===== REGISTRASI PUSH NOTIFICATION (FCM) =====
+    let pushUser = null;
+    function registerPush() {
+      if (!window.FirebasePlugin) { showToast("Plugin push belum terpasang di APK ini."); return; }
+      if (!currentUser) return;
+      const user = currentUser;
+      const save = (t) => {
+        if (!t) return;
+        set(ref(db, `fcmTokens/${user}`), t)
+          .then(() => showToast("Push aktif ✅"))
+          .catch((e) => showToast("Gagal simpan token: " + (e && e.message ? e.message : e)));
+      };
+      FirebasePlugin.grantPermission(() => {}, () => {});
+      FirebasePlugin.getToken(save, (err) => showToast("Gagal ambil token: " + err));
+      FirebasePlugin.onTokenRefresh(save, () => {});
+    }
+    document.addEventListener('deviceready', () => {
+      setInterval(() => {
+        if (currentUser && currentUser !== pushUser) {
+          pushUser = currentUser;
+          registerPush();
+        } else if (!currentUser && pushUser) {
+          remove(ref(db, `fcmTokens/${pushUser}`));
+          pushUser = null;
+        }
+      }, 3000);
+    });
   </script>
 </body>
 </html>
