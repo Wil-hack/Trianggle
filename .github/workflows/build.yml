@@ -28,18 +28,18 @@ jobs:
     - name: Create and Build Android APK
       run: |
         cordova create myApp com.trihive.app TriHive
-        
-        if [ -f index.html ]; then
-          cp index.html myApp/www/index.html
+
+        cp index.html myApp/www/index.html
+        [ -f logo.png ] && cp logo.png myApp/www/logo.png
+
+        if [ ! -f google-services.json ]; then
+          echo "google-services.json belum ada di repo!"
+          exit 1
         fi
-        
-        if [ -f logo.png ]; then
-          cp logo.png myApp/www/logo.png
-        fi
-        
+        cp google-services.json myApp/google-services.json
+
         cd myApp
-        
-        # Config.xml Resmi
+
         cat <<EOT > config.xml
         <?xml version='1.0' encoding='utf-8'?>
         <widget id="com.trihive.app" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
@@ -55,22 +55,14 @@ jobs:
             <preference name="SplashScreenDelay" value="0" />
             <platform name="android">
                 <icon src="www/logo.png" />
+                <resource-file src="google-services.json" target="app/google-services.json" />
             </platform>
         </widget>
         EOT
 
         cordova platform add android
-        
-        # Plugin Background Mode untuk Menjaga Koneksi & Membangunkan Layar
-        cordova plugin add cordova-plugin-background-mode || true
-        
-        # Injeksi Izin Android Lengkap (Kamera, Audio, Background, & Full Screen Intent Tembus Layar Kunci)
-        sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.WAKE_LOCK" />\n    <uses-permission android:name="android.permission.VIBRATE" />\n    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />\n    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />\n    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />\n    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />\n    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />' platforms/android/app/src/main/AndroidManifest.xml
-        
-        cordova build android --debug
 
-    - name: Upload APK Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: TriHive-APK
-        path: myApp/platforms/android/app/build/outputs/apk/debug/app-debug.apk
+        cordova plugin add cordova-plugin-background-mode || true
+        cordova plugin add cordova-plugin-firebasex
+
+        sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.WAKE_LOCK" />\n    <uses-permission android:name="android.permission.VIBRATE" />\n    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />\n    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />\n    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />\n    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />\n    <uses-permission and
