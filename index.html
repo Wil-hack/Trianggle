@@ -867,7 +867,11 @@
           alert("Izin notifikasi belum diizinkan. Aktifkan izin TriHive dari pengaturan situs di Chrome.");
           return;
         }
-        const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+
+        // Jalur Service Worker dinamis mendeteksi repository GitHub Pages (/Trianggle/)
+        const basePath = window.location.hostname.includes('github.io') ? '/' + window.location.pathname.split('/')[1] + '/' : '/';
+        const registration = await navigator.serviceWorker.register(basePath + 'firebase-messaging-sw.js');
+
         const messaging = getMessaging(app);
         const token = await getToken(messaging, {
           vapidKey: VAPID_PUBLIC_KEY,
@@ -921,7 +925,6 @@
     };
 
     document.addEventListener('deviceready', () => {
-      // Mengaktifkan Background Mode agar proses tidak mati saat di-minimize
       if (window.cordova && cordova.plugins && cordova.plugins.backgroundMode) {
         cordova.plugins.backgroundMode.enable();
         cordova.plugins.backgroundMode.setDefaults({
@@ -1010,8 +1013,6 @@
     function buildGrid() {
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
-      // Acak urutan kontak, lalu tempatkan foto teman dalam satu kelompok
-      // supaya segitiga foto profil berdekatan. Lokasi kelompok diacak tiap grid dibuat.
       const randomizedContacts = [...contacts];
       for (let i = randomizedContacts.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -1258,7 +1259,6 @@
         }
       });
 
-      // Keep-Alive Heartbeat setiap 15 detik
       setInterval(() => {
         if (currentUser) {
           set(ref(db, `status/${currentUser}/lastSeen`), Date.now());
