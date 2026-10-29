@@ -935,7 +935,6 @@
         });
       }
 
-      // Inisialisasi CallKeep untuk Panggilan Native Lock Screen
       if (window.CordovaCall) {
         window.CordovaCall.init({
           appName: "TriHive",
@@ -1039,18 +1038,34 @@
 
     function buildGrid() {
       const grid = document.getElementById('grid');
+      if (!grid) return;
       grid.innerHTML = '';
-      const randomizedContacts = [...contacts];
+
+      function pseudoRandom(seed) {
+        let hash = 0;
+        for (let i = 0; i < seed.length; i++) {
+          hash = seed.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        return function() {
+          const x = Math.sin(hash++) * 10000;
+          return x - Math.floor(x);
+        };
+      }
+
+      const rng = pseudoRandom(currentUser || 'trihive_default_seed');
+
+      const randomizedContacts = [...contacts].sort((a, b) => a.username.localeCompare(b.username));
       for (let i = randomizedContacts.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
+        const j = Math.floor(rng() * (i + 1));
         [randomizedContacts[i], randomizedContacts[j]] = [randomizedContacts[j], randomizedContacts[i]];
       }
 
       const contactAt = new Map();
       if (randomizedContacts.length > 0) {
-        const anchorR = 1 + Math.floor(Math.random() * 6);
-        const anchorC = 1 + Math.floor(Math.random() * 8);
+        const anchorR = 1 + Math.floor(rng() * 6);
+        const anchorC = 1 + Math.floor(rng() * 8);
         const availableSlots = [];
+
         for (let rr = 0; rr < 8; rr++) {
           for (let cc = 0; cc < 10; cc++) {
             if ((rr + cc) % 2 === 1) {
@@ -1062,9 +1077,13 @@
             }
           }
         }
+
         availableSlots.sort((a, b) => a.distance - b.distance);
+
         randomizedContacts.forEach((person, i) => {
-          if (availableSlots[i]) contactAt.set(`${availableSlots[i].r}-${availableSlots[i].c}`, person);
+          if (availableSlots[i]) {
+            contactAt.set(`${availableSlots[i].r}-${availableSlots[i].c}`, person);
+          }
         });
       }
 
@@ -1083,7 +1102,6 @@
 
           const person = contactAt.get(`${r}-${c}`);
           if (person && !isUpright) {
-            
             const photoWrapper = document.createElement('div');
             photoWrapper.className = 'tile-photo-wrapper';
 
@@ -1378,7 +1396,6 @@
           targetUser = callData.caller;
           playRingingSound();
 
-          // Memicu CallKeep UI Native (Full Screen / Lock Screen)
           if (window.CordovaCall) {
             window.CordovaCall.receiveCall(callData.callerName, callData.caller);
           }
