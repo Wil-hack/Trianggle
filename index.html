@@ -978,11 +978,11 @@
           localVid.srcObject = localStream;
           videoBox.style.display = 'block';
           btnFlip.style.display = 'flex';
-          callAvatar.style.display = 'none'; // Sembunyikan foto profil jika video aktif
+          callAvatar.style.display = 'none';
         } else {
           videoBox.style.display = 'none';
           btnFlip.style.display = 'none';
-          callAvatar.style.display = 'block'; // Tampilkan foto profil saat voice call
+          callAvatar.style.display = 'block';
         }
       } catch (err) { alert("Gagal akses kamera/mikrofon."); throw err; }
     }
@@ -1007,7 +1007,6 @@
         localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
       }
       
-      // Penanganan ontrack yang aman untuk WebView / APK Android (Mendukung Video & Audio Fullscreen)
       peerConnection.ontrack = (event) => {
         const remoteAudio = document.getElementById('remote-audio');
         const remoteVideo = document.getElementById('remote-video');
@@ -1034,6 +1033,12 @@
       if (!activeContact) return;
       isVideoCall = video;
       try { await initMediaStream(video); } catch (e) { return; }
+      
+      if (video) {
+        document.getElementById('video-box').style.display = 'block';
+        document.getElementById('btn-flip').style.display = 'flex';
+      }
+
       playRingingSound();
       remove(ref(db, `webrtc_signals/${activeContact.username}`));
       remove(ref(db, `webrtc_signals/${currentUser}`));
@@ -1055,6 +1060,12 @@
     window.acceptCall = async function() {
       stopRingingSound();
       document.getElementById('incoming-call-modal').classList.remove('active');
+      
+      if (isVideoCall) {
+        document.getElementById('video-box').style.display = 'block';
+        document.getElementById('btn-flip').style.display = 'flex';
+      }
+
       try { await initMediaStream(isVideoCall); } catch (e) { return; }
       createPeerConnection(targetUser);
 
