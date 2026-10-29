@@ -455,7 +455,7 @@
       touch-action: pan-y !important;
     }
 
-    /* GELEMBUNG PESAN METALLIC + GOLD TRIM */
+    /* GELEMBUNG PESAN & STATUS BACA WARNA (TANPA CENTANG) */
     .msg {
       max-width: 82%;
       padding: 12px 18px;
@@ -463,43 +463,82 @@
       line-height: 1.45;
       position: relative;
       word-break: break-word;
+      cursor: pointer;
     }
     
-    /* RECEIVER: METALLIC DARK GREY */
+    /* RECEIVER: DI KIRI */
     .msg-in {
       background: linear-gradient(145deg, #323846 0%, #202430 100%);
       color: #e2e8f0;
       align-self: flex-start;
       border-radius: 20px 20px 20px 6px;
-      border: 1.5px solid #dfb76c;
-      box-shadow: 
-        0 8px 20px rgba(0, 0, 0, 0.6),
-        inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      border: 1.5px solid #2d3342;
+      margin-right: 30px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     }
 
-    /* SENDER: METALLIC ROYAL BLUE */
-    .msg-out {
-      background: linear-gradient(145deg, #1e3a8a 0%, #1e293b 100%);
+    /* SENDER: DI KANAN */
+    /* 1. BELUM DIBACA: Border Emas Terang + Latar Menyala */
+    .msg-out.unread {
+      background: linear-gradient(145deg, #1d4ed8 0%, #1e293b 100%);
       color: #ffffff;
       align-self: flex-end;
       border-radius: 20px 20px 6px 20px;
-      padding-bottom: 22px;
-      padding-right: 38px;
-      border: 1.5px solid #dfb76c;
-      box-shadow: 
-        0 8px 20px rgba(0, 0, 0, 0.6),
-        inset 0 1px 1px rgba(255, 255, 255, 0.25),
-        0 0 12px rgba(30, 58, 138, 0.5);
+      border: 1.8px solid #dfb76c;
+      margin-left: 30px;
+      box-shadow: 0 6px 20px rgba(223, 183, 108, 0.25);
     }
-    
-    .msg-status {
-      position: absolute;
-      bottom: 4px;
-      right: 12px;
-      font-size: 0.72rem;
+
+    /* 2. SUDAH DIBACA: Border Redup + Latar Abu/Biru Tenang */
+    .msg-out.read {
+      background: linear-gradient(145deg, #151b2b 0%, #0f131c 100%);
+      color: #94a3b8;
+      align-self: flex-end;
+      border-radius: 20px 20px 6px 20px;
+      border: 1.5px solid #2d3342;
+      margin-left: 30px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    /* KUTIPAN / REPLY QUOTE DI DALAM PESAN */
+    .msg-quote {
+      background: rgba(0, 0, 0, 0.25);
+      border-left: 3px solid #dfb76c;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      margin-bottom: 6px;
+      color: #cbd5e1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* KOTAK PREVIEW REPLY DI BAWAH CHAT */
+    #reply-preview-container {
+      display: none;
+      background: #202430;
+      padding: 8px 14px;
+      border-top: 1px solid #2d3342;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.82rem;
+    }
+    #reply-preview-text {
       color: #dfb76c;
-      letter-spacing: -1.5px;
-      font-weight: 800;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+    }
+
+    /* GAMBAR DI DALAM CHAT */
+    .msg-img {
+      max-width: 100%;
+      border-radius: 12px;
+      margin-top: 4px;
+      display: block;
+      cursor: pointer;
     }
 
     /* TOMBOL PLAY EMAS 3D TIMBUL */
@@ -516,14 +555,10 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      box-shadow: 
-        0 4px 10px rgba(0, 0, 0, 0.5),
-        inset 0 1px 2px rgba(255, 255, 255, 0.8);
-      transition: transform 0.15s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     }
     .btn-play-voice:active {
       transform: scale(0.92);
-      box-shadow: inset 0 2px 5px rgba(0,0,0,0.6);
     }
 
     .voice-msg-container {
@@ -542,18 +577,22 @@
 
     /* INPUT CHAT FOOTER */
     .chat-footer-full {
-      padding: 14px 18px;
-      padding-bottom: max(16px, env(safe-area-inset-bottom));
       background: #191c24;
       border-top: 1px solid #2d3342;
       display: flex;
-      gap: 12px;
+      flex-direction: column;
+    }
+    .chat-input-row {
+      padding: 12px 16px;
+      padding-bottom: max(14px, env(safe-area-inset-bottom));
+      display: flex;
+      gap: 10px;
       align-items: center;
     }
     .chat-footer-full input {
       flex: 1;
       min-width: 0;
-      padding: 13px 20px;
+      padding: 12px 18px;
       background: #202430;
       border: 1px solid #2d3342;
       border-radius: 26px;
@@ -568,8 +607,8 @@
     .btn-chat-action {
       background: linear-gradient(135deg, #dfb76c 0%, #b48c40 100%);
       border: none;
-      width: 44px;
-      height: 44px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       color: #10141d;
       cursor: pointer;
@@ -581,7 +620,7 @@
     }
     .btn-chat-action:active { transform: scale(0.92); }
     
-    .btn-mic {
+    .btn-mic, .btn-gallery {
       background: #202430;
       border: 1px solid #2d3342;
       color: #dfb76c;
@@ -656,22 +695,18 @@
       <span class="brand-title">TriHive</span>
     </div>
     <div class="header-controls">
-      <!-- Tombol Tambah Kontak Ikon Ringkas -->
       <button class="btn-icon-header" onclick="openAddContactModal()" title="Tambah Kontak">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="12" y1="5" x2="12" y2="19"></line>
           <line x1="5" y1="12" x2="19" y2="12"></line>
         </svg>
       </button>
-
-      <!-- Tombol Notifikasi Ikon Lonceng -->
       <button class="btn-icon-header" id="enable-notifications-btn" onclick="enablePushNotifications()" title="Aktifkan Notifikasi">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
           <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
         </svg>
       </button>
-
       <div class="user-pill" id="user-pill" style="display: none;" onclick="openEditProfileModal()">
         <img id="current-user-avatar" src="" alt="Avatar">
         <span id="current-user-name">Pengguna</span>
@@ -808,23 +843,42 @@
           <button class="close-btn" style="position:static; font-size:1.4rem;" onclick="closeModals()">✕</button>
         </div>
       </div>
+      
       <div class="chat-body-full" id="chat-body"></div>
+
+      <!-- Footer Chat dengan Reply Preview & Tombol Gambar -->
       <div class="chat-footer-full">
-        <input type="text" id="chat-input" placeholder="Ketik pesan..." onkeypress="handleKey(event)">
-        <button class="btn-chat-action btn-mic" id="btn-mic" onclick="toggleVoiceRecord()" title="Kirim Pesan Suara">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-            <line x1="12" y1="19" x2="12" y2="23"/>
-            <line x1="8" y1="23" x2="16" y2="23"/>
-          </svg>
-        </button>
-        <button class="btn-chat-action" onclick="sendMsg()" title="Kirim">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10141d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="22" y1="2" x2="11" y2="13"/>
-            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-          </svg>
-        </button>
+        <div id="reply-preview-container">
+          <span id="reply-preview-text">Membalas pesan...</span>
+          <button onclick="cancelReply()" style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size:1rem;">✕</button>
+        </div>
+        <div class="chat-input-row">
+          <label for="chat-image-input" class="btn-chat-action btn-gallery" title="Kirim Gambar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+          </label>
+          <input type="file" id="chat-image-input" accept="image/*" style="display:none;" onchange="sendImageMessage(event)">
+          
+          <input type="text" id="chat-input" placeholder="Ketik pesan..." oninput="notifyTyping()" onkeypress="handleKey(event)">
+          
+          <button class="btn-chat-action btn-mic" id="btn-mic" onclick="toggleVoiceRecord()" title="Kirim Pesan Suara">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="23"/>
+              <line x1="8" y1="23" x2="16" y2="23"/>
+            </svg>
+          </button>
+          <button class="btn-chat-action" onclick="sendMsg()" title="Kirim">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10141d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"/>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -931,6 +985,8 @@
     let activeListeners = {};
     let activeStatusListener = null;
     let activeProfileStatusListener = null;
+    let typingTimeout = null;
+    let replyingTo = null; // Menyimpan data pesan yang sedang direply
 
     let peerConnection = null;
     let localStream = null;
@@ -976,29 +1032,18 @@
         });
 
         window.addEventListener('cordova-call:answer', function (data) {
-          console.log("Panggilan diterima via CallKeep:", data);
-          if (typeof window.acceptCall === 'function') {
-            window.acceptCall();
-          }
+          if (typeof window.acceptCall === 'function') window.acceptCall();
         });
 
         window.addEventListener('cordova-call:reject', function (data) {
-          console.log("Panggilan ditolak via CallKeep:", data);
-          if (typeof window.rejectCall === 'function') {
-            window.rejectCall();
-          }
+          if (typeof window.rejectCall === 'function') window.rejectCall();
         });
       }
 
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ audio: true })
-          .then((stream) => {
-            stream.getTracks().forEach(track => track.stop());
-            console.log("Izin Mikrofon Berhasil!");
-          })
-          .catch((err) => {
-            console.log("Izin Mikrofon Ditolak:", err);
-          });
+        navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+          stream.getTracks().forEach(track => track.stop());
+        }).catch((err) => {});
       }
     }, false);
 
@@ -1025,45 +1070,26 @@
     function unlockAudio() {
       const notifAudio = document.getElementById('notif-audio');
       const ringAudio = document.getElementById('ring-audio');
-      if (notifAudio) {
-        notifAudio.play().then(() => {
-          notifAudio.pause();
-          notifAudio.currentTime = 0;
-        }).catch(() => {});
-      }
-      if (ringAudio) {
-        ringAudio.play().then(() => {
-          ringAudio.pause();
-          ringAudio.currentTime = 0;
-        }).catch(() => {});
-      }
+      if (notifAudio) { notifAudio.play().then(() => { notifAudio.pause(); notifAudio.currentTime = 0; }).catch(() => {}); }
+      if (ringAudio) { ringAudio.play().then(() => { ringAudio.pause(); ringAudio.currentTime = 0; }).catch(() => {}); }
     }
 
     function playNotificationSound() {
       const audio = document.getElementById('notif-audio');
-      if (audio) {
-        audio.currentTime = 0;
-        audio.play().catch(e => console.log("Audio notify blocked:", e));
-      }
+      if (audio) { audio.currentTime = 0; audio.play().catch(e => {}); }
     }
 
     function playRingingSound() {
       const audio = document.getElementById('ring-audio');
-      if (audio) {
-        audio.currentTime = 0;
-        audio.play().catch(e => console.log("Ring audio blocked:", e));
-      }
+      if (audio) { audio.currentTime = 0; audio.play().catch(e => {}); }
     }
 
     function stopRingingSound() {
       const audio = document.getElementById('ring-audio');
-      if (audio) {
-        audio.pause();
-        audio.currentTime = 0;
-      }
+      if (audio) { audio.pause(); audio.currentTime = 0; }
     }
 
-    /* BUILD GRID: RATA KIRI DENGAN BACKGROUND SEGITIGA 12x12 */
+    /* BUILD GRID 12x12 RATA KIRI */
     function buildGrid() {
       const grid = document.getElementById('grid');
       if (!grid) return;
@@ -1074,30 +1100,17 @@
 
       if (sortedContacts.length > 0) {
         const availableSlots = [];
-
-        // Perluas area grid background menjadi 12x12 agar layar penuh dengan segitiga
         for (let rr = 0; rr < 12; rr++) {
           for (let cc = 0; cc < 12; cc++) {
-            if ((rr + cc) % 2 === 1) {
-              availableSlots.push({ r: rr, c: cc });
-            }
+            if ((rr + cc) % 2 === 1) availableSlots.push({ r: rr, c: cc });
           }
         }
-
-        // Urutkan slot dari kolom paling kiri ke kanan (rata kiri)
-        availableSlots.sort((a, b) => {
-          if (a.c !== b.c) return a.c - b.c;
-          return a.r - b.r;
-        });
-
+        availableSlots.sort((a, b) => (a.c !== b.c) ? a.c - b.c : a.r - b.r);
         sortedContacts.forEach((person, i) => {
-          if (availableSlots[i]) {
-            contactAt.set(`${availableSlots[i].r}-${availableSlots[i].c}`, person);
-          }
+          if (availableSlots[i]) contactAt.set(`${availableSlots[i].r}-${availableSlots[i].c}`, person);
         });
       }
 
-      // Render grid 12x12
       for (let r = 0; r < 12; r++) {
         const row = document.createElement('div');
         row.className = 'grid-row';
@@ -1130,17 +1143,13 @@
             const badge = document.createElement('div');
             badge.className = 'unread-badge';
             badge.id = `badge-${person.username}`;
-            
             const count = unreadCounts[person.username] || 0;
             if (count > 0) {
               badge.innerText = count;
               badge.style.display = 'block';
             }
             tile.appendChild(badge);
-
-            tile.onclick = () => {
-              openProfile(person);
-            };
+            tile.onclick = () => openProfile(person);
           } else {
             const bg = document.createElement('div');
             bg.className = 'tile-bg';
@@ -1158,39 +1167,25 @@
     const canvas = document.getElementById('canvas');
     let isPanning = false, startX = 0, startY = 0, panX = -100, panY = -100;
 
-    function updateTransform() {
-      canvas.style.transform = `translate3d(${panX}px, ${panY}px, 0)`;
-    }
+    function updateTransform() { canvas.style.transform = `translate3d(${panX}px, ${panY}px, 0)`; }
     updateTransform();
 
     function startPan(clientX, clientY, target) {
       if (target.closest('.modal-backdrop') || target.closest('header')) return;
-      isPanning = true;
-      startX = clientX - panX;
-      startY = clientY - panY;
+      isPanning = true; startX = clientX - panX; startY = clientY - panY;
     }
-
     function movePan(clientX, clientY) {
       if (!isPanning) return;
-      panX = clientX - startX;
-      panY = clientY - startY;
+      panX = clientX - startX; panY = clientY - startY;
       updateTransform();
     }
-
     function endPan() { isPanning = false; }
 
     viewport.addEventListener('mousedown', (e) => startPan(e.clientX, e.clientY, e.target));
     window.addEventListener('mousemove', (e) => movePan(e.clientX, e.clientY));
     window.addEventListener('mouseup', endPan);
-
-    viewport.addEventListener('touchstart', (e) => {
-      if (e.touches.length === 1) startPan(e.touches[0].clientX, e.touches[0].clientY, e.target);
-    }, { passive: true });
-
-    window.addEventListener('touchmove', (e) => {
-      if (isPanning && e.touches.length === 1) movePan(e.touches[0].clientX, e.touches[0].clientY);
-    }, { passive: true });
-
+    viewport.addEventListener('touchstart', (e) => { if (e.touches.length === 1) startPan(e.touches[0].clientX, e.touches[0].clientY, e.target); }, { passive: true });
+    window.addEventListener('touchmove', (e) => { if (isPanning && e.touches.length === 1) movePan(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
     window.addEventListener('touchend', endPan);
 
     window.handleFileUpload = function(e, previewId) {
@@ -1218,20 +1213,12 @@
       unlockAudio();
       const inputUsername = document.getElementById('login-username').value.trim().toLowerCase();
       const inputPassword = document.getElementById('login-password').value.trim();
-
-      if (!inputUsername || !inputPassword) {
-        alert("Username dan Password wajib diisi!");
-        return;
-      }
+      if (!inputUsername || !inputPassword) { alert("Username dan Password wajib diisi!"); return; }
 
       get(ref(db, `users/${inputUsername}`)).then((userSnapshot) => {
         if (userSnapshot.exists()) {
           const userData = userSnapshot.val();
-          if (userData.password !== inputPassword) {
-            alert("Password salah!");
-            return;
-          }
-
+          if (userData.password !== inputPassword) { alert("Password salah!"); return; }
           currentUser = inputUsername;
           currentDisplayName = userData.displayName || inputUsername;
           currentAvatarUrl = userData.avatar || currentAvatarUrl;
@@ -1243,11 +1230,7 @@
           setUserLoggedIn();
           loadUserContacts();
           listenIncomingCalls();
-        } else {
-          alert("Username tidak ditemukan! Silakan daftar akun baru.");
-        }
-      }).catch((err) => {
-        alert("Gagal terhubung ke database: " + err.message);
+        } else { alert("Username tidak ditemukan!"); }
       });
     }
 
@@ -1256,40 +1239,18 @@
       const regUsername = document.getElementById('reg-username').value.trim().toLowerCase();
       const regFullname = document.getElementById('reg-fullname').value.trim() || regUsername;
       const regPassword = document.getElementById('reg-password').value.trim();
-
-      if (!regUsername || !regPassword) {
-        alert("Username dan Password wajib diisi!");
-        return;
-      }
+      if (!regUsername || !regPassword) { alert("Username dan Password wajib diisi!"); return; }
 
       get(ref(db, `users/${regUsername}`)).then((userSnapshot) => {
-        if (userSnapshot.exists()) {
-          alert("Username ini sudah dipakai orang lain! Pilih username lain.");
-          return;
-        }
-
+        if (userSnapshot.exists()) { alert("Username sudah dipakai!"); return; }
         const avatar = tempUploadAvatar || currentAvatarUrl;
-
-        set(ref(db, `users/${regUsername}`), {
-          username: regUsername,
-          displayName: regFullname,
-          password: regPassword,
-          avatar: avatar
-        }).then(() => {
-          currentUser = regUsername;
-          currentDisplayName = regFullname;
-          currentAvatarUrl = avatar;
-
+        set(ref(db, `users/${regUsername}`), { username: regUsername, displayName: regFullname, password: regPassword, avatar: avatar }).then(() => {
+          currentUser = regUsername; currentDisplayName = regFullname; currentAvatarUrl = avatar;
           localStorage.setItem('trihive_user', currentUser);
           localStorage.setItem('trihive_name', currentDisplayName);
           localStorage.setItem('trihive_avatar', currentAvatarUrl);
-
-          setUserLoggedIn();
-          loadUserContacts();
-          listenIncomingCalls();
+          setUserLoggedIn(); loadUserContacts(); listenIncomingCalls();
         });
-      }).catch((err) => {
-        alert("Gagal mendaftarkan akun: " + err.message);
       });
     }
 
@@ -1301,37 +1262,13 @@
 
       const userStatusRef = ref(db, `status/${currentUser}`);
       const connectedRef = ref(db, '.info/connected');
-
       onValue(connectedRef, (snap) => {
         if (snap.val() === true) {
-          onDisconnect(userStatusRef).set({
-            isOnline: false,
-            lastSeen: Date.now()
-          });
-          set(userStatusRef, {
-            isOnline: true,
-            lastSeen: Date.now()
-          });
-        }
-      });
-
-      setInterval(() => {
-        if (currentUser) {
-          set(ref(db, `status/${currentUser}/lastSeen`), Date.now());
-        }
-      }, 15000);
-
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible' && currentUser) {
+          onDisconnect(userStatusRef).set({ isOnline: false, lastSeen: Date.now() });
           set(userStatusRef, { isOnline: true, lastSeen: Date.now() });
         }
       });
-
-      document.addEventListener('resume', () => {
-        if (currentUser) {
-          set(userStatusRef, { isOnline: true, lastSeen: Date.now() });
-        }
-      }, false);
+      setInterval(() => { if (currentUser) set(ref(db, `status/${currentUser}/lastSeen`), Date.now()); }, 15000);
     }
 
     function loadUserContacts() {
@@ -1342,11 +1279,7 @@
           if (cSnap.exists()) {
             const cData = cSnap.val();
             if (!contacts.find(c => c.username === contactUsername)) {
-              contacts.push({
-                username: cData.username,
-                name: cData.displayName || cData.username,
-                avatar: cData.avatar
-              });
+              contacts.push({ username: cData.username, name: cData.displayName || cData.username, avatar: cData.avatar });
               buildGrid();
               listenIncomingMessages(contactUsername);
             }
@@ -1361,25 +1294,18 @@
 
       const roomId = getRoomId(currentUser, contactUsername);
       const messagesRef = ref(db, `chats/${roomId}`);
-
       let isInitialLoad = true;
-      get(messagesRef).then(() => {
-        isInitialLoad = false;
-      });
+      get(messagesRef).then(() => { isInitialLoad = false; });
 
       onChildAdded(messagesRef, (snapshot) => {
         const data = snapshot.val();
-        
         if (data.sender === contactUsername) {
           const isChatOpen = activeContact && activeContact.username === contactUsername && document.getElementById('chat-modal').classList.contains('active');
-
           if (isChatOpen) {
             update(ref(db, `chats/${roomId}/${snapshot.key}`), { unread: false });
           } else {
             if (data.unread !== false) {
-              if (!isInitialLoad) {
-                playNotificationSound();
-              }
+              if (!isInitialLoad) playNotificationSound();
               unreadCounts[contactUsername] = (unreadCounts[contactUsername] || 0) + 1;
               buildGrid();
             }
@@ -1406,11 +1332,7 @@
         if (callData && callData.status === 'calling') {
           targetUser = callData.caller;
           playRingingSound();
-
-          if (window.CordovaCall) {
-            window.CordovaCall.receiveCall(callData.callerName, callData.caller);
-          }
-
+          if (window.CordovaCall) window.CordovaCall.receiveCall(callData.callerName, callData.caller);
           document.getElementById('incoming-name').innerText = callData.callerName;
           document.getElementById('incoming-avatar').src = callData.callerAvatar;
           document.getElementById('incoming-call-modal').classList.add('active');
@@ -1426,103 +1348,39 @@
           document.getElementById('call-modal').classList.remove('active');
         }
       });
-
-      const answerRef = ref(db, `webrtc_signals/${currentUser}/answer`);
-      onValue(answerRef, async (snapshot) => {
-        const answer = snapshot.val();
-        if (answer && peerConnection && peerConnection.signalingState === "have-local-offer") {
-          try {
-            await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-            document.getElementById('call-status-text').innerText = "Terhubung (Suara Live)";
-            stopRingingSound();
-            processPendingCandidates();
-          } catch (e) { console.log("Answer error:", e); }
-        }
-      });
-
-      const candRef = ref(db, `webrtc_signals/${currentUser}/candidates`);
-      onChildAdded(candRef, async (snapshot) => {
-        const candidate = snapshot.val();
-        if (candidate) {
-          if (peerConnection && peerConnection.remoteDescription) {
-            try { await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)); } catch(e){}
-          } else {
-            pendingCandidates.push(candidate);
-          }
-        }
-      });
-    }
-
-    async function processPendingCandidates() {
-      if (peerConnection && peerConnection.remoteDescription) {
-        while (pendingCandidates.length > 0) {
-          const cand = pendingCandidates.shift();
-          try { await peerConnection.addIceCandidate(new RTCIceCandidate(cand)); } catch(e){}
-        }
-      }
     }
 
     async function initLocalAudio() {
       try {
-        if (!localStream) {
-          localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-        }
-      } catch (err) {
-        alert("Mohon izinkan akses Mikrofon di browser HP Anda!");
-        throw err;
-      }
+        if (!localStream) localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      } catch (err) { alert("Izinkan akses Mikrofon!"); throw err; }
     }
 
     function createPeerConnection(remoteUsername) {
       if (peerConnection) return;
       targetUser = remoteUsername;
       peerConnection = new RTCPeerConnection(rtcConfig);
-
-      if (localStream) {
-        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-      }
-
+      if (localStream) localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
       peerConnection.ontrack = (event) => {
         const remoteAudio = document.getElementById('remote-audio');
-        if (remoteAudio && event.streams[0]) {
-          remoteAudio.srcObject = event.streams[0];
-          remoteAudio.play().catch(e => console.log("Auto-play remote audio failed:", e));
-        }
+        if (remoteAudio && event.streams[0]) { remoteAudio.srcObject = event.streams[0]; remoteAudio.play().catch(e => {}); }
       };
-
       peerConnection.onicecandidate = (event) => {
-        if (event.candidate && targetUser) {
-          push(ref(db, `webrtc_signals/${targetUser}/candidates`), event.candidate.toJSON());
-        }
+        if (event.candidate && targetUser) push(ref(db, `webrtc_signals/${targetUser}/candidates`), event.candidate.toJSON());
       };
     }
 
     window.startCall = async function() {
       if (!activeContact) return;
-      const remoteUsername = activeContact.username;
-
-      try {
-        await initLocalAudio();
-      } catch (e) { return; }
-
+      try { await initLocalAudio(); } catch (e) { return; }
       playRingingSound();
-      remove(ref(db, `webrtc_signals/${remoteUsername}`));
+      remove(ref(db, `webrtc_signals/${activeContact.username}`));
       remove(ref(db, `webrtc_signals/${currentUser}`));
-      
-      createPeerConnection(remoteUsername);
-
+      createPeerConnection(activeContact.username);
       const offer = await peerConnection.createOffer();
       await peerConnection.setLocalDescription(offer);
-
-      set(ref(db, `calls/${remoteUsername}`), {
-        caller: currentUser,
-        callerName: currentDisplayName,
-        callerAvatar: currentAvatarUrl,
-        status: 'calling'
-      });
-
-      set(ref(db, `webrtc_signals/${remoteUsername}/offer`), { type: offer.type, sdp: offer.sdp });
-
+      set(ref(db, `calls/${activeContact.username}`), { caller: currentUser, callerName: currentDisplayName, callerAvatar: currentAvatarUrl, status: 'calling' });
+      set(ref(db, `webrtc_signals/${activeContact.username}/offer`), { type: offer.type, sdp: offer.sdp });
       document.getElementById('call-name').innerText = activeContact.name;
       document.getElementById('call-avatar').src = activeContact.avatar;
       document.getElementById('call-status-text').innerText = "Memanggil...";
@@ -1532,29 +1390,17 @@
     window.acceptCall = async function() {
       stopRingingSound();
       document.getElementById('incoming-call-modal').classList.remove('active');
-
-      try {
-        await initLocalAudio();
-      } catch (e) { return; }
-
-      const callerUsername = targetUser;
-      createPeerConnection(callerUsername);
-
+      try { await initLocalAudio(); } catch (e) { return; }
+      createPeerConnection(targetUser);
       const offerSnap = await get(ref(db, `webrtc_signals/${currentUser}/offer`));
       if (offerSnap.exists()) {
-        const offerData = offerSnap.val();
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(offerData));
-
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(offerSnap.val()));
         const answer = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answer);
-
-        set(ref(db, `webrtc_signals/${callerUsername}/answer`), { type: answer.type, sdp: answer.sdp });
-        processPendingCandidates();
+        set(ref(db, `webrtc_signals/${targetUser}/answer`), { type: answer.type, sdp: answer.sdp });
       }
-
       await update(ref(db, `calls/${currentUser}`), { status: 'connected' });
-      await update(ref(db, `calls/${callerUsername}`), { status: 'connected' });
-
+      await update(ref(db, `calls/${targetUser}`), { status: 'connected' });
       document.getElementById('call-name').innerText = document.getElementById('incoming-name').innerText;
       document.getElementById('call-avatar').src = document.getElementById('incoming-avatar').src;
       document.getElementById('call-status-text').innerText = "Terhubung (Suara Live)";
@@ -1563,44 +1409,22 @@
 
     window.rejectCall = function() {
       stopRingingSound();
-      if (window.CordovaCall) window.CordovaCall.endCall();
-      if (targetUser) {
-        remove(ref(db, `calls/${targetUser}`));
-        remove(ref(db, `webrtc_signals/${targetUser}`));
-      }
-      remove(ref(db, `calls/${currentUser}`));
-      remove(ref(db, `webrtc_signals/${currentUser}`));
+      if (targetUser) { remove(ref(db, `calls/${targetUser}`)); remove(ref(db, `webrtc_signals/${targetUser}`)); }
+      remove(ref(db, `calls/${currentUser}`)); remove(ref(db, `webrtc_signals/${currentUser}`));
       document.getElementById('incoming-call-modal').classList.remove('active');
     }
 
     function cleanupWebRTC() {
-      if (peerConnection) {
-        peerConnection.close();
-        peerConnection = null;
-      }
-      if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
-        localStream = null;
-      }
-      const remoteAudio = document.getElementById('remote-audio');
-      if (remoteAudio) remoteAudio.srcObject = null;
+      if (peerConnection) { peerConnection.close(); peerConnection = null; }
+      if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
       targetUser = null;
-      pendingCandidates = [];
     }
 
     window.endCall = function() {
       stopRingingSound();
-      if (window.CordovaCall) window.CordovaCall.endCall();
-      if (targetUser) {
-        remove(ref(db, `calls/${targetUser}`));
-        remove(ref(db, `webrtc_signals/${targetUser}`));
-      }
-      if (activeContact) {
-        remove(ref(db, `calls/${activeContact.username}`));
-        remove(ref(db, `webrtc_signals/${activeContact.username}`));
-      }
-      remove(ref(db, `calls/${currentUser}`));
-      remove(ref(db, `webrtc_signals/${currentUser}`));
+      if (targetUser) { remove(ref(db, `calls/${targetUser}`)); remove(ref(db, `webrtc_signals/${targetUser}`)); }
+      if (activeContact) { remove(ref(db, `calls/${activeContact.username}`)); remove(ref(db, `webrtc_signals/${activeContact.username}`)); }
+      remove(ref(db, `calls/${currentUser}`)); remove(ref(db, `webrtc_signals/${currentUser}`));
       cleanupWebRTC();
       document.getElementById('call-modal').classList.remove('active');
     }
@@ -1612,53 +1436,46 @@
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
           mediaRecorder = new MediaRecorder(stream);
           audioChunks = [];
-
-          mediaRecorder.ondataavailable = event => {
-            if (event.data.size > 0) {
-              audioChunks.push(event.data);
-            }
-          };
-
+          mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
           mediaRecorder.onstop = () => {
             const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
             const reader = new FileReader();
             reader.readAsDataURL(audioBlob);
-            reader.onloadend = function() {
-              const base64Audio = reader.result;
-              sendVoiceMessage(base64Audio);
-            };
-            stream.getTracks().forEach(track => track.stop());
+            reader.onloadend = () => { sendVoiceMessage(reader.result); };
+            stream.getTracks().forEach(t => t.stop());
           };
-
-          mediaRecorder.start();
-          isRecording = true;
-          micBtn.classList.add('recording');
-          micBtn.title = "Ketuk untuk Berhenti & Kirim";
-        } catch (e) {
-          alert("Gagal mengakses mikrofon: " + e.message);
-        }
+          mediaRecorder.start(); isRecording = true; micBtn.classList.add('recording');
+        } catch (e) { alert("Gagal akses mikrofon"); }
       } else {
-        if (mediaRecorder && mediaRecorder.state !== "inactive") {
-          mediaRecorder.stop();
-        }
-        isRecording = false;
-        micBtn.classList.remove('recording');
-        micBtn.title = "Kirim Pesan Suara";
+        if (mediaRecorder && mediaRecorder.state !== "inactive") mediaRecorder.stop();
+        isRecording = false; micBtn.classList.remove('recording');
       }
     }
 
     function sendVoiceMessage(audioBase64) {
       if (!activeContact) return;
       const roomId = getRoomId(currentUser, activeContact.username);
-      const messagesRef = ref(db, `chats/${roomId}`);
-
-      push(messagesRef, {
-        sender: currentUser,
-        type: 'voice',
-        audio: audioBase64,
-        unread: true,
-        timestamp: Date.now()
+      push(ref(db, `chats/${roomId}`), {
+        sender: currentUser, type: 'voice', audio: audioBase64, unread: true, timestamp: Date.now(),
+        replyTo: replyingTo ? { text: replyingTo.text || 'Pesan Suara / Gambar', sender: replyingTo.sender } : null
       });
+      cancelReply();
+    }
+
+    window.sendImageMessage = function(e) {
+      const file = e.target.files[0];
+      if (!file || !activeContact) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const base64Img = evt.target.result;
+        const roomId = getRoomId(currentUser, activeContact.username);
+        push(ref(db, `chats/${roomId}`), {
+          sender: currentUser, type: 'image', image: base64Img, unread: true, timestamp: Date.now(),
+          replyTo: replyingTo ? { text: replyingTo.text || 'Gambar', sender: replyingTo.sender } : null
+        });
+        cancelReply();
+      };
+      reader.readAsDataURL(file);
     }
 
     window.openEditProfileModal = function() {
@@ -1672,82 +1489,39 @@
     window.saveProfileChanges = function() {
       const newName = document.getElementById('edit-fullname').value.trim();
       const newAvatar = tempUploadAvatar || currentAvatarUrl;
-
-      if (!newName) {
-        alert("Nama tidak boleh kosong!");
-        return;
-      }
-
-      update(ref(db, `users/${currentUser}`), {
-        displayName: newName,
-        avatar: newAvatar
-      }).then(() => {
-        currentDisplayName = newName;
-        currentAvatarUrl = newAvatar;
-
+      if (!newName) { alert("Nama kosong!"); return; }
+      update(ref(db, `users/${currentUser}`), { displayName: newName, avatar: newAvatar }).then(() => {
+        currentDisplayName = newName; currentAvatarUrl = newAvatar;
         localStorage.setItem('trihive_name', currentDisplayName);
         localStorage.setItem('trihive_avatar', currentAvatarUrl);
-
         document.getElementById('current-user-name').innerText = currentDisplayName;
         document.getElementById('current-user-avatar').src = currentAvatarUrl;
-        tempUploadAvatar = "";
-
-        alert("Profil berhasil diperbarui!");
-        closeModals();
+        tempUploadAvatar = ""; alert("Profil diperbarui!"); closeModals();
       });
     }
 
     window.openAddContactModal = function() {
-      if (!currentUser) {
-        alert("Silakan login terlebih dahulu!");
-        return;
-      }
+      if (!currentUser) { alert("Login dulu!"); return; }
       document.getElementById('add-contact-modal').classList.add('active');
     }
 
     window.submitAddContact = function() {
       const contactUsername = document.getElementById('add-contact-username').value.trim().toLowerCase();
-      if (!contactUsername) {
-        alert("Masukkan username teman!");
-        return;
-      }
-
-      if (contactUsername === currentUser) {
-        alert("Anda tidak bisa menambahkan username sendiri!");
-        return;
-      }
-
+      if (!contactUsername || contactUsername === currentUser) { alert("Username tidak valid!"); return; }
       get(ref(db, `users/${contactUsername}`)).then((targetSnap) => {
-        if (!targetSnap.exists()) {
-          alert("Username tidak ditemukan di server!");
-          return;
-        }
-
+        if (!targetSnap.exists()) { alert("Username tidak ditemukan!"); return; }
         set(ref(db, `user_contacts/${currentUser}/${contactUsername}`), true);
         set(ref(db, `user_contacts/${contactUsername}/${currentUser}`), true);
-
         document.getElementById('add-contact-username').value = '';
-        alert("Kontak berhasil ditambahkan!");
-        closeModals();
+        alert("Kontak ditambahkan!"); closeModals();
       });
     }
 
     window.logout = function() {
-      if (currentUser) {
-        set(ref(db, `status/${currentUser}`), { isOnline: false, lastSeen: Date.now() });
-      }
-      localStorage.removeItem('trihive_user');
-      localStorage.removeItem('trihive_name');
-      localStorage.removeItem('trihive_avatar');
-
-      currentUser = null;
-      contacts = [];
-      unreadCounts = {};
-      activeListeners = {};
-      buildGrid();
-      document.getElementById('user-pill').style.display = 'none';
-      closeModals();
-      document.getElementById('login-modal').classList.add('active');
+      if (currentUser) set(ref(db, `status/${currentUser}`), { isOnline: false, lastSeen: Date.now() });
+      localStorage.clear(); currentUser = null; contacts = []; unreadCounts = {}; activeListeners = {};
+      buildGrid(); document.getElementById('user-pill').style.display = 'none';
+      closeModals(); document.getElementById('login-modal').classList.add('active');
     }
 
     window.openProfile = function(person) {
@@ -1755,23 +1529,13 @@
       document.getElementById('preview-name').innerText = person.name;
       document.getElementById('preview-username-id').innerText = `@${person.username}`;
       document.getElementById('preview-avatar').src = person.avatar;
-
       const statusElem = document.getElementById('preview-status');
-      
       if (activeProfileStatusListener) activeProfileStatusListener();
-
-      const contactStatusRef = ref(db, `status/${person.username}`);
-      activeProfileStatusListener = onValue(contactStatusRef, (snapshot) => {
+      activeProfileStatusListener = onValue(ref(db, `status/${person.username}`), (snapshot) => {
         const data = snapshot.val();
-        if (data && data.isOnline) {
-          statusElem.innerText = "● Online";
-          statusElem.style.color = "#10b981";
-        } else {
-          statusElem.innerText = "● Offline";
-          statusElem.style.color = "#94a3b8";
-        }
+        statusElem.innerText = (data && data.isOnline) ? "● Online" : "● Offline";
+        statusElem.style.color = (data && data.isOnline) ? "#10b981" : "#94a3b8";
       });
-
       document.getElementById('profile-modal').classList.add('active');
     }
 
@@ -1780,18 +1544,19 @@
       document.getElementById('chat-name').innerText = activeContact.name;
       document.getElementById('chat-avatar').src = activeContact.avatar;
       document.getElementById('chat-modal').classList.add('active');
-      
       unreadCounts[activeContact.username] = 0;
       buildGrid();
 
       const statusElem = document.getElementById('chat-status');
-      const contactStatusRef = ref(db, `status/${activeContact.username}`);
-
       if (activeStatusListener) activeStatusListener();
-
-      activeStatusListener = onValue(contactStatusRef, (snapshot) => {
+      
+      // Listener Status & Sedang Mengetik
+      activeStatusListener = onValue(ref(db, `status/${activeContact.username}`), (snapshot) => {
         const data = snapshot.val();
-        if (data && data.isOnline) {
+        if (data && data.isTyping) {
+          statusElem.innerText = "Sedang mengetik...";
+          statusElem.style.color = "#dfb76c";
+        } else if (data && data.isOnline) {
           statusElem.innerText = "Online";
           statusElem.style.color = "#10b981";
         } else {
@@ -1803,22 +1568,31 @@
       loadMessages();
     }
 
-    function getRoomId(userA, userB) {
-      return [userA, userB].sort().join('_');
-    }
+    function getRoomId(userA, userB) { return [userA, userB].sort().join('_'); }
+
+    // FITUR TYPING INDICATOR PENGIRIM
+    window.notifyTyping = function() {
+      if (!currentUser || !activeContact) return;
+      const statusRef = ref(db, `status/${currentUser}`);
+      update(statusRef, { isOnline: true, isTyping: true });
+      if (typingTimeout) clearTimeout(typingTimeout);
+      typingTimeout = setTimeout(() => {
+        update(statusRef, { isTyping: false });
+      }, 2000);
+    };
 
     function loadMessages() {
       const chatBody = document.getElementById('chat-body');
       chatBody.innerHTML = '';
-
       const roomId = getRoomId(currentUser, activeContact.username);
       const messagesRef = ref(db, `chats/${roomId}`);
 
       onChildAdded(messagesRef, (snapshot) => {
         const data = snapshot.val();
         const msgKey = snapshot.key;
-        const isMe = data.sender === currentUser;
+        if (!data || (data.type === 'text' && (!data.text || data.text === 'undefined'))) return;
 
+        const isMe = data.sender === currentUser;
         if (!isMe && data.unread !== false) {
           update(ref(db, `chats/${roomId}/${msgKey}`), { unread: false });
         }
@@ -1830,36 +1604,39 @@
           chatBody.appendChild(msgDiv);
         }
 
-        msgDiv.className = `msg ${isMe ? 'msg-out' : 'msg-in'}`;
-
-        let statusTicks = '';
+        // Terapkan warna status baca (unread / read) tanpa centang dua
+        let readClass = '';
         if (isMe) {
-          if (data.unread === false) {
-            statusTicks = '<span class="msg-status read">✓✓</span>';
-          } else {
-            statusTicks = '<span class="msg-status">✓✓</span>';
-          }
+          readClass = (data.unread === false) ? 'read' : 'unread';
+        }
+        msgDiv.className = `msg ${isMe ? 'msg-out ' + readClass : 'msg-in'}`;
+
+        // Render Kutipan Balasan (jika ada)
+        let replyHtml = '';
+        if (data.replyTo) {
+          replyHtml = `<div class="msg-quote"><strong>${data.replyTo.sender === currentUser ? 'Anda' : activeContact.name}</strong>: ${data.replyTo.text}</div>`;
         }
 
+        // Konten Pesan (Teks, Suara, atau Gambar)
+        let contentHtml = '';
         if (data.type === 'voice') {
-          msgDiv.innerHTML = `
+          contentHtml = `
             <div class="voice-msg-container">
               <button class="btn-play-voice" onclick="playVoice(this, '${data.audio}')">▶</button>
-              <span class="voice-tag">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dfb76c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                  <line x1="12" y1="19" x2="12" y2="23"/>
-                  <line x1="8" y1="23" x2="16" y2="23"/>
-                </svg>
-                Pesan Suara
-              </span>
-            </div>
-            ${statusTicks}
-          `;
+              <span class="voice-tag">Pesan Suara</span>
+            </div>`;
+        } else if (data.type === 'image') {
+          contentHtml = `<img src="${data.image}" class="msg-img" alt="Gambar">`;
         } else {
-          msgDiv.innerHTML = `${data.text} ${statusTicks}`;
+          contentHtml = `<span>${data.text}</span>`;
         }
+
+        msgDiv.innerHTML = replyHtml + contentHtml;
+
+        // Klik gelembung untuk membalas pesan (Reply)
+        msgDiv.onclick = () => {
+          setReply(data.text || (data.type === 'voice' ? 'Pesan Suara' : 'Gambar'), data.sender);
+        };
 
         chatBody.scrollTop = chatBody.scrollHeight;
       });
@@ -1867,25 +1644,33 @@
       onChildChanged(messagesRef, (snapshot) => {
         const data = snapshot.val();
         const msgKey = snapshot.key;
-        const isMe = data.sender === currentUser;
-
         const msgDiv = document.getElementById(`msg-${msgKey}`);
-        if (msgDiv && isMe) {
-          const statusElem = msgDiv.querySelector('.msg-status');
-          if (statusElem && data.unread === false) {
-            statusElem.classList.add('read');
+        if (msgDiv && data.sender === currentUser) {
+          if (data.unread === false) {
+            msgDiv.classList.remove('unread');
+            msgDiv.classList.add('read');
           }
         }
       });
+    }
+
+    window.setReply = function(text, sender) {
+      replyingTo = { text, sender };
+      document.getElementById('reply-preview-container').style.display = 'flex';
+      document.getElementById('reply-preview-text').innerText = `Membalas ${sender === currentUser ? 'Anda' : activeContact.name}: "${text}"`;
+      document.getElementById('chat-input').focus();
+    }
+
+    window.cancelReply = function() {
+      replyingTo = null;
+      document.getElementById('reply-preview-container').style.display = 'none';
     }
 
     window.playVoice = function(btn, base64Audio) {
       const audio = new Audio(base64Audio);
       btn.innerText = "⏸";
       audio.play();
-      audio.onended = () => {
-        btn.innerText = "▶";
-      };
+      audio.onended = () => { btn.innerText = "▶"; };
     }
 
     window.sendMsg = function() {
@@ -1894,22 +1679,26 @@
       if (!text || !activeContact) return;
 
       const roomId = getRoomId(currentUser, activeContact.username);
-      const messagesRef = ref(db, `chats/${roomId}`);
-
-      push(messagesRef, {
+      push(ref(db, `chats/${roomId}`), {
         sender: currentUser,
         type: 'text',
         text: text,
         unread: true,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        replyTo: replyingTo ? { text: replyingTo.text, sender: replyingTo.sender } : null
       });
 
       input.value = '';
+      cancelProfileOrTyping();
+      cancelReply();
     }
 
-    window.handleKey = function(e) {
-      if (e.key === 'Enter') window.sendMsg();
+    function cancelProfileOrTyping() {
+      if (typingTimeout) clearTimeout(typingTimeout);
+      if (currentUser) update(ref(db, `status/${currentUser}`), { isTyping: false });
     }
+
+    window.handleKey = function(e) { if (e.key === 'Enter') window.sendMsg(); }
 
     window.closeModals = function() {
       document.querySelectorAll('.modal-backdrop').forEach(m => {
