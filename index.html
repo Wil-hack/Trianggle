@@ -130,7 +130,7 @@
       font-weight: 500;
     }
 
-    /* VIEWPORT CANVAS GRID */
+    /* VIEWPORT KANVAS */
     #viewport {
       width: 100vw;
       height: 100vh;
@@ -138,7 +138,7 @@
       position: relative;
       cursor: grab;
       perspective: 900px;
-      touch-action: none;
+      touch-action: none !important;
     }
 
     #viewport:active {
@@ -151,11 +151,13 @@
       left: 0;
       transform-origin: 0 0;
       will-change: transform;
+      touch-action: none !important;
     }
 
     .honeycomb-grid {
       position: relative;
       padding: 150px;
+      touch-action: none !important;
     }
 
     .grid-row {
@@ -163,6 +165,7 @@
       align-items: flex-start;
       margin-top: -57px;
       width: max-content;
+      touch-action: none !important;
     }
 
     .grid-row:first-child {
@@ -190,6 +193,7 @@
       animation: oceanWave 6s ease-in-out infinite alternate;
       animation-delay: calc(var(--col-index, 0) * 0.15s);
       transition: filter 0.2s, transform 0.2s;
+      touch-action: none !important;
     }
 
     @keyframes oceanWave {
@@ -202,6 +206,7 @@
       width: 100%;
       height: 100%;
       position: relative;
+      touch-action: none !important;
     }
 
     .tile-upright .tile-inner {
@@ -218,13 +223,19 @@
       width: 100%;
       height: 100%;
       background: linear-gradient(145deg, #161b26 0%, #0d0f17 50%, #1e2433 100%);
-      border: 0.5px solid rgba(255, 255, 255, 0.03);
+      border: 0.5px solid rgba(255, 255, 255, 0.04);
+      transition: border-color 0.2s;
+    }
+
+    .tile:hover .tile-bg {
+      border-color: rgba(59, 130, 246, 0.4);
     }
 
     .tile-photo-wrapper {
       position: relative;
       width: 100%;
       height: 100%;
+      touch-action: none !important;
     }
 
     .tile-photo {
@@ -232,6 +243,7 @@
       height: 100%;
       object-fit: cover;
       display: block;
+      pointer-events: none;
     }
 
     .tile-photo-overlay {
@@ -424,7 +436,7 @@
       color: white;
     }
 
-    /* CHAT MODAL */
+    /* CHAT */
     .chat-backdrop {
       align-items: center;
       padding: 10px;
@@ -498,7 +510,6 @@
       background: #14161d;
     }
 
-    /* PESAN */
     .msg {
       max-width: 82%;
       min-width: 78px;
@@ -650,7 +661,7 @@
       color: #dfb76c;
     }
 
-    /* PANGGILAN LAYAR PENUH */
+    /* PANGGILAN */
     #call-modal.modal-backdrop { background: rgba(0, 0, 0, 0.95); }
 
     .call-card {
@@ -770,7 +781,6 @@
       display: none;
     }
 
-    /* IN-APP TOAST */
     #app-toast {
       position: fixed;
       top: 20px;
@@ -804,7 +814,7 @@
       background: #3b82f6;
     }
 
-    /* OPTIMISASI PERFORMA HP & CHAT CEPAT */
+    /* OPTIMISASI PERFORMA MOBILE */
     body.modal-open .tile {
       animation-play-state: paused !important;
     }
@@ -1022,7 +1032,7 @@
 
   <div id="app-toast"></div>
 
-  <!-- STANDALONE SCRIPT UTAMA MENGGUNAKAN CDN FIREBASE RESMI (COMPATIBLE CORDOVA) -->
+  <!-- SCRIPT UTAMA FIREBASE CDN -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import {
@@ -1042,7 +1052,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Toast
     function showToast(message, duration = 3000) {
       let toast = document.getElementById('app-toast');
       if (!toast) return;
@@ -1055,7 +1064,6 @@
     }
     window.alert = function(msg) { showToast(String(msg)); };
 
-    // Notifikasi sistem
     function showSystemNotification(title, options = {}) {
       if (!('Notification' in window) || Notification.permission !== 'granted') return;
       try {
@@ -1083,7 +1091,6 @@
       } catch (e) {}
     };
 
-    // Audio Autoplay Unlock
     let isAudioUnlocked = false;
     function unlockAudio() {
       if (isAudioUnlocked) return;
@@ -1112,7 +1119,14 @@
       if (a) { a.pause(); a.currentTime = 0; }
     }
 
-    // STATE
+    // HELPER STATUS ONLINE (Grace Period 10 Menit agar tetap online saat di-minimize)
+    function isUserOnline(d) {
+      if (!d) return false;
+      if (d.isOnline === true) return true;
+      if (d.lastSeen && (Date.now() - Number(d.lastSeen) < 600000)) return true;
+      return false;
+    }
+
     let currentUser = localStorage.getItem('trihive_user') || null;
     let currentDisplayName = localStorage.getItem('trihive_name') || 'Pengguna';
     let currentAvatarUrl = localStorage.getItem('trihive_avatar') || 'logo.png';
@@ -1128,7 +1142,6 @@
     let activeProfileStatusListener = null;
     let activeListeners = {};
 
-    // WEBRTC STATE (MULTI-STUN & QUEUED CANDIDATES)
     let peerConnection = null;
     let localStream = null;
     let isVideoCall = false;
@@ -1147,24 +1160,50 @@
       ]
     };
 
-    // GRID
-    const ROWS = 12;
-    const COLS = 12;
-    let scale = 1;
-    let pointX = (window.innerWidth - 1200) / 2;
-    let pointY = (window.innerHeight - 800) / 2;
+    // KOORDINAT CLUSTER ORGANIK DI TENGAH (Saling berdampingan & menempel)
+    const ORGANIC_CLUSTER_SLOTS = [
+      { r: 5, c: 5 }, { r: 5, c: 6 }, { r: 6, c: 5 }, { r: 4, c: 6 },
+      { r: 6, c: 6 }, { r: 5, c: 4 }, { r: 4, c: 5 }, { r: 6, c: 4 },
+      { r: 5, c: 7 }, { r: 7, c: 5 }, { r: 4, c: 7 }, { r: 7, c: 6 },
+      { r: 3, c: 6 }, { r: 6, c: 7 }, { r: 7, c: 4 }, { r: 4, c: 4 },
+      { r: 5, c: 3 }, { r: 6, c: 3 }, { r: 3, c: 5 }, { r: 8, c: 5 },
+      { r: 8, c: 6 }, { r: 3, c: 7 }, { r: 7, c: 7 }, { r: 5, c: 8 }
+    ];
+
+    let hasDragged = false;
+    let panX = 0;
+    let panY = 0;
+
+    function centerGridOnCluster() {
+      const canvas = document.getElementById('canvas');
+      if (!canvas) return;
+      const clusterCenterX = 150 + (5.5 * 50) + 50;
+      const clusterCenterY = 150 + (5.5 * 58) + 50;
+      panX = Math.round((window.innerWidth / 2) - clusterCenterX);
+      panY = Math.round((window.innerHeight / 2) - clusterCenterY);
+      canvas.style.transform = `translate3d(${panX}px, ${panY}px, 0)`;
+    }
 
     function buildGrid() {
       const grid = document.getElementById('grid');
       if (!grid) return;
       grid.innerHTML = '';
-      let contactIdx = 0;
 
-      for (let r = 0; r < ROWS; r++) {
+      const contactAt = new Map();
+      if (contacts.length > 0) {
+        contacts.forEach((person, idx) => {
+          const slot = ORGANIC_CLUSTER_SLOTS[idx % ORGANIC_CLUSTER_SLOTS.length];
+          if (slot) {
+            contactAt.set(`${slot.r}-${slot.c}`, person);
+          }
+        });
+      }
+
+      for (let r = 0; r < 12; r++) {
         const rowEl = document.createElement('div');
         rowEl.className = 'grid-row';
 
-        for (let c = 0; c < COLS; c++) {
+        for (let c = 0; c < 12; c++) {
           const tile = document.createElement('div');
           const isUpright = (r + c) % 2 === 0;
           tile.className = `tile ${isUpright ? 'tile-upright' : 'tile-inverted'}`;
@@ -1173,16 +1212,14 @@
           const inner = document.createElement('div');
           inner.className = 'tile-inner';
 
-          if (contactIdx < contacts.length) {
-            const contact = contacts[contactIdx];
-            const unread = unreadCounts[contact.username] || 0;
-
+          const person = contactAt.get(`${r}-${c}`);
+          if (person) {
             const photoWrapper = document.createElement('div');
             photoWrapper.className = 'tile-photo-wrapper';
 
             const img = document.createElement('img');
             img.className = 'tile-photo';
-            img.src = contact.avatar || currentAvatarUrl;
+            img.src = person.avatar || currentAvatarUrl;
             img.onerror = () => { img.src = 'logo.png'; };
 
             const overlay = document.createElement('div');
@@ -1190,22 +1227,26 @@
 
             const badge = document.createElement('div');
             badge.className = 'unread-badge';
-            badge.innerText = unread > 99 ? '99+' : unread;
-            if (unread > 0) badge.style.display = 'block';
+            const count = unreadCounts[person.username] || 0;
+            badge.innerText = count > 99 ? '99+' : count;
+            if (count > 0) badge.style.display = 'block';
 
             photoWrapper.appendChild(img);
             photoWrapper.appendChild(overlay);
             photoWrapper.appendChild(badge);
             inner.appendChild(photoWrapper);
 
-            tile.onclick = () => { window.openProfile(contact); };
-            contactIdx++;
+            tile.onclick = () => {
+              if (hasDragged) return;
+              window.openProfile(person);
+            };
           } else {
             const bg = document.createElement('div');
             bg.className = 'tile-bg';
             inner.appendChild(bg);
 
             tile.onclick = () => {
+              if (hasDragged) return;
               if (currentUser) window.openAddContactModal();
               else showToast("Silakan login dulu.");
             };
@@ -1218,7 +1259,54 @@
       }
     }
 
-    // LOGIN & REGISTER
+    // DRAGGING POINTER
+    function initCanvasPanning() {
+      const viewport = document.getElementById('viewport');
+      const canvas = document.getElementById('canvas');
+      if (!viewport || !canvas) return;
+
+      centerGridOnCluster();
+      window.addEventListener('resize', centerGridOnCluster);
+
+      let isPointerDown = false;
+      let startPointerX = 0;
+      let startPointerY = 0;
+      let initialPanX = 0;
+      let initialPanY = 0;
+
+      viewport.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('.modal-backdrop') || e.target.closest('header')) return;
+        isPointerDown = true;
+        hasDragged = false;
+        startPointerX = e.clientX;
+        startPointerY = e.clientY;
+        initialPanX = panX;
+        initialPanY = panY;
+        try { viewport.setPointerCapture(e.pointerId); } catch (_) {}
+      });
+
+      viewport.addEventListener('pointermove', (e) => {
+        if (!isPointerDown) return;
+        const dx = e.clientX - startPointerX;
+        const dy = e.clientY - startPointerY;
+        if (Math.abs(dx) > 6 || Math.abs(dy) > 6) {
+          hasDragged = true;
+        }
+        panX = initialPanX + dx;
+        panY = initialPanY + dy;
+        canvas.style.transform = `translate3d(${panX}px, ${panY}px, 0)`;
+      });
+
+      const onPointerUp = (e) => {
+        if (!isPointerDown) return;
+        isPointerDown = false;
+        try { viewport.releasePointerCapture(e.pointerId); } catch (_) {}
+      };
+
+      viewport.addEventListener('pointerup', onPointerUp);
+      viewport.addEventListener('pointercancel', onPointerUp);
+    }
+
     window.switchTab = function(tab) {
       document.getElementById('tab-login')?.classList.toggle('active', tab === 'login');
       document.getElementById('tab-register')?.classList.toggle('active', tab === 'register');
@@ -1282,10 +1370,39 @@
 
       if (!currentUser) return;
       const statusRef = ref(db, `status/${currentUser}`);
+
+      // Heartbeat berkala agar status selalu Online
+      const sendHeartbeat = () => {
+        if (currentUser) {
+          set(statusRef, { isOnline: true, lastSeen: Date.now() });
+        }
+      };
+
+      sendHeartbeat();
+      setInterval(sendHeartbeat, 15000);
+
+      document.addEventListener('visibilitychange', sendHeartbeat);
+      window.addEventListener('focus', sendHeartbeat);
+
+      // Support plugin background mode Cordova
+      document.addEventListener('deviceready', () => {
+        const cdv = window.cordova;
+        if (cdv && cdv.plugins && cdv.plugins.backgroundMode) {
+          cdv.plugins.backgroundMode.enable();
+          cdv.plugins.backgroundMode.overrideBackButton();
+          cdv.plugins.backgroundMode.setDefaults({
+            title: 'TriHive',
+            text: 'Tetap online untuk chat & panggilan',
+            icon: 'icon',
+            color: '10b981',
+            silent: true
+          });
+        }
+      }, false);
+
       onValue(ref(db, '.info/connected'), (snap) => {
         if (snap.val() === true) {
-          onDisconnect(statusRef).set({ isOnline: false, lastSeen: Date.now() });
-          set(statusRef, { isOnline: true, lastSeen: Date.now() });
+          sendHeartbeat();
         }
       });
     }
@@ -1301,6 +1418,7 @@
             if (!contacts.find(c => c.username === cUser)) {
               contacts.push({ username: data.username, name: data.displayName || data.username, avatar: data.avatar });
               buildGrid();
+              centerGridOnCluster();
               listenIncomingMessages(cUser);
             }
           }
@@ -1333,7 +1451,6 @@
       });
     }
 
-    // WEBRTC CALLING DENGAN CANDIDATE QUEUEING
     async function handleIncomingIceCandidate(cand) {
       if (!cand || !cand.candidate) return;
       if (peerConnection && peerConnection.remoteDescription && peerConnection.remoteDescription.type) {
@@ -1549,7 +1666,7 @@
       targetUser = null;
     }
 
-    // CHAT (DILIMIT 50 TERAKHIR & PAUSE ANIMASI LATAR)
+    // CHAT
     let activeChatAdded = null;
     let currentChatRoom = null;
 
@@ -1565,6 +1682,25 @@
       document.getElementById('chat-avatar').src = activeContact.avatar || 'logo.png';
       unreadCounts[activeContact.username] = 0;
       buildGrid();
+
+      const statusElem = document.getElementById('chat-status');
+      if (activeStatusListener) activeStatusListener();
+      activeStatusListener = onValue(ref(db, `status/${activeContact.username}`), (snap) => {
+        const d = snap.val();
+        if (statusElem) {
+          if (d && d.isTyping) {
+            statusElem.innerText = "Sedang mengetik...";
+            statusElem.style.color = "#dfb76c";
+          } else if (isUserOnline(d)) {
+            statusElem.innerText = "Online";
+            statusElem.style.color = "#10b981";
+          } else {
+            statusElem.innerText = "Offline";
+            statusElem.style.color = "#94a3b8";
+          }
+        }
+      });
+
       loadMessages();
     };
 
@@ -1583,7 +1719,6 @@
         currentChatRoom = roomId;
       }
 
-      // KUNCI PERBAIKAN: limitToLast(50) membuat obrolan terbuka instan di HP
       const chatQuery = query(ref(db, `chats/${roomId}`), limitToLast(50));
 
       activeChatAdded = onChildAdded(chatQuery, (snap) => {
@@ -1645,6 +1780,18 @@
       document.getElementById('preview-name').innerText = person.name;
       document.getElementById('preview-username-id').innerText = `@${person.username}`;
       document.getElementById('preview-avatar').src = person.avatar || 'logo.png';
+
+      const statusElem = document.getElementById('preview-status');
+      if (activeProfileStatusListener) activeProfileStatusListener();
+      activeProfileStatusListener = onValue(ref(db, `status/${person.username}`), (snap) => {
+        const d = snap.val();
+        if (statusElem) {
+          const online = isUserOnline(d);
+          statusElem.innerText = online ? "● Online" : "● Offline";
+          statusElem.style.color = online ? "#10b981" : "#94a3b8";
+        }
+      });
+
       document.body.classList.add('modal-open');
       document.getElementById('profile-modal')?.classList.add('active');
     };
@@ -1666,10 +1813,29 @@
       });
     };
 
+    window.logout = function() {
+      if (currentUser) {
+        set(ref(db, `status/${currentUser}`), { isOnline: false, lastSeen: Date.now() });
+      }
+      localStorage.clear();
+      currentUser = null;
+      contacts = [];
+      unreadCounts = {};
+      activeListeners = {};
+      isIncomingListening = false;
+      buildGrid();
+      document.getElementById('user-pill').style.display = 'none';
+      window.closeModals();
+      document.getElementById('login-modal')?.classList.add('active');
+      showToast("Anda telah keluar akun.");
+    };
+
     window.handleKey = function(e) { if (e.key === 'Enter') window.sendMsg(); };
 
     // Inisialisasi awal
     buildGrid();
+    initCanvasPanning();
+
     if (currentUser) {
       setUserLoggedIn();
       loadUserContacts();
