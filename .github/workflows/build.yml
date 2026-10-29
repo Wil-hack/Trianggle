@@ -63,7 +63,8 @@ jobs:
           cordova platform add android
 
           cordova plugin add cordova-plugin-background-mode || true
-          cordova plugin add cordova-plugin-firebasex
+          cordova plugin add cordova-plugin-firebasex-core@1.0.3
+          cordova plugin add cordova-plugin-firebasex-messaging@1.0.3
 
           MANIFEST=platforms/android/app/src/main/AndroidManifest.xml
           for P in CAMERA RECORD_AUDIO MODIFY_AUDIO_SETTINGS INTERNET WAKE_LOCK VIBRATE RECEIVE_BOOT_COMPLETED FOREGROUND_SERVICE FOREGROUND_SERVICE_DATA_SYNC POST_NOTIFICATIONS SYSTEM_ALERT_WINDOW USE_FULL_SCREEN_INTENT REQUEST_IGNORE_BATTERY_OPTIMIZATIONS; do
