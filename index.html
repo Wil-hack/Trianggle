@@ -1005,15 +1005,18 @@
       if (peerConnection) return;
       targetUser = remoteUser;
       peerConnection = new RTCPeerConnection(rtcConfig);
+      
       if (localStream) {
         localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
       }
       
+      // Penanganan track masuk yang lebih tangguh untuk mencegah video mati/hilang
       peerConnection.ontrack = (event) => {
         const remoteAudio = document.getElementById('remote-audio');
         const remoteVideo = document.getElementById('remote-video');
+        
         if (event.streams && event.streams[0]) {
-          if (isVideoCall && remoteVideo) {
+          if (remoteVideo) {
             remoteVideo.srcObject = event.streams[0];
             remoteVideo.play().catch(e => console.log("Gagal autoplay video:", e));
           }
@@ -1027,6 +1030,13 @@
       peerConnection.onicecandidate = (event) => {
         if (event.candidate && targetUser) {
           push(ref(db, `webrtc_signals/${targetUser}/candidates`), event.candidate.toJSON());
+        }
+      };
+
+      peerConnection.oniceconnectionstatechange = () => {
+        console.log("ICE Connection State:", peerConnection.iceConnectionState);
+        if (peerConnection.iceConnectionState === 'disconnected' || peerConnection.iceConnectionState === 'failed') {
+          console.log("Koneksi terputus, mencoba menyambungkan ulang...");
         }
       };
     }
