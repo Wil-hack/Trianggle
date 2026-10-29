@@ -153,7 +153,6 @@
       position: relative;
       filter: brightness(0.96);
     }
-    /* Gunakan polygon langsung agar bentuk tile konsisten di browser Android/WebView */
     .tile-upright .tile-inner {
       clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
       -webkit-clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
@@ -868,7 +867,6 @@
           return;
         }
 
-        // Jalur Service Worker dinamis mendeteksi repository GitHub Pages (/Trianggle/)
         const basePath = window.location.hostname.includes('github.io') ? '/' + window.location.pathname.split('/')[1] + '/' : '/';
         const registration = await navigator.serviceWorker.register(basePath + 'firebase-messaging-sw.js');
 
@@ -930,10 +928,39 @@
         cordova.plugins.backgroundMode.setDefaults({
           title: "TriHive Aktif",
           text: "Aplikasi berjalan di latar belakang",
-          ticker: "TriHive siap menerima pesan",
+          ticker: "TriHive siap menerima panggilan",
           hidden: false,
           resume: true,
           silent: false
+        });
+      }
+
+      // Inisialisasi CallKeep untuk Panggilan Native Lock Screen
+      if (window.CordovaCall) {
+        window.CordovaCall.init({
+          appName: "TriHive",
+          android: {
+            ringtone: "_default",
+            vibrate: true,
+            incomingCallText: "Panggilan Suara TriHive...",
+            answerButtonText: "Terima",
+            declineButtonText: "Tolak",
+            missedCallNotification: true
+          }
+        });
+
+        window.addEventListener('cordova-call:answer', function (data) {
+          console.log("Panggilan diterima via CallKeep:", data);
+          if (typeof window.acceptCall === 'function') {
+            window.acceptCall();
+          }
+        });
+
+        window.addEventListener('cordova-call:reject', function (data) {
+          console.log("Panggilan ditolak via CallKeep:", data);
+          if (typeof window.rejectCall === 'function') {
+            window.rejectCall();
+          }
         });
       }
 
@@ -1350,14 +1377,22 @@
         if (callData && callData.status === 'calling') {
           targetUser = callData.caller;
           playRingingSound();
+
+          // Memicu CallKeep UI Native (Full Screen / Lock Screen)
+          if (window.CordovaCall) {
+            window.CordovaCall.receiveCall(callData.callerName, callData.caller);
+          }
+
           document.getElementById('incoming-name').innerText = callData.callerName;
           document.getElementById('incoming-avatar').src = callData.callerAvatar;
           document.getElementById('incoming-call-modal').classList.add('active');
         } else if (callData && callData.status === 'connected') {
           stopRingingSound();
+          if (window.CordovaCall) window.CordovaCall.connectCall();
           document.getElementById('call-status-text').innerText = "Terhubung (Suara Live)";
         } else if (!callData) {
           stopRingingSound();
+          if (window.CordovaCall) window.CordovaCall.endCall();
           cleanupWebRTC();
           document.getElementById('incoming-call-modal').classList.remove('active');
           document.getElementById('call-modal').classList.remove('active');
@@ -1500,6 +1535,7 @@
 
     window.rejectCall = function() {
       stopRingingSound();
+      if (window.CordovaCall) window.CordovaCall.endCall();
       if (targetUser) {
         remove(ref(db, `calls/${targetUser}`));
         remove(ref(db, `webrtc_signals/${targetUser}`));
@@ -1526,6 +1562,7 @@
 
     window.endCall = function() {
       stopRingingSound();
+      if (window.CordovaCall) window.CordovaCall.endCall();
       if (targetUser) {
         remove(ref(db, `calls/${targetUser}`));
         remove(ref(db, `webrtc_signals/${targetUser}`));
