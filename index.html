@@ -756,7 +756,6 @@
       if (a) { a.pause(); a.currentTime = 0; }
     }
 
-    // Fungsi untuk memaksa pemutaran audio/video dari remote stream
     window.forcePlayAudio = function() {
       const remoteAudio = document.getElementById('remote-audio');
       const remoteVideo = document.getElementById('remote-video');
@@ -1000,9 +999,14 @@
         if (localStream) {
           localStream.getTracks().forEach(t => t.stop());
         }
+        // Resolusi diatur ideal 640x480 agar ringan dan tidak lemot di perangkat seluler
         const constraints = {
           audio: true,
-          video: video ? { facingMode: useFrontCamera ? 'user' : 'environment' } : false
+          video: video ? { 
+            width: { ideal: 640 }, 
+            height: { ideal: 480 }, 
+            facingMode: useFrontCamera ? 'user' : 'environment' 
+          } : false
         };
         localStream = await navigator.mediaDevices.getUserMedia(constraints);
         const localVid = document.getElementById('local-video');
@@ -1020,7 +1024,10 @@
           btnFlip.style.display = 'none';
           callAvatar.style.display = 'block';
         }
-      } catch (err) { alert("Gagal akses kamera/mikrofon."); throw err; }
+      } catch (err) { 
+        alert("Gagal akses kamera/mikrofon. Pastikan izin kamera diaktifkan di browser."); 
+        throw err; 
+      }
     }
 
     window.switchCamera = async function() {
@@ -1044,7 +1051,6 @@
         localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
       }
       
-      // Mengaitkan event ontrack ke elemen audio dan video dengan pemutaran paksa otomatis
       peerConnection.ontrack = (event) => {
         const remoteAudio = document.getElementById('remote-audio');
         const remoteVideo = document.getElementById('remote-video');
@@ -1060,7 +1066,6 @@
             remoteAudio.play().catch(e => console.log("Gagal autoplay audio:", e));
           }
         } else {
-          // Fallback jika stream tidak langsung terikat
           let inboundStream = new MediaStream();
           inboundStream.addTrack(event.track);
           if (event.track.kind === 'video' && remoteVideo) {
