@@ -1,8 +1,8 @@
-// Import Firebase scripts untuk Service Worker
+// Impor script Firebase SDK versi modular untuk Service Worker
 importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js');
 
-// Inisialisasi Firebase di Service Worker menggunakan konfigurasi project Anda
+// Inisialisasi Firebase di dalam Service Worker menggunakan konfigurasi project Anda
 firebase.initializeApp({
   apiKey: "AIzaSyBfAvdE0PZMvytkSaofbFAgk0749E-b_pI",
   authDomain: "trihive-857cd.firebaseapp.com",
@@ -15,14 +15,14 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// Menangani background notification saat aplikasi ditutup atau di latar belakang
+// Menangani pesan latar belakang (saat aplikasi ditutup/di latar belakang)
 messaging.onBackgroundMessage((payload) => {
-  console.log('[firebase-messaging-sw.js] Pesan background diterima: ', payload);
-  
-  const notificationTitle = payload.notification ? payload.notification.title : 'TriHive';
+  console.log('[firebase-messaging-sw.js] Received background message ', payload);
+
+  const notificationTitle = payload.notification ? payload.notification.title : "Pesan Baru TriHive";
   const notificationOptions = {
-    body: payload.notification ? payload.notification.body : 'Anda memiliki pesan baru.',
-    icon: '/favicon.ico' // Sesuaikan ikon jika ada
+    body: payload.notification ? payload.notification.body : "Anda menerima pesan baru.",
+    icon: '/favicon.ico'
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
