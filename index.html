@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>TriHive - Chat & Call</title>
+  <title>TriHive - Premium Chat & Call</title>
   <meta name="theme-color" content="#0B0F19">
   <link rel="icon" href="logo.png">
   <link rel="manifest" href="manifest.json">
@@ -27,6 +27,7 @@
       
       --success: #10B981;
       --danger: #F43F5E;
+      --warning: #F59E0B;
       
       --border-light: rgba(255, 255, 255, 0.08);
       --border-strong: rgba(255, 255, 255, 0.15);
@@ -226,6 +227,16 @@
     .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; color: var(--text-muted); font-weight: 600; border-radius: 8px; cursor: pointer; }
     .tab-btn.active { background: var(--accent-gradient); color: white; }
 
+    /* PROFILE CARD */
+    .profile-card {
+      background: var(--bg-surface); border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg); width: 85%; max-width: 320px; padding: 28px 24px;
+      text-align: center; position: relative; box-shadow: var(--shadow-lg);
+      transform: translateY(20px) scale(0.95); transition: transform 0.3s var(--ease);
+    }
+    .modal-backdrop.active .profile-card { transform: translateY(0) scale(1); }
+    .profile-card img { width: 88px; height: 88px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-primary); margin-bottom: 12px; }
+
     /* CHAT UI PREMIUM */
     .chat-card-full {
       width: 100vw; height: 100vh; height: 100dvh; background: var(--bg-app);
@@ -371,6 +382,17 @@
     .toggle.active { background: var(--accent-primary); }
     .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: 0.2s; }
     .toggle.active::after { left: 22px; }
+
+    /* CALL HISTORY */
+    .history-item { display: flex; align-items: center; gap: 12px; padding: 12px 4px; border-bottom: 1px solid var(--border-light); text-align: left; }
+    .history-item:last-child { border-bottom: none; }
+    .history-item img { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--bg-surface-hover); }
+    .history-item .info { flex: 1; min-width: 0; }
+    .history-item h5 { font-size: 0.88rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .history-item p { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+    .history-item .missed { color: var(--danger); }
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 0.9rem; }
+    .empty-state .icon { width: 56px; height: 56px; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--bg-surface-hover); color: var(--text-muted); }
   </style>
 </head>
 <body>
@@ -396,6 +418,7 @@
     <symbol id="i-mic-off" viewBox="0 0 24 24"><path d="M9 9v3a3 3 0 0 0 5.1 2.1M15 9.3V5a3 3 0 0 0-5.9-.7"/><path d="M19 10v1a7 7 0 0 1-.6 2.8M5 10v1a7 7 0 0 0 10.5 6.1M12 18v4M8 22h8"/><path d="m2 2 20 20"/></symbol>
     <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor" stroke="none"/></symbol>
     <symbol id="i-switch-cam" viewBox="0 0 24 24"><path d="M20 5H9l-3 3-3-3M4 5v6a8 8 0 0 0 8 8h4M12 19h3l3 3 3-3M20 19v-6"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
   </defs>
 </svg>
 
@@ -487,8 +510,21 @@
   <div class="card-modal">
     <button class="close-btn" onclick="closeModals()"><svg class="ico sm"><use href="#i-x"/></svg></button>
     <h2>Cari Kontak</h2>
-    <input type="text" class="search-box" id="search-input" placeholder="Ketik nama..." oninput="doSearch()" style="margin-top:14px; width:100%; padding:12px; border-radius:12px; background:var(--bg-app); border:1px solid var(--border-light); color:var(--text-main);">
+    <input type="text" id="search-input" placeholder="Ketik nama..." oninput="doSearch()" style="margin-top:14px; width:100%; padding:12px; border-radius:12px; background:var(--bg-app); border:1px solid var(--border-light); color:var(--text-main);">
     <div id="search-results" style="margin-top:14px; max-height:300px; overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- PROFILE PREVIEW -->
+<div class="modal-backdrop" id="profile-modal">
+  <div class="profile-card">
+    <button class="close-btn" onclick="closeModals()"><svg class="ico sm"><use href="#i-x"/></svg></button>
+    <img id="preview-avatar" src="" alt="Avatar">
+    <h3 id="preview-name" style="margin-bottom: 2px;">Nama</h3>
+    <p id="preview-username-id" style="color: var(--text-muted); font-size: 0.75rem; margin-bottom: 6px;">@user</p>
+    <p id="preview-status" style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">● Offline</p>
+    <button class="btn-submit" onclick="openChat()">Mulai Ngobrol</button>
+    <button class="btn-submit btn-danger" style="margin-top:10px;" onclick="removeContact()">Hapus Kontak</button>
   </div>
 </div>
 
@@ -509,6 +545,18 @@
       <div><label>Izin Notifikasi</label></div>
       <button class="btn-submit" style="width:auto; padding:6px 12px; font-size:0.8rem; margin:0;" onclick="enablePushNotifications()">Aktifkan</button>
     </div>
+    <button class="btn-submit btn-ghost" style="margin-top:16px;" onclick="openCallHistory()">
+      <svg class="ico sm" style="margin-right:8px;vertical-align:-3px;"><use href="#i-clock"/></svg> Riwayat Panggilan
+    </button>
+  </div>
+</div>
+
+<!-- CALL HISTORY -->
+<div class="modal-backdrop" id="call-history-modal">
+  <div class="card-modal">
+    <button class="close-btn" onclick="closeModals()"><svg class="ico sm"><use href="#i-x"/></svg></button>
+    <h2>Riwayat Panggilan</h2>
+    <div id="call-history-list" style="margin-top:14px;"></div>
   </div>
 </div>
 
@@ -619,6 +667,8 @@ const settings = {
   theme: localStorage.getItem('trihive_theme') || 'dark',
   sound: localStorage.getItem('trihive_sound') !== 'false'
 };
+const callHistory = JSON.parse(localStorage.getItem('trihive_call_history') || '[]');
+
 const rtcConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] };
 
 const $ = id => document.getElementById(id);
@@ -894,6 +944,14 @@ window.submitAddContact = () => {
     closeModals(); showToast("Kontak ditambahkan");
   });
 };
+window.removeContact = () => {
+  if (!activeContact || !currentUser) return;
+  if (!confirm(`Hapus ${activeContact.name}?`)) return;
+  remove(ref(db, `user_contacts/${currentUser}/${activeContact.username}`));
+  remove(ref(db, `user_contacts/${activeContact.username}/${currentUser}`));
+  contacts = contacts.filter(c => c.username !== activeContact.username);
+  buildGrid(); closeModals(); showToast("Kontak dihapus");
+};
 
 window.openSearch = () => {
   if (!currentUser) return showToast("Login dulu");
@@ -914,7 +972,9 @@ window.doSearch = () => {
 
 window.openProfile = person => {
   activeContact = person;
-  $('preview-name').textContent = person.name; $('preview-username-id').textContent = '@' + person.username; $('preview-avatar').src = person.avatar;
+  $('preview-name').textContent = person.name;
+  $('preview-username-id').textContent = '@' + person.username;
+  $('preview-avatar').src = person.avatar;
   $('profile-modal').classList.add('active');
 };
 window.showContactProfile = () => { if (activeContact) window.openProfile(activeContact); };
@@ -927,6 +987,33 @@ window.openEditProfileModal = () => {
 };
 window.openSettings = () => { $('settings-modal').classList.add('active'); };
 window.closeModals = () => { document.querySelectorAll('.modal-backdrop').forEach(m => { if (m.id !== 'login-modal') m.classList.remove('active'); }); };
+
+// CALL HISTORY
+window.openCallHistory = () => {
+  window.closeModals();
+  const list = $('call-history-list'); list.innerHTML = '';
+  if (callHistory.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="icon"><svg class="ico lg"><use href="#i-phone"/></svg></div>Belum ada riwayat</div>';
+  } else {
+    [...callHistory].reverse().forEach(h => {
+      const el = document.createElement('div'); el.className = 'history-item';
+      el.innerHTML = `<img src="${h.avatar || 'logo.png'}"><div class="info"><h5></h5><p></p></div><span style="font-size:0.72rem;color:var(--text-muted);white-space:nowrap;">${new Date(h.time).toLocaleString('id',{hour:'2-digit',minute:'2-digit',day:'numeric',month:'short'})}</span>`;
+      el.querySelector('h5').textContent = h.name;
+      const p = el.querySelector('p');
+      p.textContent = (h.type === 'video' ? '📹 Video' : '📞 Suara') + ' • ' + h.status;
+      if (h.status === 'missed' || h.status === 'rejected') p.classList.add('missed');
+      el.onclick = () => { const c = contacts.find(x => x.username === h.username); if (c) { activeContact = c; window.closeModals(); setTimeout(() => window.openChat(), 150); } };
+      list.appendChild(el);
+    });
+  }
+  setTimeout(() => { $('call-history-modal').classList.add('active'); }, 150);
+};
+
+function saveCallHistory(entry) {
+  callHistory.push({ ...entry, time: Date.now() });
+  if (callHistory.length > 50) callHistory.shift();
+  localStorage.setItem('trihive_call_history', JSON.stringify(callHistory));
+}
 
 // CHAT
 let chatAddedUnsub = null, chatChangedUnsub = null, activeChatRoom = null;
@@ -1179,12 +1266,27 @@ window.acceptCall = async () => {
   }
   update(ref(db, `calls/${currentUser}`), { status: 'connected' }); update(ref(db, `calls/${targetUser}`), { status: 'connected' });
   $('call-status-text').textContent = "Terhubung"; $('call-modal').classList.add('active');
+  const c = contacts.find(x => x.username === targetUser);
+  saveCallHistory({ username: targetUser, name: c?.name || targetUser, avatar: c?.avatar, type: isVideoCall ? 'video' : 'audio', status: 'accepted' });
 };
 
-window.rejectCall = () => { stopRing(); if(targetUser) update(ref(db, `calls/${targetUser}`), { status: 'rejected' }); remove(ref(db, `calls/${currentUser}`)); $('incoming-call-modal').classList.remove('active'); };
+window.rejectCall = () => { 
+  stopRing(); 
+  if(targetUser) {
+    update(ref(db, `calls/${targetUser}`), { status: 'rejected' }); 
+    const c = contacts.find(x => x.username === targetUser);
+    saveCallHistory({ username: targetUser, name: c?.name || targetUser, avatar: c?.avatar, type: isVideoCall ? 'video' : 'audio', status: 'rejected' });
+  }
+  remove(ref(db, `calls/${currentUser}`)); 
+  $('incoming-call-modal').classList.remove('active'); 
+};
+
 window.endCall = () => { 
-  stopRing(); if (targetUser) remove(ref(db, `calls/${targetUser}`)); remove(ref(db, `calls/${currentUser}`)); 
-  if (peerConnection) peerConnection.close(); if (localStream) localStream.getTracks().forEach(t => t.stop());
+  stopRing(); 
+  if (targetUser) remove(ref(db, `calls/${targetUser}`)); 
+  remove(ref(db, `calls/${currentUser}`)); 
+  if (peerConnection) peerConnection.close(); 
+  if (localStream) localStream.getTracks().forEach(t => t.stop());
   $('call-modal').classList.remove('active'); 
 };
 
